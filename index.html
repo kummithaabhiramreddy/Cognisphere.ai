@@ -2512,6 +2512,208 @@ FORMATTING RULES:
 <style>
   #webSearchOverlay { display: none !important; }
 </style>
+
+<!-- ============================================================
+     MOBILE FIT & FIX — full-viewport responsive hardening
+     ============================================================ -->
+<style>
+  /* Never let any element push the page wider than the viewport */
+  html, body{ max-width:100vw; overflow-x:hidden; }
+  *{ -webkit-tap-highlight-color: transparent; }
+  img, video, svg{ max-width:100%; height:auto; }
+
+  @media (max-width: 900px){
+    .header-mode-pill{ display:flex; }
+  }
+
+  @media (max-width: 720px){
+    /* ---------- Header ---------- */
+    header{
+      padding:12px 14px;
+      gap:8px;
+      flex-wrap:nowrap;
+    }
+    header .brand{ gap:8px; min-width:0; flex-shrink:1; }
+    header .brand > div{ min-width:0; }
+    header .brand > div > div:first-child{
+      font-size:0.82rem;
+      white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+    }
+    header .brand > div > div:last-child{ font-size:0.4rem; letter-spacing:0.08em; }
+    .mark{ width:20px; height:20px; }
+
+    .header-right{ gap:6px; flex-shrink:0; }
+
+    /* Icon-only mode pill — text labels hidden, just the emoji symbol shows */
+    .header-mode-pill{ padding:2px; gap:1px; }
+    .header-mode-pill-btn{
+      padding:7px; min-width:32px; height:32px;
+      display:flex; align-items:center; justify-content:center;
+      font-size:0.95rem;
+    }
+    .header-mode-pill-btn .pill-label{ display:none; }
+    .header-mode-pill-btn .pill-icon{ line-height:1; }
+
+    /* Icon-only share button — text hidden, just the icon shows */
+    .share-btn{
+      padding:0; width:34px; height:34px;
+      display:flex; align-items:center; justify-content:center;
+      border-radius:50%; gap:0;
+    }
+    .share-btn svg{ width:16px; height:16px; }
+    .share-btn .share-label{ display:none; }
+
+    .share-popup{
+      position:fixed;
+      top:60px; right:8px; left:8px;
+      width:auto; max-width:none;
+    }
+
+    /* ---------- Sidebar ---------- */
+    .sidebar{ width:86vw; max-width:320px; padding:16px 12px 0; }
+    .account-menu{ left:6px; right:6px; }
+
+    /* ---------- Main / hero ---------- */
+    main{ padding:16px 14px; }
+    h1{ font-size:1.4rem; max-width:22ch; margin-bottom:26px; }
+    .eyebrow{ font-size:0.64rem; margin-bottom:12px; }
+    .hint{ font-size:0.66rem; line-height:1.8; }
+
+    /* ---------- Search / composer ---------- */
+    .search-shell{ width:100%; max-width:100%; }
+    body.docked .search-shell,
+    body.chat-active .search-shell{
+      left:50%;
+      bottom:10px;
+      width:calc(100vw - 20px);
+      max-width:calc(100vw - 20px);
+    }
+    body.chat-active main, body.docked main{ padding-bottom:118px; }
+
+    form{
+      padding:10px 8px;
+      border-radius:16px;
+      gap:2px;
+    }
+    form textarea{
+      font-size:16px;      /* prevents iOS Safari auto-zoom on focus */
+      padding:10px 6px;
+      min-height:34px;
+    }
+    .icon-btn{ width:32px; height:32px; }
+    .icon-btn svg{ width:16px; height:16px; }
+    form button.send{ width:38px; height:38px; }
+    form button.send svg{ width:15px; height:15px; }
+    .active-tool-pill{ font-size:0.6rem; padding:4px 8px 4px 6px; }
+
+    /* ---------- Tools popover ---------- */
+    .tools-row{ width:min(220px, 78vw); left:4px; }
+
+    /* ---------- Chat thread ---------- */
+    .chat-thread{ max-width:100%; gap:12px; }
+    .msg-row{ max-width:94%; }
+    .msg{ font-size:0.88rem; padding:10px 13px; line-height:1.5; }
+    .msg-actions{ font-size:0.68rem; gap:6px; }
+    .msg-tool-status{ font-size:0.66rem; }
+
+    /* ---------- Attachments ---------- */
+    .attach-card{ width:140px; padding:10px; }
+    .attach-card-preview{ height:80px; }
+    .attach-card-code{ font-size:0.6rem; }
+    .msg-small-card{ max-width:200px; padding:5px 9px; }
+
+    /* ---------- Tables ---------- */
+    .msg-text table, table.premium-table{ font-size:0.76rem; }
+    .msg-text table th, .msg-text table td,
+    table.premium-table th, table.premium-table td{
+      padding:8px 10px; white-space:normal;
+    }
+
+    /* ---------- Code / diagram / output cards ---------- */
+    .code-block-header, .diagram-card-header, .code-output-label{ font-size:0.68rem; }
+    .code-block-body, .code-output-body{ font-size:0.74rem; padding:14px 12px; }
+    .diagram-card-body{ padding:14px 8px; min-height:90px; }
+    .code-output-inner{ padding:12px 14px; padding-right:46px; }
+
+    /* ---------- Video / image results ---------- */
+    .web-result-videos{ gap:8px; }
+    .video-card{ width:130px; }
+    .video-card-thumb{ height:74px; }
+    .video-card-title{ font-size:0.68rem; }
+    .web-result-images img{ width:96px; height:64px; }
+    .videos-section-title{ font-size:0.74rem; }
+    .lang-select{ font-size:0.68rem; padding:4px 8px; }
+
+    /* ---------- Modals (settings / download / plan / language / help / history / paste) ---------- */
+    .modal-overlay{ padding:10px; align-items:flex-end; }
+    .download-card, .paste-card{
+      max-width:100%; width:100%;
+      max-height:88vh;
+      padding:16px;
+      border-radius:16px 16px 0 0;
+    }
+    .paste-card-head, .download-card-head{ flex-wrap:wrap; gap:8px; }
+    .paste-lines, .paste-edit-area{ font-size:0.72rem; }
+
+    /* Settings / Plan pricing grid stacks on mobile */
+    #planModal [style*="grid-template-columns:repeat(auto-fit"]{
+      grid-template-columns:1fr !important;
+    }
+    #downloadModal [style*="grid-template-columns:repeat(auto-fit"]{
+      grid-template-columns:1fr !important;
+    }
+
+    /* ---------- Web dev / app builder file cards ---------- */
+    .web-dev-file-card{
+      flex-direction:column; align-items:flex-start; gap:12px;
+      padding:14px;
+    }
+    .web-dev-file-card > div:last-child{ width:100%; }
+    .web-dev-download-btn{ width:100%; }
+    .web-project-header{ flex-direction:column; align-items:flex-start; }
+    .web-project-actions{ width:100%; }
+    .web-project-zip-btn, .web-project-preview-btn{ flex:1; justify-content:center; }
+
+    /* ---------- Cloud live preview modal ---------- */
+    .cloud-preview-header{ padding:0 10px; flex-wrap:wrap; height:auto; min-height:48px; }
+    .cloud-preview-file-title{
+      max-width:38vw; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+      font-size:0.76rem;
+    }
+    .cloud-copy-btn{ font-size:0.7rem; padding:5px 9px; }
+
+    /* ---------- Education panel ---------- */
+    .edu-panel{ width:100vw; }
+    #eduToggleBtn{ bottom:92px; right:10px; width:42px; height:42px; }
+    .apm-card{ width:96vw; }
+    .apm-field-row{ flex-direction:column; gap:12px; }
+
+    /* ---------- Footer ---------- */
+    footer{ padding:12px 16px; font-size:0.62rem; }
+
+    /* ---------- Videos full page ---------- */
+    #videosPageView{ padding:14px; }
+    #featuredVideoTitle{ font-size:0.8rem; }
+  }
+
+  @media (max-width: 400px){
+    header .brand > div > div:first-child{ font-size:0.72rem; }
+    .header-mode-pill{ max-width:38vw; }
+    .header-mode-pill-btn{ padding:4px 6px; font-size:0.6rem; }
+    .share-btn span, .share-btn{ font-size:0; padding:8px; }
+    .share-btn svg{ width:15px; height:15px; margin:0; }
+    h1{ font-size:1.18rem; }
+    .attach-card{ width:120px; }
+    .msg{ font-size:0.85rem; }
+    .video-card{ width:112px; }
+  }
+
+  /* Landscape phones: keep composer from eating the whole screen */
+  @media (max-height: 420px) and (orientation: landscape){
+    body.chat-active main, body.docked main{ padding-bottom:96px; }
+    form{ padding:8px 8px; }
+  }
+</style>
 </head>
 <body>
 
@@ -3432,19 +3634,19 @@ FORMATTING RULES:
   <div class="header-right">
     <div class="header-mode-pill" id="headerModePill">
       <button type="button" class="header-mode-pill-btn active-search" id="pillBtnSearch" onclick="setAppMode('standard')" title="Global AI Search Mode">
-        ⚡ Search
+        <span class="pill-icon">⚡</span><span class="pill-label"> Search</span>
       </button>
       <button type="button" class="header-mode-pill-btn" id="pillBtnWebDev" onclick="setAppMode('webdev')" title="Web Dev Studio Mode">
-        🌐 Web Dev
+        <span class="pill-icon">🌐</span><span class="pill-label"> Web Dev</span>
       </button>
       <button type="button" class="header-mode-pill-btn" id="pillBtnApp" onclick="setAppMode('appbuilder')" title="App Builder Studio">
-        📱 App Builder
+        <span class="pill-icon">📱</span><span class="pill-label"> App Builder</span>
       </button>
     </div>
 
-    <button class="share-btn" id="shareBtn">
+    <button class="share-btn" id="shareBtn" title="Share">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.6" y1="10.6" x2="15.4" y2="6.4"></line><line x1="8.6" y1="13.4" x2="15.4" y2="17.6"></line></svg>
-      Share
+      <span class="share-label">Share</span>
     </button>
 
     <div class="share-popup" id="sharePopup">
