@@ -1350,9 +1350,11 @@ CORE RESPONSE STANDARDS:
    - If user asks for a FLOWCHART / DIAGRAM -> Provide ONLY the Mermaid flowchart diagram.
    - DO NOT dump unrequested extra sections, past chat filler text, or extra unasked items. Output ONLY the exact data/code requested for the current question!
 
-2. CONDITIONAL IMAGES RULE:
-   - Include images ONLY IF the user explicitly asks for images in their prompt (e.g., "show images", "picture of", "photo of").
-   - If the user did NOT explicitly request images, DO NOT include any images.
+2. CONDITIONAL IMAGES, URLS, AND VIDEOS DIRECTIVES:
+   - IMAGE-ONLY DIRECTIVE: Include images ONLY IF the user explicitly asks for images in their prompt (e.g., "show images", "picture of", "photo of", "image of").
+     * CRITICAL: If the user asks ONLY for images (without asking for text or explanation), output ONLY the 3 to 5 markdown images `![Description](https://images.unsplash.com/...)` side-by-side. Do NOT write any extra introductory text, paragraphs, or raw URLs.
+   - VIDEOS DIRECTIVE: Never include video embeds, video links, or video cards UNLESS the user explicitly asks for "video", "watch video", or "video clip".
+   - URL & LINK DIRECTIVE: If the user asks for links or URLs (e.g., "give link for X", "URL of Cloud AI", "official website link"), search online resources and provide exact, accurate, working URLs formatted clearly as markdown links `[Title](https://...)`.
 
 3. STRICT MERMAID DIAGRAM SYNTAX & COLORFUL DESIGN:
    - ALL node labels MUST be enclosed in double quotes inside brackets: \`A["Start Process"] --> B["Check Condition"]\`.

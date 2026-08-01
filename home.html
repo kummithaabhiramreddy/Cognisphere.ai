@@ -773,9 +773,10 @@
   }
   .msg-text {
     max-width: 100%;
-    overflow-x: auto;
+    overflow-x: visible;
     word-break: break-word;
     overflow-wrap: break-word;
+    min-width: 0;
   }
   .msg-text pre {
     white-space: pre;
@@ -986,7 +987,7 @@
   .msg-edit-btn.primary:hover{ transform:translateY(-1px); }
 
   /* ---------- SEARCH / COMPOSER FORM (increased height) ---------- */
-  form{
+  form:not(#askForm){
     position:relative;
     width:100%;
     display:flex; align-items:flex-end; gap:6px;
@@ -997,7 +998,7 @@
     box-shadow:0 10px 34px rgba(0,0,0,0.4), inset 0 1px 0 rgba(43,40,35,0.05);
     transition:border-color .2s ease, box-shadow .2s ease;
   }
-  form::before{
+  form:not(#askForm)::before{
     content:'';
     position:absolute; inset:-1px;
     border-radius:19px;
@@ -1009,12 +1010,12 @@
     opacity:0; transition:opacity .25s ease;
     pointer-events:none;
   }
-  form:focus-within::before{ opacity:1; }
-  form:focus-within{
+  form:not(#askForm):focus-within::before{ opacity:1; }
+  form:not(#askForm):focus-within{
     border-color:var(--gold);
     box-shadow:0 0 0 3px rgba(217,119,87,0.12), 0 14px 38px rgba(0,0,0,0.45);
   }
-  form textarea{
+  form:not(#askForm) textarea{
     flex:1; background:transparent; border:none; outline:none; resize:none;
     color:var(--text-primary); font-family:'Inter', sans-serif;
     font-size:1.04rem; line-height:1.55; padding:14px 8px;
@@ -1619,9 +1620,12 @@
   .code-block-wrap {
     margin: 16px 0;
     border-radius: 12px;
-    background: #0d0d0d !important; /* Premium pure black card */
+    background: #0d0d0d !important;
     border: 1px solid #2d3139;
     overflow: hidden;
+    min-width: 0;
+    width: 100%;
+    box-sizing: border-box;
     font-family: 'Inter', sans-serif;
     box-shadow: 0 8px 30px rgba(0,0,0,0.5);
   }
@@ -1652,18 +1656,26 @@
   }
   .code-block-lang svg { width:14px; height:14px; fill:currentColor; }
   .code-block-copy {
-    background: transparent;
-    border: none;
+    all: unset;
+    box-sizing: border-box;
+    background: transparent !important;
+    border: none !important;
     color: #858585;
     cursor: pointer;
-    display: flex;
+    display: inline-flex !important;
     align-items: center;
     justify-content: center;
     gap: 5px;
+    font-size: 0.72rem;
+    font-weight: 500;
+    font-family: 'Inter', sans-serif;
+    padding: 3px 6px;
+    border-radius: 6px;
     transition: color 0.2s;
+    white-space: nowrap;
   }
-  .code-block-copy:hover { color: #fff; }
-  .code-block-copy svg { width:14px; height:14px; }
+  .code-block-copy:hover { color: #fff !important; }
+  .code-block-copy svg { width:13px !important; height:13px !important; flex-shrink:0; }
   .code-block-body {
     padding: 18px 16px;
     margin: 0;
@@ -2580,91 +2592,158 @@
     display: block;
   }
 
-  /* ====== SEARCH BAR MODE SELECTOR & BLUE BUTTON (MATCHING SCREENSHOT) ====== */
+  /* ====== ANTIGRAVITY / GEMINI-STYLE CHAT BAR ====== */
   .search-shell {
     position: relative;
     width: 100%;
-    max-width: 720px;
+    max-width: 760px;
     margin: 0 auto;
     transition: all 0.3s ease;
   }
-  #askForm {
-    display: flex;
-    flex-direction: column;
-    background: #17181c;
-    border: 1px solid rgba(255, 255, 255, 0.14);
-    border-radius: 20px;
-    padding: 12px 16px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.45);
-    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+
+  /* Override global form style completely */
+  #askForm.antigravity-search-form {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 0 !important;
+    background: #1e1f24 !important;
+    border: 1px solid rgba(255,255,255,0.10) !important;
+    border-radius: 20px !important;
+    padding: 14px 16px 10px 16px !important;
+    box-shadow: 0 8px 36px rgba(0,0,0,0.5) !important;
+    transition: border-color 0.2s, box-shadow 0.2s !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+    position: relative !important;
   }
-  #askForm:focus-within {
-    border-color: rgba(255, 255, 255, 0.28);
-    box-shadow: 0 8px 36px rgba(0, 136, 255, 0.18);
+  #askForm.antigravity-search-form::before {
+    display: none !important;
   }
-  .ask-form-top-row {
-    display: flex;
-    align-items: flex-start;
-    gap: 10px;
-    width: 100%;
+  #askForm.antigravity-search-form:focus-within {
+    border-color: rgba(255,255,255,0.22) !important;
+    box-shadow: 0 12px 44px rgba(0,0,0,0.6) !important;
   }
-  form textarea#askInput {
-    flex: 1;
+
+  /* Top row: full-width textarea */
+  #askForm.antigravity-search-form .search-input-row {
+    width: 100% !important;
+    display: block !important;
+    margin-bottom: 6px !important;
+  }
+  #askForm.antigravity-search-form textarea#askInput {
+    display: block !important;
+    width: 100% !important;
+    background: transparent !important;
+    border: none !important;
+    outline: none !important;
+    resize: none !important;
+    color: #e8e8e8 !important;
+    font-family: 'Inter', system-ui, sans-serif !important;
+    font-size: 1rem !important;
+    line-height: 1.55 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    min-height: 44px !important;
+    max-height: 240px !important;
+    overflow-y: auto !important;
+    box-sizing: border-box !important;
+    flex: unset !important;
+  }
+  #askForm.antigravity-search-form textarea#askInput::placeholder {
+    color: rgba(255,255,255,0.35) !important;
+  }
+
+  /* Bottom row: controls all on one horizontal line */
+  #askForm.antigravity-search-form .search-controls-row {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    width: 100% !important;
+    gap: 0 !important;
+    padding-top: 2px !important;
+  }
+  #askForm.antigravity-search-form .search-controls-left {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    gap: 6px !important;
+  }
+  #askForm.antigravity-search-form .search-controls-right {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    gap: 8px !important;
+  }
+  /* Button styles for the chat bar */
+  .plus-attach-btn {
+    width: 30px;
+    height: 30px;
+    border-radius: 8px;
     background: transparent;
     border: none;
-    outline: none;
-    resize: none;
-    color: var(--text-primary);
-    font-family: 'Inter', sans-serif;
-    font-size: 0.98rem;
-    line-height: 1.5;
-    padding: 6px 4px;
-    min-height: 44px;
-    max-height: 260px;
-    overflow-y: auto;
-    box-sizing: border-box;
-  }
-  form textarea#askInput::placeholder {
-    color: rgba(255, 255, 255, 0.45);
-  }
-  .paperclip-icon {
-    margin-top: 4px;
-  }
-  .search-actions-right {
-    display: flex;
+    cursor: pointer;
+    color: rgba(255,255,255,0.6);
+    display: flex !important;
     align-items: center;
-    gap: 8px;
+    justify-content: center;
     flex-shrink: 0;
-    margin-top: 4px;
+    transition: background 0.15s, color 0.15s;
   }
-  form button.send.send-blue-btn {
-    width: 38px; height: 38px; border-radius: 50%;
-    background: #0088ff !important; border: none; cursor: pointer;
-    display: flex; align-items: center; justify-content: center;
-    transition: transform .15s ease, background .15s ease;
-    box-shadow: 0 2px 10px rgba(0, 136, 255, 0.35);
+  .plus-attach-btn:hover { background: rgba(255,255,255,0.08); color:#fff; }
+
+  .antigravity-mode-btn {
+    display: inline-flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    gap: 5px;
+    background: transparent;
+    border: none;
+    color: rgba(255,255,255,0.72);
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 0.84rem;
+    font-weight: 500;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 8px;
+    white-space: nowrap;
+    flex-shrink: 0;
+    transition: background 0.15s, color 0.15s;
+  }
+  .antigravity-mode-btn:hover { background: rgba(255,255,255,0.08); color:#fff; }
+
+  .mic-control-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: rgba(255,255,255,0.62);
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: background 0.15s, color 0.15s;
+  }
+  .mic-control-btn:hover { background: rgba(255,255,255,0.08); color:#fff; }
+
+  .send-circle-btn {
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    background: #d97757 !important;
+    border: none;
+    cursor: pointer;
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 10px rgba(217,119,87,0.35);
+    transition: transform 0.15s, background 0.15s;
     flex-shrink: 0;
   }
-  form button.send.send-blue-btn:hover {
-    background: #0077ee !important;
-    transform: scale(1.05);
-  }
-  .search-bar-bottom-row {
-    display: flex; align-items: center; justify-content: flex-end;
-    margin-top: 6px; padding-top: 4px;
-    border-top: 1px solid rgba(255, 255, 255, 0.06);
-  }
-  .search-bar-mode-btn {
-    display: inline-flex; align-items: center; gap: 4px;
-    background: transparent; border: none;
-    color: rgba(255, 255, 255, 0.65);
-    font-family: 'Inter', sans-serif; font-size: 0.8rem; font-weight: 500;
-    cursor: pointer; padding: 3px 8px; border-radius: 6px;
-    transition: color 0.15s ease, background 0.15s ease;
-  }
-  .search-bar-mode-btn:hover {
-    color: #ffffff; background: rgba(255, 255, 255, 0.08);
-  }
+  .send-circle-btn:hover { background: #e88868 !important; transform: scale(1.05); }
   .modes-card-popup {
     position: absolute;
     bottom: calc(100% + 12px);
@@ -3873,43 +3952,81 @@
       </div>
     </div>
 
-    <form id="askForm">
-      <div class="ask-form-top-row">
-        <button type="button" class="icon-btn paperclip-icon" id="attachFileBtn" aria-label="Attach file" title="Attach file, image, or video">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48"></path>
-          </svg>
-        </button>
+    <!-- Language Picker Popup (shows when coding question detected without language) -->
+    <div id="langPickerPopup" style="display:none; position:fixed; inset:0; z-index:9999; background:rgba(0,0,0,0.65); backdrop-filter:blur(8px); align-items:center; justify-content:center;">
+      <div style="background:#1c1e26; border:1px solid rgba(255,255,255,0.13); border-radius:20px; padding:28px 28px 22px; max-width:420px; width:90%; box-shadow:0 24px 80px rgba(0,0,0,0.7);">
+        <div style="display:flex; align-items:center; gap:12px; margin-bottom:20px;">
+          <div style="width:38px; height:38px; background:linear-gradient(135deg,#d97757,#c05a3a); border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:1.2rem; flex-shrink:0;">💻</div>
+          <div>
+            <div style="color:#e8e8e8; font-weight:600; font-size:1rem; font-family:'Inter',sans-serif;">Choose Programming Language</div>
+            <div style="color:rgba(255,255,255,0.45); font-size:0.8rem; font-family:'Inter',sans-serif; margin-top:2px;">Which language would you like the code in?</div>
+          </div>
+        </div>
+        <div id="langPickerGrid" style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:20px;">
+          <button onclick="selectCodingLang('C')" style="all:unset;box-sizing:border-box;display:flex;align-items:center;gap:10px;padding:11px 14px;border-radius:12px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);cursor:pointer;color:#e8e8e8;font-family:'Inter',sans-serif;font-size:0.88rem;font-weight:500;transition:all 0.15s;" onmouseover="this.style.background='rgba(217,119,87,0.18)';this.style.borderColor='rgba(217,119,87,0.5)';" onmouseout="this.style.background='rgba(255,255,255,0.05)';this.style.borderColor='rgba(255,255,255,0.1)';">
+            <span style="font-size:1.1rem;">⚙️</span> C Language
+          </button>
+          <button onclick="selectCodingLang('Python')" style="all:unset;box-sizing:border-box;display:flex;align-items:center;gap:10px;padding:11px 14px;border-radius:12px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);cursor:pointer;color:#e8e8e8;font-family:'Inter',sans-serif;font-size:0.88rem;font-weight:500;transition:all 0.15s;" onmouseover="this.style.background='rgba(217,119,87,0.18)';this.style.borderColor='rgba(217,119,87,0.5)';" onmouseout="this.style.background='rgba(255,255,255,0.05)';this.style.borderColor='rgba(255,255,255,0.1)';">
+            <span style="font-size:1.1rem;">🐍</span> Python
+          </button>
+          <button onclick="selectCodingLang('Java')" style="all:unset;box-sizing:border-box;display:flex;align-items:center;gap:10px;padding:11px 14px;border-radius:12px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);cursor:pointer;color:#e8e8e8;font-family:'Inter',sans-serif;font-size:0.88rem;font-weight:500;transition:all 0.15s;" onmouseover="this.style.background='rgba(217,119,87,0.18)';this.style.borderColor='rgba(217,119,87,0.5)';" onmouseout="this.style.background='rgba(255,255,255,0.05)';this.style.borderColor='rgba(255,255,255,0.1)';">
+            <span style="font-size:1.1rem;">☕</span> Java
+          </button>
+          <button onclick="selectCodingLang('C++')" style="all:unset;box-sizing:border-box;display:flex;align-items:center;gap:10px;padding:11px 14px;border-radius:12px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);cursor:pointer;color:#e8e8e8;font-family:'Inter',sans-serif;font-size:0.88rem;font-weight:500;transition:all 0.15s;" onmouseover="this.style.background='rgba(217,119,87,0.18)';this.style.borderColor='rgba(217,119,87,0.5)';" onmouseout="this.style.background='rgba(255,255,255,0.05)';this.style.borderColor='rgba(255,255,255,0.1)';">
+            <span style="font-size:1.1rem;">⚡</span> C++
+          </button>
+          <button onclick="selectCodingLang('JavaScript')" style="all:unset;box-sizing:border-box;display:flex;align-items:center;gap:10px;padding:11px 14px;border-radius:12px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);cursor:pointer;color:#e8e8e8;font-family:'Inter',sans-serif;font-size:0.88rem;font-weight:500;transition:all 0.15s;" onmouseover="this.style.background='rgba(217,119,87,0.18)';this.style.borderColor='rgba(217,119,87,0.5)';" onmouseout="this.style.background='rgba(255,255,255,0.05)';this.style.borderColor='rgba(255,255,255,0.1)';">
+            <span style="font-size:1.1rem;">📜</span> JavaScript
+          </button>
+          <button onclick="selectCodingLang('Go')" style="all:unset;box-sizing:border-box;display:flex;align-items:center;gap:10px;padding:11px 14px;border-radius:12px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);cursor:pointer;color:#e8e8e8;font-family:'Inter',sans-serif;font-size:0.88rem;font-weight:500;transition:all 0.15s;" onmouseover="this.style.background='rgba(217,119,87,0.18)';this.style.borderColor='rgba(217,119,87,0.5)';" onmouseout="this.style.background='rgba(255,255,255,0.05)';this.style.borderColor='rgba(255,255,255,0.1)';">
+            <span style="font-size:1.1rem;">🔵</span> Go
+          </button>
+        </div>
+        <button onclick="closeLangPicker()" style="all:unset;box-sizing:border-box;width:100%;text-align:center;padding:10px;border-radius:10px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);cursor:pointer;color:rgba(255,255,255,0.5);font-family:'Inter',sans-serif;font-size:0.84rem;display:block;">Cancel</button>
+      </div>
+    </div>
 
-        <textarea placeholder="Ask Cognisphere AI anything…" id="askInput" rows="1"></textarea>
+    <form id="askForm" class="antigravity-search-form" style="display:flex !important; flex-direction:column !important; align-items:stretch !important; gap:0 !important; background:#1e1f24 !important; border:1px solid rgba(255,255,255,0.11) !important; border-radius:20px !important; padding:14px 16px 10px !important; box-shadow:0 8px 36px rgba(0,0,0,0.5) !important; width:100% !important; box-sizing:border-box !important; position:relative !important;">
+      <div style="width:100%; display:block; margin-bottom:8px;">
+        <textarea placeholder="Ask Cognisphere AI anything…" id="askInput" rows="1" style="display:block; width:100%; background:transparent; border:none; outline:none; resize:none; color:#e8e8e8; font-family:'Inter',system-ui,sans-serif; font-size:1rem; line-height:1.55; padding:0; margin:0; min-height:44px; max-height:240px; overflow-y:auto; box-sizing:border-box;"></textarea>
+      </div>
 
-        <div class="active-tool-pill" id="activeToolPill" style="display:none;"></div>
+      <div class="active-tool-pill" id="activeToolPill" style="display:none;"></div>
 
-        <div class="search-actions-right">
-          <button type="button" class="icon-btn" id="micBtn" aria-label="Voice input" title="Voice input">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <div style="display:flex; flex-direction:row; align-items:center; justify-content:space-between; width:100%; padding-top:4px;">
+        <div style="display:flex; flex-direction:row; align-items:center; gap:6px;">
+          <button type="button" class="icon-btn plus-attach-btn" id="attachFileBtn" aria-label="Attach file" title="Attach file, image, or code" style="display:flex; align-items:center; justify-content:center; width:30px; height:30px; border-radius:8px; background:transparent; border:none; cursor:pointer; color:rgba(255,255,255,0.6); flex-shrink:0;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16">
+              <line x1="12" y1="5" x2="12" y2="19"></line>
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+          </button>
+
+          <button type="button" class="antigravity-mode-btn" id="searchBarModeBtn" onclick="toggleModesCard(event)" style="display:inline-flex; flex-direction:row; align-items:center; gap:5px; background:transparent; border:none; color:rgba(255,255,255,0.72); font-family:'Inter',system-ui,sans-serif; font-size:0.84rem; font-weight:500; cursor:pointer; padding:4px 8px; border-radius:8px; white-space:nowrap; flex-shrink:0;">
+            <span id="currentModeLabel">Main Agent</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13">
+              <polyline points="18 15 12 9 6 15"></polyline>
+            </svg>
+          </button>
+        </div>
+
+        <div style="display:flex; flex-direction:row; align-items:center; gap:8px;">
+          <button type="button" class="icon-btn mic-control-btn" id="micBtn" aria-label="Voice input" title="Voice input" style="display:flex; align-items:center; justify-content:center; width:32px; height:32px; border-radius:50%; background:transparent; border:none; cursor:pointer; color:rgba(255,255,255,0.62); flex-shrink:0;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18">
               <rect x="9" y="2" width="6" height="12" rx="3"></rect>
               <path d="M5 10a7 7 0 0014 0"></path>
               <line x1="12" y1="19" x2="12" y2="22"></line>
             </svg>
           </button>
-          <button type="submit" class="send send-blue-btn" id="sendBtn" aria-label="Ask">
-            <svg viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="18" height="18">
+
+          <button type="submit" class="send-circle-btn" id="sendBtn" aria-label="Ask" style="display:flex; align-items:center; justify-content:center; width:35px; height:35px; border-radius:50%; background:#d97757; border:none; cursor:pointer; box-shadow:0 2px 10px rgba(217,119,87,0.35); flex-shrink:0;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="16" height="16">
               <line x1="5" y1="12" x2="19" y2="12"></line>
               <polyline points="12 5 19 12 12 19"></polyline>
             </svg>
             <span class="stop-icon"></span>
           </button>
         </div>
-      </div>
-
-      <div class="search-bar-bottom-row">
-        <button type="button" class="search-bar-mode-btn" id="searchBarModeBtn" onclick="toggleModesCard(event)">
-          <span id="currentModeLabel">Main Agent</span>
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14" style="margin-left:4px;">
-            <polyline points="6 9 12 15 18 9"></polyline>
-          </svg>
-        </button>
       </div>
     </form>
   </div>
@@ -3985,7 +4102,7 @@
   function streamAutoScroll() {
     if (userScrolledUp) return; // user is browsing freely – don't interrupt
     isAutoScrolling = true;
-    const aiRows = document.querySelectorAll('.msg-row.ai');
+    const aiRows = document.querySelectorAll('.msg-row.assistant');
     const lastAi = aiRows.length ? aiRows[aiRows.length - 1] : null;
     if (lastAi) {
       lastAi.scrollIntoView({ behavior: 'smooth', block: 'end' });
@@ -4408,7 +4525,22 @@
         </div>
       `;
     };
+
+    renderer.link = function(href, title, text) {
+      const url = (href || '').trim();
+      const label = (text || title || url).trim();
+      if (!url) return label;
+      return `<a href="${url}" target="_blank" rel="noopener noreferrer" class="custom-url-chip" style="display:inline-flex;align-items:center;gap:5px;background:rgba(217,119,87,0.12);border:1px solid rgba(217,119,87,0.3);color:#e88868;padding:3px 10px;border-radius:8px;font-size:0.85rem;font-weight:500;text-decoration:none;transition:all 0.15s ease;" onmouseover="this.style.background='rgba(217,119,87,0.22)';" onmouseout="this.style.background='rgba(217,119,87,0.12)';">🔗 ${label} ↗</a>`;
+    };
     renderer.code = function(code, language) {
+      // Handle both marked v4 (code, language) and v5+ (token object) calling convention
+      if (code && typeof code === 'object') {
+        language = code.lang || language || '';
+        code = code.text || '';
+      }
+      code = (code || '').toString();
+      language = ((language || '').toString()).toLowerCase().trim();
+
       if (language === 'mermaid') {
         const encodedCode = encodeURIComponent(code);
         const uniqId = 'mermaid-' + Math.random().toString(36).slice(2,8);
@@ -4438,8 +4570,13 @@
         `;
       }
       
-      const validLang = Prism.languages[language] ? language : 'markup';
-      const highlighted = Prism.highlight(code, Prism.languages[validLang], validLang);
+      const validLang = (language && Prism.languages[language]) ? language : 'clike';
+      let highlighted = '';
+      try {
+        highlighted = Prism.highlight(code, Prism.languages[validLang] || Prism.languages.clike, validLang);
+      } catch(e) {
+        highlighted = code.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+      }
       const encodedCode = encodeURIComponent(code);
 
       // Smart Code Block Header Title
@@ -4521,21 +4658,18 @@
         `;
       }
 
-      // ── ALL code is rendered strictly in Code Cards (No File Cards) ──
-      return `
-        <div class="code-block-wrap">
-          <div class="code-block-header">
-            <div class="code-block-lang">${headerTitle}</div>
-            <div class="code-block-actions" style="display:flex; align-items:center; gap:10px;">
-              <button class="code-block-copy" onclick="copyFileCard(this, '${encodedCode}')" title="Copy Code">
-                <span class="code-copy-tip" style="font-size: 0.72rem; font-weight: 500; margin-right: 4px;">Copy</span>
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"></rect><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"></path></svg>
-              </button>
-            </div>
-          </div>
-          <pre class="code-block-body"><code class="language-${validLang}">${highlighted}</code></pre>
-        </div>
-      `;
+      // ── ALL code is rendered strictly in Code Cards ──
+      const escapedCode = highlighted;
+      return `<div style="margin:16px 0;border-radius:12px;background:#0d0d0d;border:1px solid #2d3139;overflow:hidden;width:100%;box-sizing:border-box;font-family:'Inter',sans-serif;box-shadow:0 8px 30px rgba(0,0,0,0.5);">
+  <div style="display:flex;flex-direction:row;align-items:center;justify-content:space-between;padding:10px 16px;background:#161b22;border-bottom:1px solid #2d3139;">
+    <div style="display:flex;align-items:center;gap:6px;font-size:0.76rem;font-weight:600;color:#8b949e;text-transform:uppercase;font-family:'JetBrains Mono',monospace;">${headerTitle}</div>
+    <button onclick="copyFileCard(this,'${encodedCode}')" title="Copy" style="all:unset;box-sizing:border-box;display:inline-flex;align-items:center;gap:5px;cursor:pointer;color:#8b949e;font-size:0.75rem;font-weight:500;font-family:'Inter',sans-serif;padding:3px 8px;border-radius:6px;border:1px solid #30363d;background:#21262d;transition:color 0.15s;">
+      <span style="white-space:nowrap;font-size:0.75rem;">Copy</span>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:12px;height:12px;flex-shrink:0;"><rect x="9" y="9" width="13" height="13" rx="2"></rect><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"></path></svg>
+    </button>
+  </div>
+  <pre style="margin:0;padding:18px 16px;overflow-x:auto;overflow-y:visible;background:#0d0d0d;font-family:'JetBrains Mono',monospace;font-size:0.82rem;line-height:1.6;white-space:pre;word-break:normal;overflow-wrap:normal;scrollbar-width:thin;scrollbar-color:#3d444d #0d0d0d;"><code class="language-${validLang}" style="background:transparent;color:#e6edf3;font-family:inherit;font-size:inherit;">${escapedCode}</code></pre>
+</div>`;
     };
 
     renderer.table = function(header, body) {
@@ -5300,7 +5434,8 @@
         clearInterval(activeStreamTimer);
         activeStreamTimer = null;
         msg.streaming = false;
-        msg.text = fullText.slice(0, msg.text.length) + '\n\n[Stopped]';
+        msg.text = fullText;
+        msg.isHtml = true;
         renderThread(conv);
         onDone();
         return;
@@ -5309,6 +5444,8 @@
         clearInterval(activeStreamTimer);
         activeStreamTimer = null;
         msg.streaming = false;
+        msg.text = fullText;
+        msg.isHtml = true;
         renderThread(conv);
         // Final scroll to end when done
         streamAutoScroll();
@@ -5319,14 +5456,15 @@
       const chunk = words.slice(idx, idx + 8).join('');
       msg.text += chunk;
       idx += 8;
-      // Smart render: avoid mid-code-fence parse glitches
-      // Count backtick fences — if odd count (fence is open), render as raw text temporarily
+      // Smart render: count backtick fences — if odd (fence open), render raw text temporarily
       const fenceCount = (msg.text.match(/^```/gm) || []).length;
       const isInsideCodeFence = fenceCount % 2 !== 0;
       if (isInsideCodeFence) {
-        // Render partial text safely without trying to close the code block
+        // Inside a code fence: show raw text (avoid broken half-rendered code block)
         msg.isHtml = false;
-        msg.text = msg.text; // keep accumulating raw
+      } else {
+        // Outside a code fence: render properly with markdown/code cards
+        msg.isHtml = true;
       }
       renderThread(conv);
       // Auto-scroll every ~10 ticks (≈80ms) to stay smooth without thrashing
@@ -5530,6 +5668,20 @@
     const text = input.value.trim();
     if(!text && attachments.length === 0) return;
 
+    // ── Language Picker: only show when user asks for a "program" without specifying language ──
+    // Examples that trigger: "write a program", "create a program for fibonacci"
+    // Does NOT trigger: "write code", "write a function", "c program", "python program"
+    const askingForProgram = /\b(write|create|give|make|build|show)\b.{0,50}\bprogram\b/i.test(text) ||
+      /\bprogram\b.{0,30}\b(for|to|that|which)\b/i.test(text);
+    const hasLanguageAlready = /\b(c language|in c\b|using c\b|c program\b|python|java(?:script)?|c\+\+|cpp|golang|\bgo\b|rust|typescript|kotlin|swift|ruby|php|dart)\b/i.test(text);
+
+    if (askingForProgram && !hasLanguageAlready) {
+      window._pendingCodingQuery = text;
+      const popup = document.getElementById('langPickerPopup');
+      if (popup) { popup.style.display = 'flex'; }
+      return; // Wait for language selection
+    }
+
     const msgAttachments = attachments.map(a => ({
       kind: a.kind,
       label: a.kind === 'tool' ? a.label : (a.kind === 'text' ? 'Pasted text' : (a.file ? a.file.name : 'Attachment')),
@@ -5571,6 +5723,11 @@
 
     document.body.classList.add('chat-active');
     document.body.classList.remove('docked');
+
+    // After chat-active layout change, scroll down to show the question
+    setTimeout(() => {
+      window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+    }, 80);
 
     const behavior = activeTool ? (TOOL_BEHAVIOR[activeTool] || DEFAULT_BEHAVIOR) : DEFAULT_BEHAVIOR;
 
@@ -5820,13 +5977,12 @@
 
       const textEl = document.createElement('div');
       textEl.className = 'msg-text';
-      const isHtmlContent = m.isHtml || (m.text && (
-        m.text.includes('<table') ||
-        m.text.includes('<div class=') ||
-        m.text.includes('<ul class=') ||
-        /^\s*<(div|table|ul|p|section|article)/i.test(m.text)
-      ));
-      if(isHtmlContent){
+      // Only treat as raw HTML if it's a fully pre-rendered HTML block (from webdev builder etc.)
+      // Regular AI responses with markdown (```code```) must always go through parseMarkdown
+      const isPreRenderedHtml = m.isHtml && m.text && (
+        /^[\s\n]*<(div|table|ul|section|article|pre|figure)\b/i.test(m.text.trim())
+      );
+      if(isPreRenderedHtml){
         textEl.innerHTML = m.text;
       } else {
         textEl.innerHTML = parseMarkdown(m.text);
@@ -5958,6 +6114,44 @@
     area.focus();
     area.setSelectionRange(area.value.length, area.value.length);
   }
+
+  // ── Language Picker Functions ──
+  window.selectCodingLang = function(lang) {
+    const popup = document.getElementById('langPickerPopup');
+    if (popup) popup.style.display = 'none';
+
+    const input = document.getElementById('askInput');
+    const pendingQuery = window._pendingCodingQuery || (input ? input.value.trim() : '');
+    window._pendingCodingQuery = null;
+
+    if (!pendingQuery) return;
+
+    // Append language to the query and resubmit
+    const langQuery = pendingQuery + ' in ' + lang;
+    if (input) {
+      input.value = langQuery;
+    }
+    // Trigger submit
+    const askForm = document.getElementById('askForm');
+    if (askForm) {
+      if (typeof askForm.requestSubmit === 'function') {
+        askForm.requestSubmit();
+      } else {
+        askForm.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
+      }
+    }
+  };
+
+  window.closeLangPicker = function() {
+    const popup = document.getElementById('langPickerPopup');
+    if (popup) popup.style.display = 'none';
+    window._pendingCodingQuery = null;
+  };
+
+  // Close lang picker on backdrop click
+  document.getElementById('langPickerPopup').addEventListener('click', function(e) {
+    if (e.target === this) closeLangPicker();
+  });
 
   function formatMermaidToPointToPoint(mermaidCode){
     try {
@@ -7587,49 +7781,127 @@
     .catch(err => console.warn('Neon DB save error:', err.message));
   };
 
-  // Enhance loadUserHistory to fetch per-user chats from Neon DB
+  // ── Pinning System for User Search History ──
+  function getPinnedHistoryKeys() {
+    try {
+      return new Set(JSON.parse(localStorage.getItem('cognisphere_pinned_history') || '[]'));
+    } catch(e) {
+      return new Set();
+    }
+  }
+
+  function savePinnedHistoryKeys(setObj) {
+    try {
+      localStorage.setItem('cognisphere_pinned_history', JSON.stringify(Array.from(setObj)));
+    } catch(e) {}
+  }
+
+  window.togglePinHistory = function(e, itemKey) {
+    if (e) e.stopPropagation();
+    const setObj = getPinnedHistoryKeys();
+    if (setObj.has(itemKey)) {
+      setObj.delete(itemKey);
+    } else {
+      setObj.add(itemKey);
+    }
+    savePinnedHistoryKeys(setObj);
+    loadUserHistory();
+  };
+
+  function renderHistoryCardsHTML(rows, isFallback = false) {
+    const pinnedKeys = getPinnedHistoryKeys();
+    const u = getCurrentUser();
+
+    if (!rows || rows.length === 0) {
+      return '<div style="padding:24px; text-align:center; color:var(--text-muted); font-size:0.9rem;">No search history found for your account yet. Ask any question to start saving!</div>';
+    }
+
+    // Sort pinned items to the top
+    const processedRows = rows.map(r => {
+      const key = r.id ? ('db_' + r.id) : ('local_' + (r.query || r.title || ''));
+      const isPinned = pinnedKeys.has(key);
+      return { ...r, _key: key, _isPinned: isPinned };
+    });
+
+    processedRows.sort((a, b) => (b._isPinned ? 1 : 0) - (a._isPinned ? 1 : 0));
+
+    const statusNotice = isFallback
+      ? `<div style="font-size:0.75rem; color:#e88868; background:rgba(217,119,87,0.1); border:1px solid rgba(217,119,87,0.25); padding:8px 12px; border-radius:8px; margin-bottom:12px; display:flex; align-items:center; gap:6px;">
+          <span>💾</span> Account History (Local Mode)
+         </div>`
+      : `<div style="font-size:0.75rem; color:#6e8b7a; background:rgba(110,139,122,0.1); border:1px solid rgba(110,139,122,0.25); padding:8px 12px; border-radius:8px; margin-bottom:12px; display:flex; align-items:center; gap:6px;">
+          <span>⚡</span> Account History synced with Cloud DB
+         </div>`;
+
+    const cardsHTML = processedRows.map(row => {
+      const dt = row.created_at ? new Date(row.created_at).toLocaleString() : 'Recent';
+      const uName = row.user_name || u.name || 'Account User';
+      const cleanQuery = cleanPromptDebugText(row.query || row.title || '');
+      const rawAns = cleanPromptDebugText(row.response || (row.messages && row.messages[1] ? row.messages[1].text : ''));
+      const cleanAns = rawAns.replace(/<[^>]*>/g, '').slice(0, 260);
+      const encQuery = encodeURIComponent(cleanQuery);
+      const encAns = encodeURIComponent(rawAns);
+      const rowId = row.id || null;
+      const isPinned = row._isPinned;
+      const keyEsc = row._key.replace(/'/g, "\\'");
+
+      return `<div data-history-row="1" onclick="triggerHistoryCardClick('${encQuery}', '${encAns}', ${rowId})" style="background:${isPinned ? 'rgba(217,119,87,0.06)' : 'var(--bg-panel-alt)'}; border:1px solid ${isPinned ? 'rgba(217,119,87,0.45)' : 'var(--line-strong)'}; border-radius:12px; padding:14px; margin-bottom:10px; cursor:pointer; position:relative; transition:border-color .15s ease, transform .15s ease;" onmouseover="this.style.borderColor='var(--gold)'; this.style.transform='translateY(-1px)';" onmouseout="this.style.borderColor='${isPinned ? 'rgba(217,119,87,0.45)' : 'var(--line-strong)'}'; this.style.transform='translateY(0)';">
+        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:8px;">
+          <div style="display:flex; align-items:center; gap:6px;">
+            ${isPinned ? '<span style="font-size:0.68rem; font-weight:700; background:#d97757; color:#fff; padding:2px 8px; border-radius:6px;">📌 PINNED</span>' : ''}
+            <span style="font-size:0.68rem; font-weight:700; background:rgba(217,119,87,0.18); color:var(--gold); padding:2px 7px; border-radius:6px;">👤 ${uName}</span>
+            <span style="font-size:0.68rem; color:var(--text-muted);">${dt}</span>
+          </div>
+          <div style="display:flex; align-items:center; gap:6px;">
+            <button type="button" onclick="togglePinHistory(event, '${keyEsc}')" title="${isPinned ? 'Unpin history item' : 'Pin to top'}" style="background:${isPinned ? 'rgba(217,119,87,0.25)' : 'transparent'}; color:${isPinned ? '#e88868' : 'rgba(255,255,255,0.6)'}; border:1px solid ${isPinned ? '#d97757' : 'rgba(255,255,255,0.15)'}; font-size:0.75rem; padding:4px 9px; border-radius:6px; cursor:pointer; display:flex; align-items:center; gap:4px; transition:all 0.15s ease;">
+              <span>📌</span> ${isPinned ? 'Unpin' : 'Pin'}
+            </button>
+            <button type="button" style="background:var(--gold); color:#0A0C10; border:none; font-size:0.72rem; font-weight:700; padding:4px 10px; border-radius:6px; cursor:pointer; display:flex; align-items:center; gap:4px;">
+              <span>▶ Open Full Chat</span>
+            </button>
+          </div>
+        </div>
+        <div style="font-size:0.92rem; font-weight:600; color:var(--text-primary); margin-bottom:5px;">${cleanQuery}</div>
+        <div style="font-size:0.8rem; color:var(--text-muted); max-height:80px; overflow-y:auto; line-height:1.5;">${cleanAns || 'Click to view full search conversation...'}</div>
+      </div>`;
+    }).join('');
+
+    return statusNotice + cardsHTML;
+  }
+
+  // Enhance loadUserHistory to fetch per-user chats from Neon DB with graceful local fallback
   loadUserHistory = function() {
     const u = getCurrentUser();
-    historyLines.innerHTML = '<div style="padding:15px; text-align:center; color:var(--text-muted);">Fetching history...</div>';
+    if (!historyLines) return;
+    historyLines.innerHTML = '<div style="padding:15px; text-align:center; color:var(--text-muted);">Fetching account search history...</div>';
+
     fetch(`${API_BASE}/api/history?user_id=${encodeURIComponent(u.id)}`)
-      .then(res => res.ok ? res.json().catch(() => ({})) : {})
+      .then(res => res.ok ? res.json().catch(() => null) : null)
       .then(resData => {
-        const rows = Array.isArray(resData) ? resData : (resData && resData.rows ? resData.rows : []);
+        const rows = Array.isArray(resData) ? resData : (resData && resData.rows ? resData.rows : null);
 
-        if (!rows || rows.length === 0) {
-          historyLines.innerHTML = '<div style="padding:20px; text-align:center; color:var(--text-muted);">No search chats stored yet. Ask any question to start saving!</div>';
-          return;
+        if (rows && rows.length > 0) {
+          historyLines.innerHTML = renderHistoryCardsHTML(rows, false);
+        } else {
+          // Fallback to in-memory local conversations for this user
+          const localRows = (conversations || []).map(c => ({
+            id: c.id,
+            query: c.title || (c.messages && c.messages[0] ? c.messages[0].text : 'Search Query'),
+            response: c.messages && c.messages[1] ? c.messages[1].text : '',
+            created_at: new Date().toISOString()
+          }));
+          historyLines.innerHTML = renderHistoryCardsHTML(localRows, true);
         }
-
-        const cardsHTML = rows.map(row => {
-          const dt = row.created_at ? new Date(row.created_at).toLocaleString() : 'Recent';
-          const uName = row.user_name || 'Aarav Sharma';
-          const cleanQuery = cleanPromptDebugText(row.query || '');
-          const rawAns = cleanPromptDebugText(row.response || '');
-          const cleanAns = rawAns.replace(/<[^>]*>/g, '').slice(0, 260);
-          const encQuery = encodeURIComponent(cleanQuery);
-          const encAns = encodeURIComponent(rawAns);
-          const rowId = row.id;
-
-          return `<div data-history-row="1" onclick="triggerHistoryCardClick('${encQuery}', '${encAns}', ${rowId})" style="background:var(--bg-panel-alt); border:1px solid var(--line-strong); border-radius:12px; padding:14px; margin-bottom:10px; cursor:pointer; transition:border-color .15s ease, transform .15s ease;" onmouseover="this.style.borderColor='var(--gold)'; this.style.transform='translateY(-1px)';" onmouseout="this.style.borderColor='var(--line-strong)'; this.style.transform='translateY(0)';">
-            <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:6px;">
-              <div style="display:flex; align-items:center; gap:6px;">
-                <span style="font-size:0.68rem; font-weight:700; background:rgba(217,119,87,0.18); color:var(--gold); padding:2px 7px; border-radius:6px;">👤 ${uName}</span>
-                <span style="font-size:0.68rem; color:var(--text-muted);">${dt}</span>
-              </div>
-              <button type="button" style="background:var(--gold); color:#0A0C10; border:none; font-size:0.72rem; font-weight:700; padding:4px 10px; border-radius:6px; cursor:pointer; display:flex; align-items:center; gap:4px;">
-                <span>▶ Open Full Chat Page</span>
-              </button>
-            </div>
-            <div style="font-size:0.9rem; font-weight:600; color:var(--text-primary); margin-bottom:4px;">${cleanQuery}</div>
-            <div style="font-size:0.78rem; color:var(--text-muted); max-height:80px; overflow-y:auto; line-height:1.5;">${cleanAns}...</div>
-          </div>`;
-        }).join('');
-
-        historyLines.innerHTML = dbBadge + cardsHTML;
       })
-      .catch(err => {
-        historyLines.innerHTML = '<div style="padding:15px; text-align:center; color:var(--gold);">Failed to connect to Neon PostgreSQL DB. Check server log.</div>';
+      .catch(() => {
+        // Neon DB offline fallback: render local conversations
+        const localRows = (conversations || []).map(c => ({
+          id: c.id,
+          query: c.title || (c.messages && c.messages[0] ? c.messages[0].text : 'Search Query'),
+          response: c.messages && c.messages[1] ? c.messages[1].text : '',
+          created_at: new Date().toISOString()
+        }));
+        historyLines.innerHTML = renderHistoryCardsHTML(localRows, true);
       });
   };
 
