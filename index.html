@@ -450,6 +450,10 @@
     setInterval(fetchStats, 3000);
   });
 
+  let activeStatsMode = 'avoid';
+  let liveGraphLeft = [0.35, 0.45, 0.38, 0.5, 0.4, 0.88, 0.42, 0.38, 0.48, 0.35, 0.4, 0.36];
+  let liveGraphRight = [0.45, 0.55, 0.7, 0.58, 0.85, 0.95, 0.72, 0.6, 0.48, 0.42, 0.5, 0.38];
+
   async function fetchStats() {
     try {
       const r = await fetch(`${API_HOST}/api/stats?_t=` + Date.now());
@@ -476,6 +480,10 @@
         currentStats.latency = d.avg_response_ms;
         pulseCard('cardLatency');
       }
+      
+      if (d.graph_left) liveGraphLeft = d.graph_left;
+      if (d.graph_right) liveGraphRight = d.graph_right;
+      renderStaticGraph(activeStatsMode);
     } catch(e) {}
   }
 
@@ -526,8 +534,8 @@
 
     ctx.clearRect(0, 0, W, H);
 
-    // Left half: Without Neon (Spike)
-    const leftPts = [0.35, 0.45, 0.38, 0.5, 0.4, 0.88, 0.42, 0.38, 0.48, 0.35];
+    // Left half: Without Neon (Spike) - Live from Neon DB
+    const leftPts = liveGraphLeft;
     const lW = midX - 20;
 
     // Draw baseline
@@ -553,10 +561,10 @@
     });
     ctx.stroke();
 
-    // Right half: With Neon Autoscaling (Green Bars)
+    // Right half: With Neon Autoscaling (Copper/Gold Bars) - Live from Neon DB
     const rightPts = mode === 'save' 
-      ? [0.4, 0.35, 0.5, 0.38, 0.42, 0.3, 0.38, 0.45, 0.32, 0.3]
-      : [0.45, 0.55, 0.7, 0.58, 0.85, 0.95, 0.72, 0.6, 0.48, 0.42];
+      ? liveGraphRight.map(v => Math.max(0.12, v * 0.45))
+      : liveGraphRight;
     const rStart = midX + 10, rW = W - midX - 20;
     const barW = rW / rightPts.length - 3;
 
@@ -577,6 +585,7 @@
   }
 
   function setMode(mode, btn) {
+    activeStatsMode = mode;
     document.querySelectorAll('.perf-tab').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
     renderStaticGraph(mode);

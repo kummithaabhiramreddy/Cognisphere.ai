@@ -732,7 +732,7 @@
 
   .chat-thread{
     display:none;
-    width:100%; max-width:760px;
+    width:100%; max-width:100%;
     flex-direction:column; gap:16px;
   }
   body.chat-active .chat-thread{ display:flex; }
@@ -746,18 +746,18 @@
   body.chat-active .search-shell{
     position:fixed; left:50%; bottom:22px;
     transform:translateX(-50%);
-    width:min(640px, 92vw);
-    max-width:640px;
+    width:min(720px, 94vw);
+    max-width:720px;
     z-index:50;
   }
   body.chat-active footer{ opacity:0; pointer-events:none; }
 
   .msg-row{
     display:flex; flex-direction:column; gap:4px;
-    max-width:80%;
+    max-width:100%;
   }
-  .msg-row.user{ align-self:flex-end; align-items:flex-end; }
-  .msg-row.assistant{ align-self:flex-start; align-items:flex-start; }
+  .msg-row.user{ align-self:flex-end; align-items:flex-end; max-width:85%; }
+  .msg-row.assistant{ align-self:flex-start; align-items:flex-start; max-width:100%; width:100%; }
 
   .msg{
     max-width:100%;
@@ -2590,13 +2590,40 @@
   }
   main {
     box-sizing: border-box;
-    width: 100%; max-width: 1000px;
+    width: 100%; max-width: 1400px;
     margin: 0 auto;
     padding: 20px 16px 140px;
   }
   @media (max-width: 768px) {
-    main { padding: 12px 10px 150px; }
-    .search-shell { max-width: 100%; }
+    main {
+      padding: 12px 8px 140px !important;
+      width: 100% !important;
+      max-width: 100% !important;
+    }
+    .chat-thread {
+      width: 100% !important;
+      max-width: 100% !important;
+    }
+    .msg-row {
+      max-width: 100% !important;
+    }
+    .msg-row.user {
+      max-width: 92% !important;
+    }
+    .msg-row.assistant {
+      max-width: 100% !important;
+      width: 100% !important;
+    }
+    body.docked .search-shell, body.chat-active .search-shell {
+      width: calc(100% - 16px) !important;
+      max-width: 100% !important;
+      left: 50% !important;
+      transform: translateX(-50%) !important;
+      bottom: 12px !important;
+    }
+    .search-shell {
+      max-width: 100% !important;
+    }
     .modes-card-popup { right: 0; left: 0; margin: 0 auto; width: 95%; }
   }
 

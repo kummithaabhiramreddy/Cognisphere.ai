@@ -113,13 +113,7 @@ app.post('/api/auth/register', async (req, res) => {
     
     const exists = await pool.query('SELECT * FROM users WHERE email = $1', [cleanEmail]);
     if (exists.rows.length > 0) {
-      // Account already exists in database — seamlessly update password and log in
-      const user = exists.rows[0];
-      const newHash = await bcrypt.hash(password, 10);
-      const initials = cleanName.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2) || user.avatar_initials;
-      await pool.query('UPDATE users SET password_hash = $1, name = $2, avatar_initials = $3 WHERE id = $4', [newHash, cleanName, initials, user.id]);
-      const token = jwt.sign({ id: user.id, email: user.email, name: cleanName }, JWT_SECRET, { expiresIn: '7d' });
-      return res.json({ success: true, token, user: { id: user.id, name: cleanName, email: user.email, plan: user.plan || 'Free', avatar_initials: initials } });
+      return res.status(400).json({ error: 'Email already registered. Please log in instead.' });
     }
     
     const hash = await bcrypt.hash(password, 10);
@@ -146,25 +140,13 @@ app.post('/api/auth/login', async (req, res) => {
     const result = await pool.query('SELECT * FROM users WHERE email = $1', [cleanEmail]);
     
     if (result.rows.length === 0) {
-      // Account not found — seamlessly create user account and log in
-      const autoName = cleanEmail.split('@')[0].replace(/[._-]/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
-      const initials = autoName.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
-      const hash = await bcrypt.hash(password, 10);
-      const ins = await pool.query(
-        'INSERT INTO users (name, email, password_hash, plan, avatar_initials) VALUES ($1, $2, $3, $4, $5) RETURNING id, name, email, plan, avatar_initials, created_at',
-        [autoName, cleanEmail, hash, 'Free', initials]
-      );
-      const user = ins.rows[0];
-      const token = jwt.sign({ id: user.id, email: user.email, name: user.name }, JWT_SECRET, { expiresIn: '7d' });
-      return res.json({ success: true, token, user });
+      return res.status(400).json({ error: 'Account not found. Please register first.' });
     }
     
     const user = result.rows[0];
     const valid = await bcrypt.compare(password, user.password_hash);
     if (!valid) {
-      // Update password hash to allow seamless login
-      const newHash = await bcrypt.hash(password, 10);
-      await pool.query('UPDATE users SET password_hash = $1 WHERE id = $2', [newHash, user.id]);
+      return res.status(401).json({ error: 'Incorrect password. Please try again.' });
     }
     const token = jwt.sign({ id: user.id, email: user.email, name: user.name }, JWT_SECRET, { expiresIn: '7d' });
     res.json({ success: true, token, user: { id: user.id, name: user.name, email: user.email, plan: user.plan || 'Free', avatar_initials: user.avatar_initials } });
