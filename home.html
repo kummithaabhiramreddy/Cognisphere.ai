@@ -4893,43 +4893,28 @@
       }
     }
 
-    // Build multi-turn conversation history from previous messages in convToUpdate
-    // STRICT RULE: Only include the last 3 message-pairs (6 messages max) for relevance,
-    // and NEVER let old questions override the current user question.
-    let historyContext = '';
-    if (convToUpdate && convToUpdate.messages && convToUpdate.messages.length > 2) {
-      // Take only the last 6 messages (3 turns), excluding current user prompt & pending assistant msg
-      const pastMessages = convToUpdate.messages.slice(0, -2).slice(-6);
-      const historySummary = pastMessages.map((m) => {
-        let textPart = cleanPromptDebugText(m.text || '');
-        if (m.attachments && m.attachments.length) {
-          m.attachments.forEach(a => {
-            if (a.content) textPart += `\n[Attached Content]: ${a.content}`;
-            else if (a.textContent) textPart += `\n[Attached File Content]: ${a.textContent}`;
-          });
-        }
-        return `${m.role === 'user' ? '[Q]' : '[A]'}: ${textPart.slice(0, 800)}`;
-      }).join('\n\n');
+    // ── HISTORY CONTEXT: stripped — AI no longer receives past conversation
+    // (prevents echoing "User:/Assistant:" in responses)
+    const historyContext = '';
 
-      if (historySummary.trim()) {
-        historyContext = `\n\n[BACKGROUND HISTORY — FOR CONTEXT ONLY. NEVER ECHO, REPEAT, OR DISPLAY THIS IN YOUR REPLY. DO NOT USE "User:", "Assistant:", "[Q]", "[A]" LABELS IN YOUR ANSWER.]:\n${historySummary}\n[END HISTORY]`;
-      }
-    }
-
-    // Inject Academic Profile Context if user has configured state & class
+    // ── ACADEMIC CONTEXT: only inject when the user is asking about education/study topics
     let academicContext = '';
     const savedProf = localStorage.getItem('userAcademicProfile');
     if (savedProf) {
       try {
         const p = JSON.parse(savedProf);
         if (p.state && p.current_class) {
-          academicContext = `\n\n[USER ACADEMIC CONTEXT — Tailor explanation to this level]:\nState: ${p.state} | Board: ${p.board || 'State Board'} | Class: ${p.current_class} ${p.stream ? '(' + p.stream + ')' : ''} | Language: ${p.preferred_language || 'English'}\nPlease structure the explanation to match the ${p.state} ${p.current_class} syllabus depth and textbook terminology.\n[END ACADEMIC CONTEXT]\n`;
+          // Only inject if the question is about a school/study topic
+          const eduKeywords = /\b(class|grade|chapter|subject|syllabus|lesson|study|exam|test|board|school|college|university|explain|what is|how does|define|formula|equation|theory|concept|problem|solve|question|exercise|homework|notes|answer|marks|topic|unit)\b/i;
+          const isEduQuery = eduKeywords.test(fullQuery);
+          if (isEduQuery) {
+            academicContext = `\n\n[USER ACADEMIC CONTEXT — Tailor explanation to this level]:\nState: ${p.state} | Board: ${p.board || 'State Board'} | Class: ${p.current_class} ${p.stream ? '(' + p.stream + ')' : ''} | Language: ${p.preferred_language || 'English'}\nPlease structure the explanation to match the ${p.state} ${p.current_class} syllabus depth and textbook terminology.\n[END ACADEMIC CONTEXT]\n`;
+          }
         }
       } catch(e) {}
     }
 
-    // Current question is placed FIRST so the LLM focuses on it, history comes after as context
-    // NOTE: No "CURRENT QUESTION TO ANSWER NOW" prefix — prevents the AI from echoing the user question
+    // Current question is placed first — no history injected to prevent echo
     const payloadQuery = `${fullQuery}${academicContext}${historyContext}`;
     const searchQuery = query.trim() || (attList.length ? (attList[0].label || 'attached file') : 'general learning');
 
