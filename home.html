@@ -4900,11 +4900,11 @@
             else if (a.textContent) textPart += `\n[Attached File Content]: ${a.textContent}`;
           });
         }
-        return `${m.role === 'user' ? 'User' : 'Assistant'}: ${textPart.slice(0, 800)}`;
+        return `${m.role === 'user' ? '[Q]' : '[A]'}: ${textPart.slice(0, 800)}`;
       }).join('\n\n');
 
       if (historySummary.trim()) {
-        historyContext = `\n\n[PREVIOUS CONVERSATION HISTORY — BACKGROUND CONTEXT ONLY. DO NOT INCLUDE OR MENTION THIS IN YOUR RESPONSE. OUTPUT ONLY THE RESPONSE/CODE FOR THE CURRENT QUESTION ABOVE]:\n${historySummary}\n[END HISTORY]`;
+        historyContext = `\n\n[BACKGROUND HISTORY — FOR CONTEXT ONLY. NEVER ECHO, REPEAT, OR DISPLAY THIS IN YOUR REPLY. DO NOT USE "User:", "Assistant:", "[Q]", "[A]" LABELS IN YOUR ANSWER.]:\n${historySummary}\n[END HISTORY]`;
       }
     }
 
@@ -7379,8 +7379,12 @@
     if (!str || typeof str !== 'string') return str || '';
     return str
       .replace(/={5,}[\s\S]*?\[PREVIOUS CONVERSATION HISTORY & CONTEXT\]:[\s\S]*?={5,}(\nInstruction:[^\n]*)?/gi, '')
-      .replace(/\[PREVIOUS CONVERSATION HISTORY & CONTEXT\]:?/gi, '')
+      .replace(/\[PREVIOUS CONVERSATION HISTORY[^\]]*\]:?/gi, '')
+      .replace(/\[BACKGROUND HISTORY[^\]]*\]:?/gi, '')
+      .replace(/\[END HISTORY\]/gi, '')
       .replace(/\[Turn \d+ - (USER|ASSISTANT)\]:?/gi, '')
+      .replace(/^\[Q\]:\s*/gim, '')
+      .replace(/^\[A\]:\s*/gim, '')
       .replace(/\[DECODED ATTACHED TEXT SENTENCES & REFERENCES\]:[\s\S]*?Focus ONLY on what the content contains\./gi, '')
       .replace(/={5,}/g, '')
       .trim();
