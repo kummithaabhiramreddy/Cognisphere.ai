@@ -2592,27 +2592,50 @@
     display: flex;
     flex-direction: column;
     background: #17181c;
-    border: 1px solid rgba(255, 255, 255, 0.12);
+    border: 1px solid rgba(255, 255, 255, 0.14);
     border-radius: 20px;
-    padding: 10px 14px;
+    padding: 12px 16px;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.45);
     transition: border-color 0.2s ease, box-shadow 0.2s ease;
   }
   #askForm:focus-within {
-    border-color: rgba(255, 255, 255, 0.25);
-    box-shadow: 0 8px 36px rgba(0, 153, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.28);
+    box-shadow: 0 8px 36px rgba(0, 136, 255, 0.18);
   }
   .ask-form-top-row {
     display: flex;
-    align-items: center;
-    gap: 8px;
+    align-items: flex-start;
+    gap: 10px;
     width: 100%;
+  }
+  form textarea#askInput {
+    flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    resize: none;
+    color: var(--text-primary);
+    font-family: 'Inter', sans-serif;
+    font-size: 0.98rem;
+    line-height: 1.5;
+    padding: 6px 4px;
+    min-height: 44px;
+    max-height: 260px;
+    overflow-y: auto;
+    box-sizing: border-box;
+  }
+  form textarea#askInput::placeholder {
+    color: rgba(255, 255, 255, 0.45);
+  }
+  .paperclip-icon {
+    margin-top: 4px;
   }
   .search-actions-right {
     display: flex;
     align-items: center;
     gap: 8px;
     flex-shrink: 0;
+    margin-top: 4px;
   }
   form button.send.send-blue-btn {
     width: 38px; height: 38px; border-radius: 50%;
@@ -2628,7 +2651,8 @@
   }
   .search-bar-bottom-row {
     display: flex; align-items: center; justify-content: flex-end;
-    margin-top: 4px; padding-top: 2px;
+    margin-top: 6px; padding-top: 4px;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
   }
   .search-bar-mode-btn {
     display: inline-flex; align-items: center; gap: 4px;
@@ -6482,7 +6506,7 @@
 
   function autosizeInput(){
     askInput.style.height = 'auto';
-    askInput.style.height = Math.min(askInput.scrollHeight, 260) + 'px';
+    askInput.style.height = Math.max(44, Math.min(askInput.scrollHeight, 260)) + 'px';
   }
   askInput.addEventListener('input', autosizeInput);
 
