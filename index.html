@@ -287,10 +287,7 @@
       <div class="brand-sub">SUPERHUMAN AUTONOMOUS INTELLIGENCE</div>
     </div>
   </a>
-  <div class="nav-right">
-    <button class="btn-nav-ghost" onclick="openAuth('login')">Log in</button>
-    <button class="btn-nav-main" onclick="openAuth('register')">Get Started</button>
-  </div>
+  <div class="nav-right" style="display:none;"></div>
 </nav>
 
 <!-- HERO -->
@@ -302,7 +299,6 @@
   <p class="hero-sub">Cognisphere.ai outperforms standard AI search engines with real-time web intelligence, full web/app code synthesis, and serverless Neon PostgreSQL memory.</p>
   <div class="hero-actions">
     <button class="btn-hero-primary" onclick="openAuth('register')">Get Started Free</button>
-    <a href="home.html" class="btn-hero-ghost" style="display:inline-flex; align-items:center; gap:8px; text-decoration:none; padding:14px 28px; border-radius:12px; font-weight:600; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.12); color:#fff;">Launch App &rarr;</a>
     <button class="btn-hero-secondary" onclick="openAuth('login')">Log in to Account →</button>
   </div>
 
@@ -568,7 +564,9 @@
       const x = rStart + i * (barW + 3);
       const bH = v * H * 0.82;
       const grd = ctx.createLinearGradient(0, H - bH, 0, H);
-      grd.addColorStop(0, '#00ffaa'); grd.addColorStop(1, 'rgba(0,255,170,0.2)');
+      grd.addColorStop(0, '#D97757'); 
+      grd.addColorStop(0.5, '#E8C9A0');
+      grd.addColorStop(1, 'rgba(217,119,87,0.18)');
       ctx.fillStyle = grd;
       ctx.fillRect(x, H - bH, barW, bH);
     });
