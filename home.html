@@ -773,16 +773,17 @@
   }
   .msg-text {
     max-width: 100%;
-    overflow-x: hidden;
+    overflow-x: auto;
     word-break: break-word;
     overflow-wrap: break-word;
   }
   .msg-text pre {
-    white-space: pre-wrap;
-    word-break: break-word;
-    overflow-wrap: break-word;
+    white-space: pre;
+    overflow-x: auto;
+    overflow-y: visible;
     max-width: 100%;
-    overflow-x: hidden;
+    word-break: normal;
+    overflow-wrap: normal;
   }
   .msg.user{
     background:transparent;
@@ -1573,11 +1574,18 @@
     font-size: 0.82rem;
     line-height: 1.5;
     background: #0d0d0d !important;
-    white-space: pre-wrap;
-    word-break: break-word;
-    overflow-wrap: break-word;
+    white-space: pre;
+    word-break: normal;
+    overflow-wrap: normal;
     max-width: 100%;
+    /* Styled scrollbar for code blocks */
+    scrollbar-width: thin;
+    scrollbar-color: #3d444d #0d0d0d;
   }
+  .code-block-body::-webkit-scrollbar { height: 6px; }
+  .code-block-body::-webkit-scrollbar-track { background: #0d0d0d; }
+  .code-block-body::-webkit-scrollbar-thumb { background: #3d444d; border-radius: 3px; }
+  .code-block-body::-webkit-scrollbar-thumb:hover { background: #6e7681; }
   .code-block-preview-btn {
     background: rgba(110,139,122,0.12) !important;
     border: 1px solid rgba(110,139,122,0.3) !important;
@@ -5182,6 +5190,15 @@
       const chunk = words.slice(idx, idx + 8).join('');
       msg.text += chunk;
       idx += 8;
+      // Smart render: avoid mid-code-fence parse glitches
+      // Count backtick fences — if odd count (fence is open), render as raw text temporarily
+      const fenceCount = (msg.text.match(/^```/gm) || []).length;
+      const isInsideCodeFence = fenceCount % 2 !== 0;
+      if (isInsideCodeFence) {
+        // Render partial text safely without trying to close the code block
+        msg.isHtml = false;
+        msg.text = msg.text; // keep accumulating raw
+      }
       renderThread(conv);
       // Auto-scroll every ~10 ticks (≈80ms) to stay smooth without thrashing
       scrollThrottle++;
