@@ -3784,9 +3784,8 @@
   let currentConversationId = null;
   let convIdSeq = 0;
   let msgIdSeq = 0;
-  // Always point to the Node.js API server on port 3000
-  // (works whether page is opened via VS Code Live Server :5500, file://, or directly :3000)
-  const API_BASE = 'http://127.0.0.1:3000';
+  const isLocalHost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+  const API_BASE = isLocalHost ? 'http://127.0.0.1:3000' : '';
 
   const askFormEl = document.getElementById('askForm');
   const chatThreadEl = document.getElementById('chatThread');
