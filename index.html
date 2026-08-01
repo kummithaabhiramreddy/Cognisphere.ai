@@ -288,8 +288,7 @@
     </div>
   </a>
   <div class="nav-right">
-    <button class="btn-nav-ghost" onclick="openAuth('login')">Log in</button>
-    <button class="btn-nav-main" onclick="openAuth('register')">Get Started</button>
+    <button class="btn-nav-main" onclick="openAuth('register')" style="background:var(--gold); color:#0a0c10;">Sign Up Free</button>
   </div>
 </nav>
 
@@ -301,9 +300,8 @@
   <h2 class="hero-title">Superhuman AI Search &amp; Autonomous Studio</h2>
   <p class="hero-sub">Cognisphere.ai outperforms standard AI search engines with real-time web intelligence, full web/app code synthesis, and serverless Neon PostgreSQL memory.</p>
   <div class="hero-actions">
-    <button class="btn-hero-primary" onclick="openAuth('register')">Get Started Free</button>
-    <a href="home.html" class="btn-hero-ghost" style="display:inline-flex; align-items:center; gap:8px; text-decoration:none; padding:14px 28px; border-radius:12px; font-weight:600; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.12); color:#fff;">Launch App &rarr;</a>
-    <button class="btn-hero-secondary" onclick="openAuth('login')">Log in to Account →</button>
+    <button class="btn-hero-primary" onclick="openAuth('register')">Create Account Free</button>
+    <button class="btn-hero-secondary" onclick="openLoginGated()">Log in to Account →</button>
   </div>
 
   <!-- METRICS (REAL-TIME LIVE NEON DB UPDATES) -->
@@ -313,7 +311,7 @@
       <div class="metric-label">Queries</div>
     </div>
     <div class="metric-card" id="cardUsers">
-      <div class="metric-num" id="statUsers">1,240</div>
+      <div class="metric-num" id="statUsers">0</div>
       <div class="metric-label">Active Users</div>
     </div>
     <div class="metric-card" id="cardUptime">
@@ -332,8 +330,8 @@
   <div class="perf-box">
     <div class="perf-top">
       <div>
-        <div class="section-tag">Performance &amp; Autoscaling</div>
-        <div style="font-size:1.1rem; font-weight:800; color:#fff;">Neon PostgreSQL Load Balancing</div>
+        <div class="section-tag">Live Performance · Cognisphere.ai</div>
+        <div style="font-size:1.1rem; font-weight:800; color:#fff;">Cognisphere.ai Intelligent Load Balancing</div>
       </div>
       <div class="perf-tabs">
         <button class="perf-tab active" onclick="setMode('avoid', this)">Avoid incidents</button>
@@ -353,7 +351,7 @@
       </div>
     </div>
 
-    <div class="graph-footer-text" id="graphCap">54,210 performance degradations prevented by autoscaling every day</div>
+    <div class="graph-footer-text" id="graphCap">Cognisphere.ai handles thousands of live queries daily with intelligent autoscaling</div>
   </div>
 </div>
 
@@ -582,11 +580,30 @@
     btn.classList.add('active');
     renderStaticGraph(mode);
     if (mode === 'save') {
-      document.getElementById('graphCap').textContent = '$2.4M saved annually through intelligent compute scaling';
+      document.getElementById('graphCap').textContent = 'Cognisphere.ai saves compute costs with smart resource scaling per request';
       document.getElementById('badgeLeft').style.display = 'none';
     } else {
-      document.getElementById('graphCap').textContent = '54,210 performance degradations prevented by autoscaling every day';
+      document.getElementById('graphCap').textContent = 'Cognisphere.ai handles thousands of live queries daily with intelligent autoscaling';
       document.getElementById('badgeLeft').style.display = 'block';
+    }
+  }
+
+  // ── LOGIN GATE: user must have registered account first ──
+  function openLoginGated() {
+    // Check if user has ever registered (csUser set means they registered before)
+    const storedUser = localStorage.getItem('csUser');
+    const storedToken = localStorage.getItem('csToken');
+    if (storedUser && storedToken) {
+      // Already has account — allow login
+      openAuth('login');
+    } else {
+      // No account found — force register first
+      const errEl = document.getElementById('authError');
+      openAuth('register');
+      if (errEl) {
+        errEl.textContent = '⚠️ No account found. Please create an account first before logging in.';
+        errEl.classList.add('show');
+      }
     }
   }
 
@@ -634,6 +651,18 @@
       return;
     }
 
+    // ── REGISTER-FIRST GATE: login requires a registered account ──
+    if (authMode === 'login') {
+      const storedUser = localStorage.getItem('csUser');
+      const storedToken = localStorage.getItem('csToken');
+      if (!storedUser || !storedToken) {
+        errEl.textContent = '⚠️ No account found for this device. Please create an account first.';
+        errEl.classList.add('show');
+        setTimeout(() => toggleAuthMode('register'), 1800);
+        return;
+      }
+    }
+
     btn.disabled = true;
     btn.textContent = authMode === 'register' ? 'Creating account...' : 'Logging in...';
 
@@ -649,6 +678,15 @@
       const data = await r.json();
 
       if (!r.ok || !data.success) {
+        // If login fails with 'not found' type error, guide user to register
+        if (authMode === 'login' && (data.error || '').toLowerCase().includes('not found')) {
+          errEl.textContent = '⚠️ Account not found. Please create an account first.';
+          errEl.classList.add('show');
+          setTimeout(() => toggleAuthMode('register'), 2000);
+          btn.disabled = false;
+          btn.textContent = 'Log in';
+          return;
+        }
         throw new Error(data.error || 'Authentication failed. Check your credentials.');
       }
 
