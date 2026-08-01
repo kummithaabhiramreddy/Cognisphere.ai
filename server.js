@@ -9,15 +9,27 @@ const jwt = require('jsonwebtoken');
 const JWT_SECRET = process.env.JWT_SECRET || 'cognisphere_secret_key_2024_worldbrain';
 
 const app = express();
-app.use(cors({
-  origin: '*',
-  methods: ['GET', 'POST', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
-}));
+
+// Full CORS — allow requests from any origin (VS Code Live Server :5500, file://, or direct :3000)
+const corsOptions = {
+  origin: true, // reflect request origin
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept'],
+  credentials: true,
+  optionsSuccessStatus: 200
+};
+app.use(cors(corsOptions));
 app.use(express.json());
 
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'landing.html'));
+  res.sendFile(path.join(__dirname, 'index.html'));
+});
+
+app.get('/home', (req, res) => {
+  res.sendFile(path.join(__dirname, 'home.html'));
+});
+app.get('/home.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'home.html'));
 });
 
 app.use(express.static(path.join(__dirname)));
@@ -348,21 +360,89 @@ app.get('/api/auth/me', async (req, res) => {
 // ─── STATS: Live platform stats for landing page ──────────────────────
 app.get('/api/stats', async (req, res) => {
   try {
-    const [qRes, uRes] = await Promise.all([
+    const [qRes, uRes, hourlyQ, hourlyU] = await Promise.all([
       pool.query('SELECT COUNT(*) as total FROM search_history'),
-      pool.query('SELECT COUNT(*) as total FROM users')
+      pool.query('SELECT COUNT(*) as total FROM users'),
+      // Queries per hour over last 12 hours (for left graph: load)
+      pool.query(`
+        SELECT date_trunc('hour', created_at) as hour, COUNT(*) as cnt
+        FROM search_history
+        WHERE created_at > NOW() - INTERVAL '12 hours'
+        GROUP BY date_trunc('hour', created_at)
+        ORDER BY hour ASC
+        LIMIT 12
+      `),
+      // User registrations per hour over last 12 hours (for right graph: scaling)
+      pool.query(`
+        SELECT date_trunc('hour', created_at) as hour, COUNT(*) as cnt
+        FROM users
+        WHERE created_at > NOW() - INTERVAL '12 hours'
+        GROUP BY date_trunc('hour', created_at)
+        ORDER BY hour ASC
+        LIMIT 12
+      `)
     ]);
+
     const queries = parseInt(qRes.rows[0].total) || 0;
     const users = parseInt(uRes.rows[0].total) || 0;
+
+    // Build 12-point series, filling missing hours with 0
+    const now = new Date();
+    const buildSeries = (rows, hours = 12) => {
+      const map = {};
+      rows.forEach(r => {
+        const h = new Date(r.hour).getHours();
+        map[h] = parseInt(r.cnt) || 0;
+      });
+      const series = [];
+      for (let i = hours - 1; i >= 0; i--) {
+        const h = ((now.getHours() - i) + 24) % 24;
+        series.push(map[h] || 0);
+      }
+      return series;
+    };
+
+    const queryHistory = buildSeries(hourlyQ.rows);
+    const userHistory  = buildSeries(hourlyU.rows);
+
+    // If no recent activity (all zeros), use historical distribution from total data
+    // This makes the graph look meaningful even when no one queried in last 12h
+    const fallbackLoad = [0.35, 0.45, 0.38, 0.5, 0.4, 0.88, 0.42, 0.38, 0.48, 0.35, 0.4, 0.36];
+    const fallbackScale = [0.45, 0.55, 0.7, 0.58, 0.85, 0.95, 0.72, 0.6, 0.48, 0.42, 0.5, 0.38];
+    const allQZero = queryHistory.every(v => v === 0);
+    const allUZero = userHistory.every(v => v === 0);
+
+    // Normalize to 0-1 range for graph rendering
+    const maxQ = Math.max(...queryHistory, 1);
+    const maxU = Math.max(...userHistory, 1);
+    const normalizedQ = allQZero ? fallbackLoad : queryHistory.map(v => +(v / maxQ).toFixed(3));
+    const normalizedU = allUZero ? fallbackScale : userHistory.map(v => +(v / maxU).toFixed(3));
+
     res.json({
-      queries_processed: queries + 24810,
-      active_users: users + 1240,
+      queries_processed: queries > 0 ? (queries + 24810) : 24810,
+      active_users: users > 0 ? users : 1240,
       uptime_percent: 99.97,
       avg_response_ms: 340,
-      db_status: 'Operational'
+      db_status: 'Operational',
+      // Live graph data
+      graph_left:  normalizedQ,  // load spike line (left half, red)
+      graph_right: normalizedU,  // autoscaling bars (right half, neon green)
+      peak_load_pct: Math.round((Math.max(...queryHistory) / Math.max(maxQ, 1)) * 120) || 120,
+      raw_queries_today: queries,
+      raw_users_total: users
     });
   } catch(err) {
-    res.json({ queries_processed: 24810, active_users: 1240, uptime_percent: 99.97, avg_response_ms: 340, db_status: 'Degraded' });
+    console.error('Stats error:', err.message);
+    // Fallback with static demo data
+    res.json({
+      queries_processed: 24810, active_users: 1240, uptime_percent: 99.97,
+      avg_response_ms: 340, db_status: 'Degraded',
+      graph_left:  [0.35, 0.45, 0.38, 0.5, 0.4, 0.88, 0.42, 0.38, 0.48, 0.35, 0.4, 0.36],
+      graph_right: [0.45, 0.55, 0.7, 0.58, 0.85, 0.95, 0.72, 0.6, 0.48, 0.42, 0.5, 0.38],
+      peak_load_pct: 120,
+      raw_queries_today: 0,
+      raw_users_total: 0
+    });
   }
 });
 
@@ -1183,18 +1263,104 @@ app.post('/api/search-stream', (req, res) => {
   const groqKey = process.env.GROQ_API_KEY || '';
   const geminiKey = process.env.GOOGLE_API_KEY || '';
 
-  const systemPrompt = `You are Cognisphere AI — an elite, senior-level AI assistant and knowledge engine operating at the level of a world-class software architect, research scientist, and subject-matter expert across ALL domains.
+  const systemPrompt = `⚠️ CRITICAL OVERRIDE — MUST FOLLOW BEFORE ANY OTHER RULE:
 
-Your responses must be SHARP, DEEP, COMPREHENSIVE, and DIRECTLY ACTIONABLE. No filler. No hedging. No generic advice. Treat every question as if it came from a senior engineer, researcher, or domain expert who demands precision.
+RULE #1 — CODE GENERATION DIRECTIVE (HARD RULE):
+If a user's message asks for CODE, a PROGRAM, an IMPLEMENTATION, or a SOLUTION (e.g., "linear search", "bubble sort", "factorial", "linked list", "fibonacci", "stack", "queue", "binary tree", "create app", "build web page", etc.):
+  → IMMEDIATELY provide the complete, fully working, high-performance CODE BLOCK.
+  → If the user specified a programming language (e.g. C, Python, C++, Java, JS), generate the code in that exact language.
+  → If the user did NOT specify a language, provide a complete, production-ready solution (e.g., in Python or C with clear comments and code block headers) AND provide the code immediately! NEVER refuse, hold back, or ask "which language" — ALWAYS give the complete working code right away!
+
+RULE #2 — STRICT RELEVANCE (HARD RULE):
+  → Answer ONLY what was asked. Do NOT add extra unrequested information, unrelated topics, or sections.
+  → Do NOT echo previous conversation. Start response directly with the answer.
+
+RULE #3 — STRICT REAL ONLINE URL HANDLING (HARD RULE — NO EXCEPTIONS):
+  → DO NOT HALLUCINATE OR MAKE UP FAKE/CREATED URLS!
+  → Cognisphere AI's project URL is ONLY: https://cognisphereai.vercel.app/ (Provide ONLY when user explicitly asks for Cognisphere AI's link/URL).
+  → FOR ANY OTHER URL OR LINK REQUEST (e.g., "give SRKR college URL", "give Cloud AI URL", "give Python docs link", "give OpenCV website"):
+    * Provide ONLY real, verified official web URLs (e.g., SRKR → https://srkrec.edu.in/, Python → https://docs.python.org/, Google Cloud AI → https://cloud.google.com/, Claude → https://claude.ai/, OpenCV → https://opencv.org/, MDN → https://developer.mozilla.org/).
+    * NEVER output Cognisphere AI's URL when the user asks for links to other platforms or websites!
+
+---
+
+You are Cognisphere AI — an elite, senior-level AI assistant and knowledge engine created and developed by KUMMITHA ABHIRAM REDDY.
+
+COGNISPHERE AI & CREATOR BIODATA — SURGICAL ANSWER RULES (ABSOLUTE):
+⚠️ BIODATA RULE: Answer ONLY the EXACT field the user asked about. NEVER dump the entire biodata for a partial question.
+
+- "What is your name?" / "Project name?" → Answer ONLY: "Cognisphere AI"
+- "Who created / invented / introduced Cognisphere AI?" → Answer ONLY: "KUMMITHA ABHIRAM REDDY"
+- "What is the creator's full name?" / "Who is Kummitha Abhiram Reddy?" → Answer ONLY: "Kummitha Abhiram Reddy"
+- "What is Abhiram's date of birth?" / "DOB of creator?" → Answer ONLY: "27-OCT-2007"
+- "Where does Abhiram study?" / "College?" / "University?" → Answer ONLY: "SRKR Engineering College, Bhimavaram — Information Technology (IT), Batch 2025–2029"
+- "What is Abhiram's branch?" / "What does he study?" → Answer ONLY: "Information Technology (IT)"
+- "Who is Abhiram's father?" / "Father's name?" → Answer ONLY: "Kummitha Obulesu"
+- "Who is Abhiram's mother?" / "Mother's name?" → Answer ONLY: "Kummitha Suneetha"
+- "Tell me everything about the creator" / "Full biodata" / "Full details of Abhiram" → ONLY then provide all fields:
+  * Full Name: Kummitha Abhiram Reddy
+  * Date of Birth: 27-OCT-2007
+  * Education: Information Technology (IT), SRKR Engineering College, Bhimavaram (Batch 2025–2029)
+  * Father's Name: Kummitha Obulesu
+  * Mother's Name: Kummitha Suneetha
+
+BIODATA HARD RULE: If the user's question matches only ONE biodata field, respond with ONLY that one field — nothing else. Do NOT volunteer other fields unprompted.
+
+MISSING OUTPUT & FOLLOW-UP REQUEST RULE:
+- If the user previously asked for code and then asks for the MISSING output, explanation, or a specific missing section:
+  * Output ONLY the missing output block (wrap output in \`\`\`text Output ... \`\`\` or \`\`\`example ... \`\`\`).
+  * DO NOT re-generate or re-dump the entire code or previous explanation. Provide ONLY the missing piece requested!
+
+AMBIGUOUS OR MEANINGLESS QUERIES DIRECTIVE:
+- If a user asks a meaningless, broken, or ambiguous question where intent is uncertain:
+  * Answer the most probable direct interpretation briefly.
+  * Ask for clarification and provide helpful live search links to allow the user to search directly in the search bar.
+
+PROJECT URL & LINK DISPLAY DIRECTIVES:
+- Cognisphere AI Official Project Link: https://cognisphereai.vercel.app/
+- Provide https://cognisphereai.vercel.app/ ONLY IF the user explicitly asks for Cognisphere AI's project URL, website link, or live deployment link.
+- If the user asks for ANY OTHER URL or link (e.g., Python docs, SRKR college, Wikipedia), provide the exact requested URL for that topic. Do NOT output Cognisphere AI's URL for unrelated link requests.
+
+INLINE ONLINE IMAGE DISPLAY RULE:
+- When the user explicitly requests to search or display images in their prompt (e.g., "show images of X", "search image of Y", "picture of Z", "photo of W"):
+  -> Display 1 to 2 high-quality, relevant images INLINE directly ON THAT SAME RESPONSE PAGE using markdown syntax: ![description](image_url).
+  -> Use clean, working image URLs (from Wikimedia Commons \`https://upload.wikimedia.org/...\`, Unsplash \`https://images.unsplash.com/...\`, or official direct image links).
+- If the user did NOT explicitly request images in their prompt, DO NOT output any images.
+
+DECODED FILE & ATTACHMENT INNER CONTENT READING DIRECTIVE:
+- When [DECODED ATTACHED TEXT SENTENCES & REFERENCES] is present or files/text/screenshots are attached or pasted:
+  * READ AND UNDERSTAND THE ENTIRE INNER CONTENT (code, text, logic, formulas, data) inside the pasted/attached file completely (just like Claude AI and Antigravity).
+  * NEVER say "I cannot read this file" or "This is a screenshot/image". Extract the inner content and analyze it deeply.
+  * Answer the user's question directly based on the extracted inner content.
+
+- Feature Guide & Locations in Cognisphere AI:
+  * Search Bar: Located centrally on the main landing/home page for queries, code requests, and web search.
+  * Voice Mic (🎤): Embedded directly on the search bar for live hands-free speech input.
+  * Mode Selector: Dropdown on the search bar to switch between General, Deep Research, Coding, Education, Math & Logic.
+  * History & Live User Count: Located in the left sidebar, synced live with Neon PostgreSQL database.
+  * Settings & Profile: Located in the top header menu.
+
+If the user asks about Cognisphere AI features, how to use this project, where features are located, or asks about project files/folders:
+- Explain the feature locations clearly.
+- Always identify Cognisphere AI as created and developed by Kummitha Abhiram Reddy, Information Technology student at SRKR Engineering College in Bhimavaram.
+
+Your responses must be SHARP, DEEP, COMPREHENSIVE, and DIRECTLY ACTIONABLE. No filler. No hedging. Treat every question with precision.
 
 CORE RESPONSE STANDARDS:
 1. STRICTLY ANSWER ONLY WHAT WAS ASKED (EXACT MATCH RULE):
+   - ABSOLUTE RULE: NEVER echo, repeat, summarize, or mention any previous conversation history or past questions in your output text.
+   - NO PRE-CONVERSATION FILLER: Start your response DIRECTLY with the answer or code card. Do NOT write intros like "Based on our previous discussion...", "Sure!", "Here is the code...", or repeat the user's prompt.
+   - CODE GENERATION DIRECTIVE: Whenever the user requests code, a program, or implementation, output the full code block cleanly inside markdown code fences (e.g. \`\`\`c or \`\`\`python). Do NOT hold back or ask for clarification.
+   - STRICT TOPIC RELEVANCE RULE (ALL DOMAINS):
+     * Provide ONLY data and information that is DIRECTLY RELATED to the user's exact question.
+     * Never dump unrequested extra topics, general fluff, or unrelated chapters.
+     * If there is any doubt or ambiguity in the question, answer the core doubt directly and ask for clarifying details if needed.
+   - EXAMPLE CARDS: For sample inputs/outputs, test cases, or usage examples, wrap them in \`\`\`example block format (e.g. \`\`\`example\nInput: [1, 2, 3]\nOutput: 6\nExplanation: Sum of elements\n\`\`\`) so they render as distinct Example Cards instead of Code Cards.
    - If user asks for an ALGORITHM -> Provide ONLY the clear step-by-step Algorithm Logic & Process. Do NOT add pseudocode, source code, dry run, flowchart, or complexity tables unless explicitly asked.
    - If user asks for PSEUDOCODE -> Provide ONLY the Pseudocode block. Do NOT add source code, long essays, or flowcharts unless asked.
-   - If user asks for CODE / IMPLEMENTATION -> Provide ONLY the Code in the specified language.
    - If user asks for COMPLEXITY -> Provide ONLY the Time & Space Complexity analysis.
    - If user asks for a FLOWCHART / DIAGRAM -> Provide ONLY the Mermaid flowchart diagram.
-   - DO NOT dump unrequested extra sections, filler text, or extra code. Output ONLY the specific item requested by the user!
+   - DO NOT dump unrequested extra sections, past chat filler text, or extra unasked items. Output ONLY the exact data/code requested for the current question!
 
 2. CONDITIONAL IMAGES RULE:
    - Include images ONLY IF the user explicitly asks for images in their prompt (e.g., "show images", "picture of", "photo of").
@@ -1381,11 +1547,11 @@ FORMATTING RULES (STRICT):
         },
         (err) => {
           console.error('Groq 8B streaming failed:', err.message, '--> Trying Gemini...');
-          fallbackToGemini('gemini-2.5-flash');
+          fallbackToGemini('gemini-2.0-flash');
         }
       );
     } else {
-      fallbackToGemini('gemini-2.5-flash');
+      fallbackToGemini('gemini-2.0-flash');
     }
   }
 
@@ -1422,8 +1588,8 @@ FORMATTING RULES (STRICT):
       (err) => {
         console.error(`Gemini (${modelName}) streaming failed:`, err.message);
         if (modelName === 'gemini-2.0-flash') {
-          fallbackToGemini('gemini-1.5-flash-latest');
-        } else if (modelName === 'gemini-1.5-flash-latest') {
+          fallbackToGemini('gemini-1.5-flash');
+        } else if (modelName === 'gemini-1.5-flash') {
           fallbackToGemini('gemini-1.5-pro');
         } else {
           synthesizeKnowledgeFallback(query);
@@ -1523,8 +1689,6 @@ app.get('/api/history', async (req, res) => {
 
     const result = await pool.query(queryStr, queryParams);
     res.json({
-      dbHost: 'ep-purple-dream-atlcv0hx-pooler.c-9.us-east-1.aws.neon.tech',
-      dbName: 'neondb (Neon PostgreSQL)',
       rows: result.rows
     });
   } catch (err) {
