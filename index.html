@@ -1253,14 +1253,25 @@
 
   /* ====== WEB RESULTS BLOCK in chat ====== */
   .web-result-block{ margin-top:14px; }
-  .web-result-images{
-    display:flex; gap:8px; flex-wrap:wrap; margin-bottom:12px;
-  }
-  .web-result-images img{
-    width:120px; height:80px; object-fit:cover;
-    border-radius:8px; border:1px solid var(--line-strong);
-    cursor:pointer; transition:transform .2s ease, border-color .2s ease;
-  }
+  .web-result-images {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+}
+
+.web-result-images img {
+  width: 120px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 1px solid var(--line-strong);
+  cursor: pointer;
+  transition: transform .2s ease, border-color .2s ease;
+  flex: 0 0 auto;
+}
   .web-result-images img:hover{ transform:scale(1.04); border-color:var(--gold); }
   /* ====== UPGRADED VIDEO CARDS ====== */
   .web-result-videos-wrap{ margin-bottom:16px; }
@@ -1286,7 +1297,7 @@
     display:flex; gap:10px; flex-wrap:wrap;
   }
   .video-card{
-    width:155px; cursor:pointer; border-radius:10px;
+    width:120px; cursor:pointer; border-radius:9px;
     background:var(--bg-panel); border:1px solid var(--line-strong);
     overflow:hidden; transition:border-color .2s, transform .2s, box-shadow .2s;
     text-decoration:none; color:inherit;
@@ -1298,7 +1309,7 @@
     box-shadow:0 6px 20px rgba(217,119,87,0.18);
   }
   .video-card-thumb{
-    width:100%; height:85px; position:relative; overflow:hidden;
+    width:100%; height:68px; position:relative; overflow:hidden;
     background:#0d1117;
   }
   .video-card-thumb img{
@@ -1409,8 +1420,7 @@
 
   /* ====== BULLET POINTS ====== */
   .web-bullets{
-    margin:0 0 14px 0; padding:0;
-    list-style:none; display:flex; flex-direction:column; gap:7px;
+    display: none !important;
   }
   .web-bullets li{
     display:flex; align-items:flex-start; gap:8px;
@@ -1781,113 +1791,99 @@
     max-width: 100%;
   }
 
-Your responses must be SHARP, DEEP, COMPREHENSIVE, and DIRECTLY ACTIONABLE. No filler. No hedging. No generic advice. Treat every question as if it came from a senior engineer, researcher, or domain expert who demands precision.
-
-CORE RESPONSE STANDARDS:
-- Be exhaustive and technically rigorous. Cover edge cases, trade-offs, best practices, and real-world implications.
-- Use concrete examples, exact syntax, real variable names — never pseudocode unless explicitly requested.
-- Structure responses for maximum clarity: use headers (###), bullet points, numbered steps, tables, and code blocks strategically.
-- Always go beyond the surface — explain WHY, not just WHAT.
-- If multiple approaches exist, present them ranked by suitability with trade-off analysis.
-
-DOMAIN-SPECIFIC INSTRUCTIONS:
-
-1. CODE & ALGORITHMS (EXPERT LEVEL):
-   - Default language: C (with structs, pointers, malloc, stdio.h/stdlib.h) UNLESS user specifies otherwise.
-   - If language specified (Python, Java, C++, JavaScript, Go, Rust, etc.), use that EXACTLY.
-   - ALL code must be production-quality: proper error handling, edge cases covered, memory-safe where applicable.
-   - MANDATORY: Every code block MUST be followed by an "Expected Output:" section in a \`\`\`text\nOutput:\n...\n\`\`\` block showing exact execution result.
-   - For DS/Algo problems: include time complexity O(n), space complexity O(n), and optimization notes.
-   - For system design: include architecture diagrams (Mermaid), component breakdown, scaling considerations.
-   - For debugging: identify root cause, explain WHY it fails, provide fixed code + explanation.
-
-2. DATA STRUCTURES & ALGORITHMS (ADVANCED):
-   - Always include: implementation, dry-run trace, complexity analysis, real-world applications.
-   - Cover all variants (e.g., singly/doubly/circular linked list; min/max heap; AVL/Red-Black trees).
-   - For sorting: show step-by-step array transformation.
-   - For graph problems: include adjacency matrix AND list representations.
-
-3. FLOWCHARTS & DIAGRAMS:
-   - Generate valid Mermaid.js inside \`\`\`mermaid\` blocks.
-   - STRICT SYNTAX: ALL node labels in double quotes inside brackets: A["Label"] --> B["Next"].
-   - NEVER use raw parentheses, angle brackets, or special chars in unquoted labels.
-   - Arrows: A --> B or A -->|condition| B only.
-
-4. STEP-BY-STEP EXPLANATIONS:
-   - Structure ALL technical explanations as numbered steps: ### Step 1: ..., ### Step 2: ...
-   - Include real examples at each step.
-   - End with a summary table or key takeaways section.
-
-5. FILE & ATTACHMENT ANALYSIS:
-   - When [DECODED ATTACHED TEXT SENTENCES & REFERENCES] is present: treat it as the primary source.
-   - Analyze it DEEPLY — bugs, logic flaws, security vulnerabilities, performance issues, style improvements.
-   - DO NOT mention metadata (file name, size, type). Focus ONLY on content.
-
-6. COMPARISONS (MANDATORY TABLE FORMAT):
-   - ANY comparison request ("vs", "difference", "pros/cons", "when to use") MUST produce:
-     a) A comprehensive Markdown table with ≥8 comparison parameters.
-     b) Detailed paragraphs explaining each dimension with real use-case context.
-     c) A clear "When to use X vs Y" decision guide.
-
-7. CONVERSATION MEMORY:
-   - [PREVIOUS CONVERSATION HISTORY & CONTEXT] section = full prior conversation. READ IT ALL.
-   - Always connect follow-up questions to prior context. Never claim lack of memory.
-
-8. WEB DEVELOPMENT (BUILD NARRATIVE — REQUIRED):
-   - For ANY web/frontend request (HTML, CSS, JS, React, Vue, Next.js, Tailwind, etc.):
-   - ALWAYS start with a build narrative line BEFORE each code block:
-       "Let me create a complete [Project Name] with [features]:"
-       "Now let me build index.html with full semantic structure:"
-       "Now let me write style.css with responsive design:"
-       "Now let me create script.js with all interactive logic:"
-   - Mention EXACT filename (index.html, app.css, main.js) in every narrative line.
-   - After each narrative → immediately output that file's complete code block.
-   - Code must be PREMIUM: glassmorphism, animations, Google Fonts, CSS variables, responsive design.
-   - DO NOT skip narrative lines — they drive the live build animation system.
-
-9. MOBILE & DESKTOP APP BUILDING (BUILD NARRATIVE — REQUIRED):
-   - For Android (Kotlin/Java/XML), iOS (Swift), Flutter (Dart), React Native, Desktop (Electron, Tauri):
-   - ALWAYS narrate each file creation step:
-       "Let me scaffold the complete Android project:"
-       "Now let me create MainActivity.kt with full logic:"
-       "Now let me create activity_main.xml with Material Design UI:"
-       "Now let me create AndroidManifest.xml:"
-       "Now let me add build.gradle dependencies:"
-   - Each narrative MUST name the exact file (MainActivity.kt, AppDelegate.swift, pubspec.yaml, etc.).
-   - After each narrative → output complete, compilable code for that file.
-   - Include proper imports, permissions, dependencies, and entry points.
-
-10. AI, ML & DATA SCIENCE:
-    - For ML requests: include full pipeline (data prep → model → training → evaluation → deployment).
-    - Show actual sklearn/TensorFlow/PyTorch code, not pseudocode.
-    - Include metrics interpretation, overfitting detection, hyperparameter tuning guidance.
-
-11. SYSTEM DESIGN & ARCHITECTURE:
-    - For system design questions: include Mermaid architecture diagram, component descriptions,
-      database schema, API design, caching strategy, scaling approach, and failure handling.
-
-12. MATHEMATICS & THEORY:
-    - Show full derivations for math problems. Use LaTeX notation where applicable.
-    - For proofs: show each logical step with justification.
-    - For statistics: include formulas, worked examples, interpretation of results.
-
-13. GENERAL KNOWLEDGE & RESEARCH:
-    - Give expert-level synthesis, not Wikipedia summaries.
-    - Cite specific mechanisms, historical context, current state-of-the-art.
-    - For opinions/debates: present multiple perspectives with evidence, then give a reasoned conclusion.
-
-FORMATTING RULES:
-- NEVER use filler phrases ("Great question!", "Certainly!", "Of course!", "I'd be happy to...").
-- Start DIRECTLY with the answer or first step.
-- Use **bold** for key terms, \`code\` for inline code, and ### headers for sections.
-- Tables preferred over bullet lists for comparisons.
-- Keep tone: expert, direct, confident, precise.`;
-    position: relative;
-    background: #1c1f26;
-    border-radius: 12px;
-    padding: 16px 18px;
-    padding-right: 52px;
+  /* ====== DISTINCT EXAMPLE CARD DESIGN (matches screenshot) ====== */
+  .example-card-wrap {
+    margin: 16px 0;
+    border-radius: 14px;
+    background: #0c0b14;
+    border: 1px solid rgba(139, 92, 246, 0.35);
+    box-shadow: 0 6px 28px rgba(109, 40, 217, 0.15);
+    overflow: hidden;
+    font-family: 'JetBrains Mono', 'Fira Code', monospace;
   }
+  .example-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 16px;
+    background: rgba(76, 29, 149, 0.45);
+    border-bottom: 1px solid rgba(139, 92, 246, 0.3);
+  }
+  .example-card-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.76rem;
+    font-weight: 700;
+    color: #c4b5fd;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    font-family: 'Inter', sans-serif;
+  }
+  .example-card-copy-btn {
+    all: unset;
+    box-sizing: border-box;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    background: rgba(109, 40, 217, 0.2);
+    border: 1px solid rgba(139, 92, 246, 0.4);
+    color: #a78bfa;
+    font-size: 0.73rem;
+    font-weight: 600;
+    font-family: 'Inter', sans-serif;
+    transition: all 0.15s ease;
+  }
+  .example-card-copy-btn:hover {
+    background: rgba(139, 92, 246, 0.35);
+    color: #ffffff;
+    border-color: rgba(167, 139, 250, 0.6);
+  }
+  .example-card-body {
+    padding: 14px 16px 16px 16px;
+    background: #0a091200;
+    border-left: 3px solid #6d28d9;
+  }
+  /* Per-line row inside example card */
+  .ex-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 7px 12px;
+    border-radius: 8px;
+    margin: 5px 0;
+    font-family: 'JetBrains Mono', 'Fira Code', monospace;
+    font-size: 0.82rem;
+    line-height: 1.5;
+  }
+  .ex-input  { background: rgba(14, 38, 78, 0.75); border: 1px solid rgba(59, 130, 246, 0.22); }
+  .ex-output { background: rgba(8, 36, 24, 0.75);  border: 1px solid rgba(16, 185, 129, 0.22); }
+  .ex-expl   { background: rgba(42, 28, 8, 0.75);  border: 1px solid rgba(245, 158, 11, 0.22); }
+  .ex-badge {
+    font-size: 0.67rem;
+    font-weight: 800;
+    padding: 2px 8px;
+    border-radius: 4px;
+    letter-spacing: 0.06em;
+    flex-shrink: 0;
+    font-family: 'Inter', sans-serif;
+    text-transform: uppercase;
+  }
+  .ex-input  .ex-badge { background: rgba(37,99,235,0.4);   color: #93c5fd; }
+  .ex-output .ex-badge { background: rgba(5,150,105,0.4);   color: #6ee7b7; }
+  .ex-expl   .ex-badge { background: rgba(217,119,6,0.4);   color: #fcd34d; }
+  .ex-val { color: #e2e8f0; }
+  .ex-plain {
+    font-family: 'JetBrains Mono', 'Fira Code', monospace;
+    font-size: 0.82rem;
+    color: #94a3b8;
+    padding: 2px 2px;
+    line-height: 1.65;
+  }
+
   .code-output-body {
     margin: 0;
     font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
@@ -2476,6 +2472,134 @@ FORMATTING RULES:
     margin-top: 4px;
     display: block;
   }
+
+  /* ====== SEARCH BAR MODE SELECTOR & BLUE BUTTON (MATCHING SCREENSHOT) ====== */
+  .search-shell {
+    position: relative;
+    width: 100%;
+    max-width: 720px;
+    margin: 0 auto;
+    transition: all 0.3s ease;
+  }
+  #askForm {
+    display: flex;
+    flex-direction: column;
+    background: #17181c;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 20px;
+    padding: 10px 14px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.45);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+  #askForm:focus-within {
+    border-color: rgba(255, 255, 255, 0.25);
+    box-shadow: 0 8px 36px rgba(0, 153, 255, 0.15);
+  }
+  .ask-form-top-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+  }
+  .search-actions-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+  form button.send.send-blue-btn {
+    width: 38px; height: 38px; border-radius: 50%;
+    background: #0088ff !important; border: none; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: transform .15s ease, background .15s ease;
+    box-shadow: 0 2px 10px rgba(0, 136, 255, 0.35);
+    flex-shrink: 0;
+  }
+  form button.send.send-blue-btn:hover {
+    background: #0077ee !important;
+    transform: scale(1.05);
+  }
+  .search-bar-bottom-row {
+    display: flex; align-items: center; justify-content: flex-end;
+    margin-top: 4px; padding-top: 2px;
+  }
+  .search-bar-mode-btn {
+    display: inline-flex; align-items: center; gap: 4px;
+    background: transparent; border: none;
+    color: rgba(255, 255, 255, 0.65);
+    font-family: 'Inter', sans-serif; font-size: 0.8rem; font-weight: 500;
+    cursor: pointer; padding: 3px 8px; border-radius: 6px;
+    transition: color 0.15s ease, background 0.15s ease;
+  }
+  .search-bar-mode-btn:hover {
+    color: #ffffff; background: rgba(255, 255, 255, 0.08);
+  }
+  .modes-card-popup {
+    position: absolute;
+    bottom: calc(100% + 12px);
+    right: 0;
+    width: 210px;
+    max-width: 94vw;
+    background: rgba(14, 16, 22, 0.96);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 14px;
+    padding: 8px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255,255,255,0.04);
+    z-index: 200;
+    backdrop-filter: blur(20px);
+    animation: fadeInCard 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  @keyframes fadeInCard {
+    from { opacity: 0; transform: translateY(8px) scale(0.97); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+  }
+  .modes-card-list { display: flex; flex-direction: column; gap: 1px; }
+  .mode-card-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 8px 10px; border-radius: 9px; cursor: pointer;
+    background: transparent;
+    transition: background 0.12s ease, border-color 0.12s ease;
+    border: 1px solid transparent;
+  }
+  .mode-card-item:hover {
+    background: rgba(255, 255, 255, 0.07);
+    border-color: rgba(255, 255, 255, 0.08);
+  }
+  .mode-card-item.active {
+    background: rgba(217, 119, 87, 0.13);
+    border-color: rgba(217, 119, 87, 0.35);
+  }
+  .mode-card-item.active .mode-card-title { color: #e8c9a0; }
+  .mode-card-icon {
+    font-size: 1rem; width: 24px; text-align: center;
+    flex-shrink: 0; opacity: 0.85;
+  }
+  .mode-card-title {
+    font-size: 0.82rem; font-weight: 600;
+    color: rgba(255,255,255,0.82);
+    font-family: 'Inter', sans-serif;
+    letter-spacing: 0.01em;
+  }
+
+  /* ====== RESPONSIVE LAYOUT FIXES FOR PC, MOBILES & TABLETS ====== */
+  html, body {
+    width: 100%; max-width: 100vw;
+    height: 100%; height: 100dvh;
+    margin: 0; padding: 0;
+    overflow-x: hidden;
+  }
+  main {
+    box-sizing: border-box;
+    width: 100%; max-width: 1000px;
+    margin: 0 auto;
+    padding: 20px 16px 140px;
+  }
+  @media (max-width: 768px) {
+    main { padding: 12px 10px 150px; }
+    .search-shell { max-width: 100%; }
+    .modes-card-popup { right: 0; left: 0; margin: 0 auto; width: 95%; }
+  }
+
 </style>
 <script src="https://cdn.jsdelivr.net/npm/marked@4.3.0/marked.min.js"></script>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
@@ -2512,219 +2636,17 @@ FORMATTING RULES:
 <style>
   #webSearchOverlay { display: none !important; }
 </style>
-
-<!-- ============================================================
-     MOBILE FIT & FIX — full-viewport responsive hardening
-     ============================================================ -->
-<style>
-  /* Never let any element push the page wider than the viewport */
-  html, body{ max-width:100vw; overflow-x:hidden; }
-  *{ -webkit-tap-highlight-color: transparent; }
-  img, video, svg{ max-width:100%; height:auto; }
-
-  @media (max-width: 900px){
-    .header-mode-pill{ display:flex; }
-  }
-
-  @media (max-width: 720px){
-    /* ---------- Header ---------- */
-    header{
-      padding:12px 14px;
-      gap:8px;
-      flex-wrap:nowrap;
-    }
-    header .brand{ gap:8px; min-width:0; flex-shrink:1; }
-    header .brand > div{ min-width:0; }
-    header .brand > div > div:first-child{
-      font-size:0.82rem;
-      white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
-    }
-    header .brand > div > div:last-child{ font-size:0.4rem; letter-spacing:0.08em; }
-    .mark{ width:20px; height:20px; }
-
-    .header-right{ gap:6px; flex-shrink:0; }
-
-    /* Icon-only mode pill — text labels hidden, just the emoji symbol shows */
-    .header-mode-pill{ padding:2px; gap:1px; }
-    .header-mode-pill-btn{
-      padding:7px; min-width:32px; height:32px;
-      display:flex; align-items:center; justify-content:center;
-      font-size:0.95rem;
-    }
-    .header-mode-pill-btn .pill-label{ display:none; }
-    .header-mode-pill-btn .pill-icon{ line-height:1; }
-
-    /* Icon-only share button — text hidden, just the icon shows */
-    .share-btn{
-      padding:0; width:34px; height:34px;
-      display:flex; align-items:center; justify-content:center;
-      border-radius:50%; gap:0;
-    }
-    .share-btn svg{ width:16px; height:16px; }
-    .share-btn .share-label{ display:none; }
-
-    .share-popup{
-      position:fixed;
-      top:60px; right:8px; left:8px;
-      width:auto; max-width:none;
-    }
-
-    /* ---------- Sidebar ---------- */
-    .sidebar{ width:86vw; max-width:320px; padding:16px 12px 0; }
-    .account-menu{ left:6px; right:6px; }
-
-    /* ---------- Main / hero ---------- */
-    main{ padding:16px 14px; }
-    h1{ font-size:1.4rem; max-width:22ch; margin-bottom:26px; }
-    .eyebrow{ font-size:0.64rem; margin-bottom:12px; }
-    .hint{ font-size:0.66rem; line-height:1.8; }
-
-    /* ---------- Search / composer ---------- */
-    .search-shell{ width:100%; max-width:100%; }
-    body.docked .search-shell,
-    body.chat-active .search-shell{
-      left:50%;
-      bottom:10px;
-      width:calc(100vw - 20px);
-      max-width:calc(100vw - 20px);
-    }
-    body.chat-active main, body.docked main{ padding-bottom:118px; }
-
-    form{
-      padding:10px 8px;
-      border-radius:16px;
-      gap:2px;
-    }
-    form textarea{
-      font-size:16px;      /* prevents iOS Safari auto-zoom on focus */
-      padding:10px 6px;
-      min-height:34px;
-    }
-    .icon-btn{ width:32px; height:32px; }
-    .icon-btn svg{ width:16px; height:16px; }
-    form button.send{ width:38px; height:38px; }
-    form button.send svg{ width:15px; height:15px; }
-    .active-tool-pill{ font-size:0.6rem; padding:4px 8px 4px 6px; }
-
-    /* ---------- Tools popover ---------- */
-    .tools-row{ width:min(220px, 78vw); left:4px; }
-
-    /* ---------- Chat thread ---------- */
-    .chat-thread{ max-width:100%; gap:12px; }
-    .msg-row{ max-width:94%; }
-    .msg{ font-size:0.88rem; padding:10px 13px; line-height:1.5; }
-    .msg-actions{ font-size:0.68rem; gap:6px; }
-    .msg-tool-status{ font-size:0.66rem; }
-
-    /* ---------- Attachments ---------- */
-    .attach-card{ width:140px; padding:10px; }
-    .attach-card-preview{ height:80px; }
-    .attach-card-code{ font-size:0.6rem; }
-    .msg-small-card{ max-width:200px; padding:5px 9px; }
-
-    /* ---------- Tables ---------- */
-    .msg-text table, table.premium-table{ font-size:0.76rem; }
-    .msg-text table th, .msg-text table td,
-    table.premium-table th, table.premium-table td{
-      padding:8px 10px; white-space:normal;
-    }
-
-    /* ---------- Code / diagram / output cards ---------- */
-    .code-block-header, .diagram-card-header, .code-output-label{ font-size:0.68rem; }
-    .code-block-body, .code-output-body{ font-size:0.74rem; padding:14px 12px; }
-    .diagram-card-body{ padding:14px 8px; min-height:90px; }
-    .code-output-inner{ padding:12px 14px; padding-right:46px; }
-
-    /* ---------- Video / image results ---------- */
-    .web-result-videos{ gap:8px; }
-    .video-card{ width:130px; }
-    .video-card-thumb{ height:74px; }
-    .video-card-title{ font-size:0.68rem; }
-    .web-result-images img{ width:96px; height:64px; }
-    .videos-section-title{ font-size:0.74rem; }
-    .lang-select{ font-size:0.68rem; padding:4px 8px; }
-
-    /* ---------- Modals (settings / download / plan / language / help / history / paste) ---------- */
-    .modal-overlay{ padding:10px; align-items:flex-end; }
-    .download-card, .paste-card{
-      max-width:100%; width:100%;
-      max-height:88vh;
-      padding:16px;
-      border-radius:16px 16px 0 0;
-    }
-    .paste-card-head, .download-card-head{ flex-wrap:wrap; gap:8px; }
-    .paste-lines, .paste-edit-area{ font-size:0.72rem; }
-
-    /* Settings / Plan pricing grid stacks on mobile */
-    #planModal [style*="grid-template-columns:repeat(auto-fit"]{
-      grid-template-columns:1fr !important;
-    }
-    #downloadModal [style*="grid-template-columns:repeat(auto-fit"]{
-      grid-template-columns:1fr !important;
-    }
-
-    /* ---------- Web dev / app builder file cards ---------- */
-    .web-dev-file-card{
-      flex-direction:column; align-items:flex-start; gap:12px;
-      padding:14px;
-    }
-    .web-dev-file-card > div:last-child{ width:100%; }
-    .web-dev-download-btn{ width:100%; }
-    .web-project-header{ flex-direction:column; align-items:flex-start; }
-    .web-project-actions{ width:100%; }
-    .web-project-zip-btn, .web-project-preview-btn{ flex:1; justify-content:center; }
-
-    /* ---------- Cloud live preview modal ---------- */
-    .cloud-preview-header{ padding:0 10px; flex-wrap:wrap; height:auto; min-height:48px; }
-    .cloud-preview-file-title{
-      max-width:38vw; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
-      font-size:0.76rem;
-    }
-    .cloud-copy-btn{ font-size:0.7rem; padding:5px 9px; }
-
-    /* ---------- Education panel ---------- */
-    .edu-panel{ width:100vw; }
-    #eduToggleBtn{ bottom:92px; right:10px; width:42px; height:42px; }
-    .apm-card{ width:96vw; }
-    .apm-field-row{ flex-direction:column; gap:12px; }
-
-    /* ---------- Footer ---------- */
-    footer{ padding:12px 16px; font-size:0.62rem; }
-
-    /* ---------- Videos full page ---------- */
-    #videosPageView{ padding:14px; }
-    #featuredVideoTitle{ font-size:0.8rem; }
-  }
-
-  @media (max-width: 400px){
-    header .brand > div > div:first-child{ font-size:0.72rem; }
-    .header-mode-pill{ max-width:38vw; }
-    .header-mode-pill-btn{ padding:4px 6px; font-size:0.6rem; }
-    .share-btn span, .share-btn{ font-size:0; padding:8px; }
-    .share-btn svg{ width:15px; height:15px; margin:0; }
-    h1{ font-size:1.18rem; }
-    .attach-card{ width:120px; }
-    .msg{ font-size:0.85rem; }
-    .video-card{ width:112px; }
-  }
-
-  /* Landscape phones: keep composer from eating the whole screen */
-  @media (max-height: 420px) and (orientation: landscape){
-    body.chat-active main, body.docked main{ padding-bottom:96px; }
-    form{ padding:8px 8px; }
-  }
-</style>
 </head>
 <body>
 
 <!-- DEDICATED CLASSES PAGE VIEW -->
-<div id="videosPageView" style="display:none; position:fixed; inset:0; z-index:99995; background:var(--bg-deep); overflow-y:auto; padding:24px;">
+<div id="videosPageView" style="display:none; position:fixed; inset:0; z-index:99995; background:var(--bg-deep); overflow-y:auto; padding:16px;">
   <div style="max-width:1000px; margin:0 auto;">
-    <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; border-bottom:1px solid var(--line-strong); padding-bottom:14px;">
-      <button type="button" id="closeVideosPageBtn" style="background:var(--bg-panel-alt); border:1px solid var(--line-strong); color:var(--text-primary); padding:8px 16px; border-radius:8px; cursor:pointer; font-weight:600; font-size:0.85rem; display:flex; align-items:center; gap:6px;">
-        ← Back to Chat
+    <div style="display:flex; align-items:center; margin-bottom:14px;">
+      <button type="button" id="closeVideosPageBtn" title="Back to Chat" style="width:36px; height:36px; border-radius:50%; background:rgba(255,255,255,0.07); border:1px solid rgba(255,255,255,0.13); color:var(--text-primary); cursor:pointer; display:flex; align-items:center; justify-content:center; flex-shrink:0; transition:background 0.2s ease, transform 0.15s ease; padding:0;" onmouseover="this.style.background='rgba(217,119,87,0.18)'" onmouseout="this.style.background='rgba(255,255,255,0.07)'">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><polyline points="15 18 9 12 15 6"></polyline></svg>
       </button>
-      <div id="videosPageQueryTitle" style="font-size:1.05rem; font-weight:700; color:var(--gold-soft);">Related Learning Classes</div>
+      <div id="videosPageQueryTitle" style="display:none;"></div>
     </div>
 
     <!-- FEATURED TOP WIDESCREEN VIDEO PLAYER -->
@@ -3081,14 +3003,15 @@ FORMATTING RULES:
 .edu-empty-icon { font-size:2.5rem; margin-bottom:10px; opacity:0.6; }
 .edu-empty-text { font-size:0.85rem; line-height:1.5; }
 
-/* Education Panel toggle button — floating */
+/* Education Panel toggle button — floating (hidden, accessible via mode selector) */
 #eduToggleBtn {
+  display: none !important;
   position:fixed; bottom:84px; right:18px; z-index:7000;
   width:46px; height:46px; border-radius:14px;
   background:linear-gradient(135deg,#0e2018,#091409);
   border:1px solid rgba(0,255,170,0.3);
   color:#00ffaa; font-size:1.2rem; cursor:pointer;
-  display:flex; align-items:center; justify-content:center;
+  align-items:center; justify-content:center;
   box-shadow:0 4px 20px rgba(0,0,0,0.5), 0 0 0 1px rgba(0,255,170,0.05);
   transition:all 0.2s;
 }
@@ -3099,6 +3022,61 @@ FORMATTING RULES:
   animation:ping 2s infinite;
 }
 @keyframes ping { 0%,100%{transform:scale(1);opacity:1} 50%{transform:scale(1.4);opacity:0.6} }
+
+/* ── Video Modal Fullscreen Zoom ── */
+#videoModal {
+  position:fixed; inset:0; z-index:9000;
+  background:rgba(0,0,0,0.92);
+  display:none; align-items:center; justify-content:center;
+  transition:background 0.25s ease;
+}
+#videoModal.open { display:flex; }
+.vmodal-card {
+  position:relative;
+  background:#000;
+  border-radius:14px;
+  overflow:hidden;
+  width:min(780px,92vw);
+  transition:width 0.35s cubic-bezier(.4,0,.2,1), height 0.35s cubic-bezier(.4,0,.2,1), border-radius 0.35s ease;
+  box-shadow:0 24px 80px rgba(0,0,0,0.8);
+}
+.vmodal-card.vmodal-fullscreen {
+  width:100vw !important;
+  height:100vh !important;
+  border-radius:0 !important;
+  transform:none !important;
+}
+.vmodal-header {
+  display:flex; align-items:center; gap:10px;
+  padding:10px 14px;
+  background:rgba(10,12,16,0.95);
+  backdrop-filter:blur(8px);
+}
+.vmodal-title-wrap { flex:1; min-width:0; }
+.vmodal-title { font-family:'Spectral',serif; font-size:0.95rem; font-weight:600; color:#E8C9A0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.vmodal-channel { font-family:'Inter',sans-serif; font-size:0.72rem; color:#9C948A; margin-top:1px; }
+.vmodal-ctrl-btn {
+  flex-shrink:0; width:32px; height:32px; border-radius:8px;
+  background:transparent; border:none; cursor:pointer;
+  color:#9C948A; display:flex; align-items:center; justify-content:center;
+  transition:background 0.15s ease, color 0.15s ease;
+}
+.vmodal-ctrl-btn:hover { background:rgba(217,119,87,0.15); color:#E8C9A0; }
+.vmodal-ctrl-btn svg { width:17px; height:17px; }
+.vmodal-iframe-wrap {
+  position:relative; width:100%;
+  padding-bottom:56.25%; /* 16:9 */
+  background:#000;
+  transition:padding-bottom 0.35s ease;
+}
+.vmodal-card.vmodal-fullscreen .vmodal-iframe-wrap {
+  padding-bottom:0 !important;
+  height:calc(100vh - 54px) !important;
+}
+.vmodal-iframe-wrap iframe {
+  position:absolute; inset:0; width:100%; height:100%;
+  border:none; background:#000;
+}
 </style>
 
 <!-- ═══════════════════════════════════════════════════════════════ -->
@@ -3139,41 +3117,8 @@ FORMATTING RULES:
       </button>
     </div>
 
-    <div style="font-size:0.85rem; color:var(--text-muted); margin-bottom:16px;">
-      Select active workspace tool mode:
-    </div>
-
-    <div style="display:flex; flex-direction:column; gap:12px; margin-bottom:20px;">
-      <label class="mode-select-card active" id="modeCardStandard" style="display:flex; align-items:center; justify-content:space-between; padding:14px 16px; background:var(--bg-panel-alt); border:1px solid var(--line-strong); border-radius:12px; cursor:pointer;">
-        <div style="display:flex; align-items:center; gap:12px;">
-          <input type="radio" name="appModeSetting" value="standard" checked style="accent-color:var(--gold);" onchange="updateModeSelectionUI('standard')">
-          <div>
-            <div style="font-size:0.9rem; font-weight:600; color:var(--text-primary);">⚡ Global AI Search &amp; Knowledge Assistant</div>
-            <div style="font-size:0.78rem; color:var(--text-muted);">Real-time multi-source web &amp; academic search Q&amp;A</div>
-          </div>
-        </div>
-      </label>
-
-      <label class="mode-select-card" id="modeCardWebDev" style="display:flex; align-items:center; justify-content:space-between; padding:14px 16px; background:var(--bg-panel-alt); border:1px solid var(--line-strong); border-radius:12px; cursor:pointer;">
-        <div style="display:flex; align-items:center; gap:12px;">
-          <input type="radio" name="appModeSetting" value="webdev" style="accent-color:var(--teal);" onchange="updateModeSelectionUI('webdev')">
-          <div>
-            <div style="font-size:0.9rem; font-weight:600; color:var(--teal);">🌐 Web Dev Studio Mode</div>
-            <div style="font-size:0.78rem; color:var(--text-muted);">Full Web App Creator — HTML/CSS/JS files, live preview &amp; ZIP download</div>
-          </div>
-        </div>
-      </label>
-
-      <label class="mode-select-card" id="modeCardAppBuilder" style="display:flex; align-items:center; justify-content:space-between; padding:14px 16px; background:var(--bg-panel-alt); border:1px solid var(--line-strong); border-radius:12px; cursor:pointer;">
-        <div style="display:flex; align-items:center; gap:12px;">
-          <input type="radio" name="appModeSetting" value="appbuilder" style="accent-color:#7f52ff;" onchange="updateModeSelectionUI('appbuilder')">
-          <div>
-            <div style="font-size:0.9rem; font-weight:600; color:#a78bfa;">📱 App Builder Studio</div>
-            <div style="font-size:0.78rem; color:var(--text-muted);">Mobile &amp; Desktop App Creator — Kotlin, Swift, Flutter, React Native, Java — full project file generation with download</div>
-          </div>
-        </div>
-        <span style="font-size:0.65rem;font-weight:700;padding:2px 7px;background:rgba(127,82,255,0.18);color:#a78bfa;border-radius:6px;letter-spacing:0.5px;">NEW</span>
-      </label>
+    <div style="font-size:0.88rem; color:var(--text-muted); margin-bottom:20px; line-height:1.5; background:var(--bg-panel-alt); padding:14px; border-radius:10px; border:1px solid var(--line);">
+      💡 <b>Workspace Modes Notice:</b> All modes are now conveniently available right on the search bar! Click <b>"Main Agent ˅"</b> on the search bar at any time to switch modes.
     </div>
 
     <div style="display:flex; justify-content:flex-end;">
@@ -3632,21 +3577,9 @@ FORMATTING RULES:
   </a>
 
   <div class="header-right">
-    <div class="header-mode-pill" id="headerModePill">
-      <button type="button" class="header-mode-pill-btn active-search" id="pillBtnSearch" onclick="setAppMode('standard')" title="Global AI Search Mode">
-        <span class="pill-icon">⚡</span><span class="pill-label"> Search</span>
-      </button>
-      <button type="button" class="header-mode-pill-btn" id="pillBtnWebDev" onclick="setAppMode('webdev')" title="Web Dev Studio Mode">
-        <span class="pill-icon">🌐</span><span class="pill-label"> Web Dev</span>
-      </button>
-      <button type="button" class="header-mode-pill-btn" id="pillBtnApp" onclick="setAppMode('appbuilder')" title="App Builder Studio">
-        <span class="pill-icon">📱</span><span class="pill-label"> App Builder</span>
-      </button>
-    </div>
-
-    <button class="share-btn" id="shareBtn" title="Share">
+    <button class="share-btn" id="shareBtn">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.6" y1="10.6" x2="15.4" y2="6.4"></line><line x1="8.6" y1="13.4" x2="15.4" y2="17.6"></line></svg>
-      <span class="share-label">Share</span>
+      Share
     </button>
 
     <div class="share-popup" id="sharePopup">
@@ -3742,31 +3675,74 @@ FORMATTING RULES:
 
     <div class="attached-files" id="attachedFiles"></div>
 
+    <!-- MODES CARD POPUP -->
+    <div class="modes-card-popup" id="modesCardPopup" style="display:none;">
+      <div class="modes-card-list">
+        <div class="mode-card-item active" id="modeItemStandard" data-mode="standard" onclick="selectSearchMode('standard')">
+          <div class="mode-card-icon">⚡</div>
+          <div class="mode-card-title">Main Agent</div>
+        </div>
+        <div class="mode-card-item" id="modeItemScience" data-mode="science" onclick="selectSearchMode('science')">
+          <div class="mode-card-icon">🔬</div>
+          <div class="mode-card-title">Science Engine</div>
+        </div>
+        <div class="mode-card-item" id="modeItemCode" data-mode="code" onclick="selectSearchMode('code')">
+          <div class="mode-card-icon">💻</div>
+          <div class="mode-card-title">Code Architect</div>
+        </div>
+        <div class="mode-card-item" id="modeItemResearch" data-mode="research" onclick="selectSearchMode('research')">
+          <div class="mode-card-icon">🔍</div>
+          <div class="mode-card-title">Deep Research</div>
+        </div>
+        <div class="mode-card-item" id="modeItemAppBuilder" data-mode="appbuilder" onclick="selectSearchMode('appbuilder')">
+          <div class="mode-card-icon">📱</div>
+          <div class="mode-card-title">App Builder Studio</div>
+        </div>
+        <div class="mode-card-item" id="modeItemEducation" data-mode="education" onclick="selectSearchMode('education')">
+          <div class="mode-card-icon">🎓</div>
+          <div class="mode-card-title">Education</div>
+        </div>
+      </div>
+    </div>
+
     <form id="askForm">
-      <button type="button" class="icon-btn paperclip-icon" id="attachFileBtn" aria-label="Attach file" title="Attach file, image, or video">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48"></path>
-        </svg>
-      </button>
+      <div class="ask-form-top-row">
+        <button type="button" class="icon-btn paperclip-icon" id="attachFileBtn" aria-label="Attach file" title="Attach file, image, or video">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48"></path>
+          </svg>
+        </button>
 
-      <textarea placeholder="Ask Cognisphere AI anything…" id="askInput" rows="1"></textarea>
+        <textarea placeholder="Ask Cognisphere AI anything…" id="askInput" rows="1"></textarea>
 
-      <div class="active-tool-pill" id="activeToolPill" style="display:none;"></div>
+        <div class="active-tool-pill" id="activeToolPill" style="display:none;"></div>
 
-      <button type="button" class="icon-btn" id="micBtn" aria-label="Voice input" title="Voice input">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <rect x="9" y="2" width="6" height="12" rx="3"></rect>
-          <path d="M5 10a7 7 0 0014 0"></path>
-          <line x1="12" y1="19" x2="12" y2="22"></line>
-        </svg>
-      </button>
-      <button type="submit" class="send" id="sendBtn" aria-label="Ask">
-        <svg viewBox="0 0 24 24" fill="none" stroke="#0A0C10" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
-          <line x1="12" y1="19" x2="12" y2="5"></line>
-          <polyline points="5 12 12 5 19 12"></polyline>
-        </svg>
-        <span class="stop-icon"></span>
-      </button>
+        <div class="search-actions-right">
+          <button type="button" class="icon-btn" id="micBtn" aria-label="Voice input" title="Voice input">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="9" y="2" width="6" height="12" rx="3"></rect>
+              <path d="M5 10a7 7 0 0014 0"></path>
+              <line x1="12" y1="19" x2="12" y2="22"></line>
+            </svg>
+          </button>
+          <button type="submit" class="send send-blue-btn" id="sendBtn" aria-label="Ask">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="18" height="18">
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+              <polyline points="12 5 19 12 12 19"></polyline>
+            </svg>
+            <span class="stop-icon"></span>
+          </button>
+        </div>
+      </div>
+
+      <div class="search-bar-bottom-row">
+        <button type="button" class="search-bar-mode-btn" id="searchBarModeBtn" onclick="toggleModesCard(event)">
+          <span id="currentModeLabel">Main Agent</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14" style="margin-left:4px;">
+            <polyline points="6 9 12 15 18 9"></polyline>
+          </svg>
+        </button>
+      </div>
     </form>
   </div>
 
@@ -3808,9 +3784,9 @@ FORMATTING RULES:
   let currentConversationId = null;
   let convIdSeq = 0;
   let msgIdSeq = 0;
-  const API_BASE = (window.location.hostname === '127.0.0.1' || window.location.hostname === 'localhost') && window.location.port === '3000'
-    ? 'http://127.0.0.1:3000'
-    : '';
+  // Always point to the Node.js API server on port 3000
+  // (works whether page is opened via VS Code Live Server :5500, file://, or directly :3000)
+  const API_BASE = 'http://127.0.0.1:3000';
 
   const askFormEl = document.getElementById('askForm');
   const chatThreadEl = document.getElementById('chatThread');
@@ -3826,12 +3802,32 @@ FORMATTING RULES:
   let activeStepTimer = null;
   let activeFileTimer = null;
 
-  // ---------- Smart scroll: don't drag user back if they scrolled up ----------
+  // ---------- Smart scroll: follow AI typing, pause if user scrolls up ----------
   let userScrolledUp = false;
+  let isAutoScrolling = false; // guard: ignore scroll events we trigger ourselves
+
   window.addEventListener('scroll', () => {
+    if (isAutoScrolling) return; // ignore our own programmatic scrolls
     const distFromBottom = document.body.scrollHeight - window.scrollY - window.innerHeight;
-    userScrolledUp = distFromBottom > 150;
+    // If user scrolled more than 80px above bottom while streaming, pause auto-scroll
+    if (distFromBottom > 80) userScrolledUp = true;
+    else userScrolledUp = false; // user scrolled back to bottom – resume
   }, { passive: true });
+
+  // Smoothly scroll the latest AI message bubble into view during streaming
+  function streamAutoScroll() {
+    if (userScrolledUp) return; // user is browsing freely – don't interrupt
+    isAutoScrolling = true;
+    const aiRows = document.querySelectorAll('.msg-row.ai');
+    const lastAi = aiRows.length ? aiRows[aiRows.length - 1] : null;
+    if (lastAi) {
+      lastAi.scrollIntoView({ behavior: 'smooth', block: 'end' });
+    } else {
+      window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+    }
+    // Release guard after scroll animation has time to settle
+    setTimeout(() => { isAutoScrolling = false; }, 350);
+  }
 
   function setGeneratingState(active){
     isGenerating = active;
@@ -3883,7 +3879,7 @@ FORMATTING RULES:
     });
   };
 
-  let currentAppMode = localStorage.getItem('cognisphere_app_mode') || 'standard';
+  let currentAppMode = 'standard'; // Always default to Main Agent mode
 
   window.downloadProjectZip = function(projectName, encodedFilesJson) {
     try {
@@ -4002,49 +3998,81 @@ FORMATTING RULES:
     if (modal) modal.classList.remove('open');
   };
 
+  const modeLabels = {
+    standard: 'Main Agent',
+    science: 'Science Engine',
+    code: 'Code Architect',
+    research: 'Deep Research',
+    appbuilder: 'App Builder Studio',
+    webdev: 'Web Dev Studio',
+    education: 'Education'
+  };
+
+  window.toggleModesCard = function(e) {
+    if (e) e.stopPropagation();
+    const popup = document.getElementById('modesCardPopup');
+    if (popup) {
+      const isVisible = popup.style.display === 'block';
+      popup.style.display = isVisible ? 'none' : 'block';
+    }
+  };
+
+  window.selectSearchMode = function(mode) {
+    currentAppMode = mode;
+    localStorage.setItem('cognisphere_app_mode', mode);
+    applyAppModeUI();
+    const popup = document.getElementById('modesCardPopup');
+    if (popup) popup.style.display = 'none';
+  };
+
+  document.addEventListener('click', function(e) {
+    const popup = document.getElementById('modesCardPopup');
+    const btn = document.getElementById('searchBarModeBtn');
+    if (popup && popup.style.display === 'block') {
+      if (!popup.contains(e.target) && !btn?.contains(e.target)) {
+        popup.style.display = 'none';
+      }
+    }
+  });
+
   window.updateModeSelectionUI = function(mode) {
-    const cardStd = document.getElementById('modeCardStandard');
-    const cardWeb = document.getElementById('modeCardWebDev');
-    const cardApp = document.getElementById('modeCardAppBuilder');
-    ['standard','webdev','appbuilder'].forEach(m => {
-      const card = document.getElementById(m === 'standard' ? 'modeCardStandard' : m === 'webdev' ? 'modeCardWebDev' : 'modeCardAppBuilder');
-      const radio = document.querySelector(`input[name="appModeSetting"][value="${m}"]`);
-      if (card) card.classList.toggle('active', mode === m);
-      if (radio) radio.checked = (mode === m);
-    });
+    applyAppModeUI();
   };
 
   window.saveSettingsMode = function() {
-    const selected = document.querySelector('input[name="appModeSetting"]:checked');
-    if (selected) {
-      currentAppMode = selected.value;
-      localStorage.setItem('cognisphere_app_mode', currentAppMode);
-      applyAppModeUI();
-    }
     closeSettingsModal();
   };
 
   function applyAppModeUI() {
     const promptInput = document.getElementById('askInput');
-    const btnSearch  = document.getElementById('pillBtnSearch');
-    const btnWebDev  = document.getElementById('pillBtnWebDev');
-    const btnApp     = document.getElementById('pillBtnApp');
+    const labelSpan = document.getElementById('currentModeLabel');
 
-    // Reset all pill buttons
-    [btnSearch, btnWebDev, btnApp].forEach(b => { if(b) b.className = 'header-mode-pill-btn'; });
-
-    if (currentAppMode === 'webdev') {
-      if (btnWebDev) btnWebDev.classList.add('active-webdev');
-      if (promptInput) promptInput.placeholder = 'Describe a web app or site to build (HTML/CSS/JS)…';
-    } else if (currentAppMode === 'appbuilder') {
-      if (btnApp) btnApp.classList.add('active-appbuilder');
-      if (promptInput) promptInput.placeholder = 'Describe an app to build (Android, iOS, Flutter, React Native)…';
-    } else {
-      if (btnSearch) btnSearch.classList.add('active-search');
-      if (promptInput) promptInput.placeholder = 'Ask anything or search real-time global knowledge…';
+    if (labelSpan) {
+      labelSpan.textContent = modeLabels[currentAppMode] || 'Main Agent';
     }
-    // Sync settings modal radio
-    updateModeSelectionUI(currentAppMode);
+
+    document.querySelectorAll('.mode-card-item').forEach(item => {
+      const m = item.getAttribute('data-mode');
+      item.classList.toggle('active', m === currentAppMode);
+    });
+
+    if (promptInput) {
+      if (currentAppMode === 'science') {
+        promptInput.placeholder = 'Ask biology, medicine, chemistry & academic questions…';
+      } else if (currentAppMode === 'code') {
+        promptInput.placeholder = 'Describe software to build or code to debug…';
+      } else if (currentAppMode === 'research') {
+        promptInput.placeholder = 'Enter deep research topic or literature query…';
+      } else if (currentAppMode === 'appbuilder') {
+        promptInput.placeholder = 'Describe an app to build (Android, iOS, Flutter, React Native)…';
+      } else if (currentAppMode === 'webdev') {
+        promptInput.placeholder = 'Describe a web app or site to build (HTML/CSS/JS)…';
+      } else if (currentAppMode === 'education') {
+        promptInput.placeholder = 'Ask any school, college, subject or academic question…';
+      } else {
+        promptInput.placeholder = 'Ask Cognisphere AI anything…';
+      }
+    }
   }
 
   let currentPreviewCode = '';
@@ -4190,6 +4218,22 @@ FORMATTING RULES:
     if (!window.marked) return text;
     
     const renderer = new marked.Renderer();
+
+    renderer.image = function(href, title, text) {
+      const cleanHref = (href || '').trim();
+      const altText = (text || title || 'Image').trim();
+      if (!cleanHref) return '';
+
+      return `
+        <div class="inline-image-container" style="margin: 14px 0; max-width: 100%; text-align: center;">
+          <img src="${cleanHref}" alt="${altText}" title="${title || altText}"
+               referrerpolicy="no-referrer" loading="lazy"
+               style="max-width: 100%; max-height: 480px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.12); box-shadow: 0 8px 28px rgba(0,0,0,0.45); object-fit: cover; display: inline-block; background: #141416;"
+               onerror="if(!this.dataset.fallback){this.dataset.fallback=1; this.src='https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?w=600&q=80';}else{this.parentElement.style.display='none';}" />
+          ${altText ? `<div style="font-size:0.75rem; color:#94a3b8; margin-top:6px; font-family:'Inter',sans-serif; font-weight:500;">📷 ${altText}</div>` : ''}
+        </div>
+      `;
+    };
     renderer.code = function(code, language) {
       if (language === 'mermaid') {
         const encodedCode = encodeURIComponent(code);
@@ -4227,8 +4271,62 @@ FORMATTING RULES:
       // Smart Code Block Header Title
       const headerTitle = formatCodeBlockHeader(validLang, code);
 
-      // ── STEP 1: Detect OUTPUT blocks FIRST — before anything else ──
       const trimmedCode = code.trim();
+
+      // ── STEP 1: Detect DISTINCT EXAMPLE / TEST CASE blocks ──
+      const isExampleBlock = language === 'example' || language === 'sample' || language === 'test' || language === 'input' || language === 'cases' ||
+                             /^(Example|Sample Input|Input:|Sample 1|Example 1|Test Case|Usage Example)[:\s]/i.test(trimmedCode);
+
+      if (isExampleBlock) {
+        const cleanExample = trimmedCode;
+        const encodedExample = encodeURIComponent(cleanExample);
+
+        // Render line-by-line: INPUT/OUTPUT/EXPLANATION as pill rows, others as plain text
+        const exLines = cleanExample.split('\n');
+        let bodyHTML = '';
+        for (const rawLine of exLines) {
+          const ln = rawLine.trim();
+          if (!ln) { bodyHTML += '<div style="height:5px"></div>'; continue; }
+          const esc = ln.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+          const iMatch = ln.match(/^(Input|Sample Input)[:\s]*(.*)/i);
+          const oMatch = ln.match(/^(Output|Sample Output|Expected Output)[:\s]*(.*)/i);
+          const eMatch = ln.match(/^(Explanation)[:\s]*(.*)/i);
+          if (iMatch) {
+            const v = iMatch[2].replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+            bodyHTML += `<div class="ex-row ex-input"><span class="ex-badge">INPUT</span><span class="ex-val">${v}</span></div>`;
+          } else if (oMatch) {
+            const v = oMatch[2].replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+            bodyHTML += `<div class="ex-row ex-output"><span class="ex-badge">OUTPUT</span><span class="ex-val">${v}</span></div>`;
+          } else if (eMatch) {
+            const v = eMatch[2].replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+            bodyHTML += `<div class="ex-row ex-expl"><span class="ex-badge">EXPLANATION</span><span class="ex-val">${v}</span></div>`;
+          } else {
+            bodyHTML += `<div class="ex-plain">${esc}</div>`;
+          }
+        }
+
+        return `
+          <div class="example-card-wrap">
+            <div class="example-card-header">
+              <div class="example-card-title">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15" style="color:#a78bfa;flex-shrink:0;">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <line x1="12" y1="8" x2="12" y2="12"></line>
+                  <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                </svg>
+                <span>Example / Test Case</span>
+              </div>
+              <button class="example-card-copy-btn" onclick="copyFileCard(this, '${encodedExample}')" title="Copy Example Data">
+                Copy
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><rect x="9" y="9" width="13" height="13" rx="2"></rect><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"></path></svg>
+              </button>
+            </div>
+            <div class="example-card-body">${bodyHTML}</div>
+          </div>
+        `;
+      }
+
+      // ── STEP 2: Detect OUTPUT blocks ──
       const isOutputBlock = language === 'text' || language === 'output' || language === 'console' ||
                             /^(Output|Expected Output|Sample Output|Result|Program Output)[:\s]/i.test(trimmedCode);
 
@@ -4249,45 +4347,7 @@ FORMATTING RULES:
         `;
       }
 
-      // ── STEP 2: Detect true Web Dev HTML only after ruling out output blocks ──
-      const isWebDev = !isOutputBlock && (
-        code.includes('<!DOCTYPE') ||
-        code.includes('<!doctype') ||
-        (code.includes('<html') && code.includes('</html>'))
-      );
-
-      if (isWebDev) {
-        let fileType = 'HTML';
-        let fileExt = 'html';
-        let fileName = 'index';
-        const titleMatch = code.match(/<title>(.*?)<\/title>/i) || code.match(/<h1[^>]*>(.*?)<\/h1>/i);
-        if (titleMatch && titleMatch[1] && titleMatch[1].trim().length < 35) {
-          fileName = titleMatch[1].trim().replace(/[<>\"'\`\/?:%*|\n\r\\]/g, '').trim() || 'index';
-        }
-        if (!fileName || fileName.toLowerCase() === 'meridian' || fileName.toLowerCase() === 'document') fileName = 'index';
-        const safeFileName = fileName;
-        const encodedFileName = encodeURIComponent(safeFileName);
-        const projectFiles = [{ name: safeFileName + '.' + fileExt, code: code }];
-        const encodedProjectFiles = encodeURIComponent(JSON.stringify(projectFiles));
-        return renderFileCard(encodedCode, safeFileName, fileExt, fileType, 'web', encodedFileName, encodedProjectFiles);
-      }
-
-      // ── App Builder: detect mobile/desktop app file types ──
-      const appFileMatch = language && language.match(/^(kotlin|swift|dart|java|xml|gradle)$/);
-      const isAppFile = appFileMatch || /^(MainActivity|AppDelegate|main\.dart|pubspec|build\.gradle|AndroidManifest|Info\.plist|styles\.xml|activity_main)/i.test(code.slice(0,200));
-      if (isAppFile && !isOutputBlock) {
-        const extMap = { kotlin: 'kt', swift: 'swift', dart: 'dart', java: 'java', xml: 'xml', gradle: 'gradle' };
-        const appFileExt = extMap[language] || language || 'kt';
-        const appFileType = (language || appFileExt).toUpperCase();
-        let appFileName = 'MainActivity';
-        const fnMatch = code.match(/(?:class|fun|object|struct|@main)\s+(\w+)|<activity[^>]+android:name="[^"]*\.(\w+)"/i);
-        if (fnMatch) appFileName = fnMatch[1] || fnMatch[2] || 'MainActivity';
-        const encodedAppFileName = encodeURIComponent(appFileName);
-        const appFiles = [{ name: appFileName + '.' + appFileExt, code: code }];
-        const encodedAppFiles = encodeURIComponent(JSON.stringify(appFiles));
-        return renderFileCard(encodedCode, appFileName, appFileExt, appFileType, 'app', encodedAppFileName, encodedAppFiles);
-      }
-
+      // ── ALL code is rendered strictly in Code Cards (No File Cards) ──
       return `
         <div class="code-block-wrap">
           <div class="code-block-header">
@@ -4739,15 +4799,10 @@ FORMATTING RULES:
   function buildWebResultHTML(data, query, langCode = '') {
     let html = '';
 
-    // 1. Bullet points summary
-    if (data.bullets && data.bullets.length) {
-      html += `<ul class="web-bullets">${data.bullets.map(b => `<li>${b}</li>`).join('')}</ul>`;
-    } else if (data.summary) {
-      html += `<ul class="web-bullets"><li>${data.summary.slice(0, 300)}</li></ul>`;
-    }
+    // Web bullet points summary removed as per user instruction (no random bullet points at end of answers)
 
-    // 2. Compact Class Bar Pill (opens dedicated Classes Page on click)
-    if (data.videos && data.videos.length) {
+    // Compact Class Bar Pill (opens dedicated Classes Page on click)
+    if (data && data.videos && data.videos.length) {
       const fullVideoCardsMarkup = buildVideoCardsHTML(data.videos, query, langCode);
       html += `<div class="video-pill-wrap" style="margin-top:12px; margin-bottom:4px; display:inline-flex; align-items:center;">
         <button type="button" class="open-videos-page-btn" data-query="${query.replace(/"/g,'&quot;')}">
@@ -4758,7 +4813,7 @@ FORMATTING RULES:
       </div>`;
     }
 
-    return html || `<ul class="web-bullets"><li>No results found for "${query}".</li></ul>`;
+    return html;
   }
 
   // ============================================================
@@ -4775,9 +4830,11 @@ FORMATTING RULES:
       const decodedSentences = [];
       attList.forEach((a, idx) => {
         if (a.kind === 'text' && a.content) {
-          decodedSentences.push(`--- FILE ${idx + 1}: Pasted Text ---\n${a.content}\n--- END FILE ${idx + 1} ---`);
-        } else if (a.kind === 'file' && a.textContent) {
-          decodedSentences.push(`--- FILE ${idx + 1}: ${a.label || 'Attached File'} ---\n${a.textContent}\n--- END FILE ${idx + 1} ---`);
+          decodedSentences.push(`--- PASTED TEXT / CODE CONTENT ${idx + 1} ---\n${a.content}\n--- END PASTED TEXT ---`);
+        } else if (a.kind === 'file') {
+          const fileName = (a.file && a.file.name) ? a.file.name : (a.label || `File ${idx + 1}`);
+          const fileBody = a.textContent || a.content || `[Attached File: ${fileName}]`;
+          decodedSentences.push(`--- ATTACHED FILE / IMAGE CONTENT ${idx + 1}: ${fileName} ---\n${fileBody}\n--- END ATTACHED FILE ---`);
         }
       });
 
@@ -4808,7 +4865,7 @@ FORMATTING RULES:
       }).join('\n\n');
 
       if (historySummary.trim()) {
-        historyContext = `\n\n[PREVIOUS CONVERSATION HISTORY — FOR CONTEXT ONLY. DO NOT RE-ANSWER THESE. ONLY ANSWER THE CURRENT QUESTION BELOW]:\n${historySummary}\n[END HISTORY]`;
+        historyContext = `\n\n[PREVIOUS CONVERSATION HISTORY — BACKGROUND CONTEXT ONLY. DO NOT INCLUDE OR MENTION THIS IN YOUR RESPONSE. OUTPUT ONLY THE RESPONSE/CODE FOR THE CURRENT QUESTION ABOVE]:\n${historySummary}\n[END HISTORY]`;
       }
     }
 
@@ -4825,7 +4882,8 @@ FORMATTING RULES:
     }
 
     // Current question is placed FIRST so the LLM focuses on it, history comes after as context
-    const payloadQuery = `CURRENT QUESTION TO ANSWER NOW:\n${fullQuery}${academicContext}${historyContext}`;
+    // NOTE: No "CURRENT QUESTION TO ANSWER NOW" prefix — prevents the AI from echoing the user question
+    const payloadQuery = `${fullQuery}${academicContext}${historyContext}`;
     const searchQuery = query.trim() || (attList.length ? (attList[0].label || 'attached file') : 'general learning');
 
     // ---- WEB SEARCH TOOL: real streaming AI answer + web result pills ----
@@ -4834,8 +4892,10 @@ FORMATTING RULES:
       let llmText = '';
       let webHtml = '';
 
-      // Start web results fetch in background (non-blocking)
-      const webResultsPromise = fetchLiveWebResults(searchQuery, '').then(data => {
+      // Check if this is an identity / creator / biodata query
+      const isIdentityQuery = /\b(your name|who are you|who made|who created|who owns|who is the owner|who invented|creator|inventor|owner|cognisphere|kummitha|abhiram|biodata)\b/i.test(searchQuery);
+
+      const webResultsPromise = isIdentityQuery ? Promise.resolve() : fetchLiveWebResults(searchQuery, '').then(data => {
         webHtml = buildWebResultHTML(data, searchQuery, '');
       }).catch(e => {
         console.warn('Web results failed (ignored):', e.message);
@@ -5058,6 +5118,7 @@ FORMATTING RULES:
 
     const words = fullText.split(/(\s+)/); // keep whitespace tokens so spacing is preserved
     let idx = 0;
+    let scrollThrottle = 0; // only scroll every N ticks to keep it smooth
     activeStreamTimer = setInterval(() => {
       if(generationAborted){
         clearInterval(activeStreamTimer);
@@ -5073,15 +5134,20 @@ FORMATTING RULES:
         activeStreamTimer = null;
         msg.streaming = false;
         renderThread(conv);
+        // Final scroll to end when done
+        streamAutoScroll();
         onDone();
         return;
       }
-      // reveal a small chunk of words per tick for a natural streaming feel
-      const chunk = words.slice(idx, idx + 2).join('');
+      // High-speed: reveal 8 words per tick at 8ms for smooth, fast live typing
+      const chunk = words.slice(idx, idx + 8).join('');
       msg.text += chunk;
-      idx += 2;
+      idx += 8;
       renderThread(conv);
-    }, 35);
+      // Auto-scroll every ~10 ticks (≈80ms) to stay smooth without thrashing
+      scrollThrottle++;
+      if (scrollThrottle % 10 === 0) streamAutoScroll();
+    }, 8);
   }
 
   // ================================================================
@@ -5651,9 +5717,17 @@ FORMATTING RULES:
       frag.appendChild(row);
     });
     chatThreadEl.appendChild(frag);
-    // Only auto-scroll if user hasn't manually scrolled up during generation
+    // Smoothly scroll and redirect view directly to the asked question
     if (!userScrolledUp) {
-      requestAnimationFrame(() => window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' }));
+      requestAnimationFrame(() => {
+        const userMsgRows = chatThreadEl.querySelectorAll('.msg-row.user');
+        const lastUserRow = userMsgRows.length ? userMsgRows[userMsgRows.length - 1] : chatThreadEl.lastElementChild;
+        if (lastUserRow) {
+          lastUserRow.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        } else {
+          window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+        }
+      });
     }
 
     if(typeof sharePopup !== 'undefined' && sharePopup.classList.contains('open')){
@@ -5768,6 +5842,10 @@ FORMATTING RULES:
     const input = document.getElementById('askInput');
     input.value = '';
     input.style.height = 'auto';
+
+    // Always default to Main Agent mode on starting new chat
+    if (window.selectSearchMode) selectSearchMode('standard');
+
     renderHistory();
     closeSidebar();
 
@@ -5786,7 +5864,7 @@ FORMATTING RULES:
       const empty = document.createElement('div');
       empty.style.cssText = 'padding:18px 12px; font-family:Inter,sans-serif; font-size:0.82rem; color:var(--text-muted); text-align:center; line-height:1.6;';
       empty.innerHTML = conversations.length === 0
-        ? '<div style="margin-bottom:8px;">🐘 Loading from Neon DB...</div><div style="font-size:0.76rem;">Or ask something to start a new chat.</div>'
+        ? '<div style="margin-bottom:8px;">No conversation history yet.</div><div style="font-size:0.76rem;">Ask something to start a new chat!</div>'
         : 'No conversations match your search.';
       sidebarScrollEl.appendChild(empty);
       return;
@@ -5895,7 +5973,9 @@ FORMATTING RULES:
     try {
       const u = getCurrentUser();
       const res = await fetch(`${API_BASE}/api/history?user_id=${encodeURIComponent(u.id)}`);
-      const resData = await res.json();
+      if (!res.ok) return;
+      const resData = await res.json().catch(() => null);
+      if (!resData) return;
       const rows = Array.isArray(resData) ? resData : (resData.rows || []);
       _dbSidebarLoaded = true;
 
@@ -6877,27 +6957,99 @@ FORMATTING RULES:
     }
   }
 
-  function closeVideoModal() {
-    if (videoModal) videoModal.classList.remove('open');
-    if (vmodalFrame) {
-      vmodalFrame.src = 'about:blank';
-      vmodalFrame.style.background = '#000';
-    }
+  window.closeVideoModal = function() {
+    const videoModalEl = document.getElementById('videoModal');
+    const vmodalFrameEl = document.getElementById('vmodalFrame');
+    const vmodalCardEl = document.getElementById('vmodalCard');
+    if (videoModalEl) videoModalEl.classList.remove('open');
+    if (vmodalCardEl) vmodalCardEl.classList.remove('vmodal-fullscreen');
+    if (vmodalFrameEl) vmodalFrameEl.src = 'about:blank';
+    // Also stop the old frame refs if present
+    if (typeof vmodalFrame !== 'undefined' && vmodalFrame) vmodalFrame.src = 'about:blank';
+    if (typeof videoModal !== 'undefined' && videoModal) videoModal.classList.remove('open');
+  };
+  function closeVideoModal() { window.closeVideoModal(); }
+
+  // ── Build a rich video modal on first open ──
+  function ensureVideoModalHTML() {
+    if (document.getElementById('videoModal')) return;
+    const modal = document.createElement('div');
+    modal.id = 'videoModal';
+    modal.innerHTML = `
+      <div class="vmodal-card" id="vmodalCard">
+        <div class="vmodal-header">
+          <div class="vmodal-title-wrap">
+            <div class="vmodal-title" id="vmodalTitle">Class Video Lesson</div>
+            <div class="vmodal-channel" id="vmodalChannel">State Class</div>
+          </div>
+          <button class="vmodal-ctrl-btn" id="vmodalZoomBtn" title="Toggle Fullscreen" onclick="window.toggleVideoFullscreen()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M8 3H5a2 2 0 00-2 2v3m18 0V5a2 2 0 00-2-2h-3m0 18h3a2 2 0 002-2v-3M3 16v3a2 2 0 002 2h3"/>
+            </svg>
+          </button>
+          <button class="vmodal-ctrl-btn" id="vmodalClose" title="Close">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
+        <div class="vmodal-iframe-wrap">
+          <iframe id="vmodalFrame" allow="autoplay; fullscreen" allowfullscreen></iframe>
+        </div>
+      </div>`;
+    document.body.appendChild(modal);
+
+    const card = document.getElementById('vmodalCard');
+    const zoomBtn = document.getElementById('vmodalZoomBtn');
+    const closeBtn = document.getElementById('vmodalClose');
+    const frame = document.getElementById('vmodalFrame');
+
+    closeBtn.addEventListener('click', window.closeVideoModal);
+    modal.addEventListener('click', (e) => { if (e.target === modal) window.closeVideoModal(); });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && modal.classList.contains('open')) window.closeVideoModal();
+      if (e.key === 'f' && modal.classList.contains('open')) window.toggleVideoFullscreen();
+    });
   }
+
+  window.toggleVideoFullscreen = function() {
+    const card = document.getElementById('vmodalCard');
+    const zoomBtn = document.getElementById('vmodalZoomBtn');
+    if (!card) return;
+    const isFS = card.classList.toggle('vmodal-fullscreen');
+    if (zoomBtn) {
+      zoomBtn.innerHTML = isFS
+        ? `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 3v3a2 2 0 01-2 2H3m18 0h-3a2 2 0 01-2-2V3m0 18v-3a2 2 0 012-2h3M3 16h3a2 2 0 012 2v3"/></svg>`
+        : `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 3H5a2 2 0 00-2 2v3m18 0V5a2 2 0 00-2-2h-3m0 18h3a2 2 0 002-2v-3M3 16v3a2 2 0 002 2h3"/></svg>`;
+      zoomBtn.title = isFS ? 'Exit Fullscreen (F)' : 'Fullscreen (F)';
+    }
+  };
 
   window.openVideoModal = function(vid, title, channel) {
     if (!vid) return;
+    ensureVideoModalHTML();
     resetAllVideoPlayers();
-    if (vmodalTitle) vmodalTitle.textContent = title || 'Class Video Lesson';
-    if (vmodalChannel) vmodalChannel.textContent = channel || 'State Class';
-    if (vmodalFrame) {
-      vmodalFrame.src = 'about:blank';
-      vmodalFrame.style.background = '#000';
+    const vmodalTitleEl = document.getElementById('vmodalTitle');
+    const vmodalChannelEl = document.getElementById('vmodalChannel');
+    const vmodalFrameEl = document.getElementById('vmodalFrame');
+    const videoModalEl = document.getElementById('videoModal');
+    const vmodalCardEl = document.getElementById('vmodalCard');
+
+    if (vmodalTitleEl) vmodalTitleEl.textContent = title || 'Class Video Lesson';
+    if (vmodalChannelEl) vmodalChannelEl.textContent = channel || 'State Class';
+    if (vmodalCardEl) vmodalCardEl.classList.remove('vmodal-fullscreen');
+    // Reset zoom icon
+    const zoomBtn = document.getElementById('vmodalZoomBtn');
+    if (zoomBtn) {
+      zoomBtn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 3H5a2 2 0 00-2 2v3m18 0V5a2 2 0 00-2-2h-3m0 18h3a2 2 0 002-2v-3M3 16v3a2 2 0 002 2h3"/></svg>`;
+      zoomBtn.title = 'Fullscreen (F)';
+    }
+    if (vmodalFrameEl) {
+      vmodalFrameEl.src = 'about:blank';
       setTimeout(() => {
-        vmodalFrame.src = `https://www.youtube-nocookie.com/embed/${vid}?autoplay=1&rel=0`;
+        vmodalFrameEl.src = `https://www.youtube-nocookie.com/embed/${vid}?autoplay=1&rel=0`;
       }, 50);
     }
-    if (videoModal) videoModal.classList.add('open');
+    if (videoModalEl) videoModalEl.classList.add('open');
   };
 
   if (vmodalClose) vmodalClose.addEventListener('click', closeVideoModal);
@@ -7161,6 +7313,24 @@ FORMATTING RULES:
       r.style.display = text.includes(queryFilter) ? 'block' : 'none';
     });
   };
+  // Global Question Redirect Helper
+  window.redirectAndAsk = function(queryText) {
+    if (!queryText) return;
+    const askInput = document.getElementById('askInput');
+    if (askInput) {
+      askInput.value = queryText;
+      askInput.style.height = 'auto';
+      askInput.focus();
+    }
+    const askForm = document.getElementById('askForm');
+    if (askForm) {
+      if (typeof askForm.requestSubmit === 'function') {
+        askForm.requestSubmit();
+      } else {
+        askForm.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
+      }
+    }
+  };
 
   // Prompt Debug Text Sanitizer
   window.cleanPromptDebugText = function(str) {
@@ -7211,7 +7381,7 @@ FORMATTING RULES:
         user_name: u.name
       })
     })
-    .then(r => r.json())
+    .then(r => r.ok ? r.json().catch(() => null) : null)
     .then(data => {
       if (data && data.record && data.record.id) {
         if (activeConv) {
@@ -7228,18 +7398,14 @@ FORMATTING RULES:
   // Enhance loadUserHistory to fetch per-user chats from Neon DB
   loadUserHistory = function() {
     const u = getCurrentUser();
-    historyLines.innerHTML = '<div style="padding:15px; text-align:center; color:var(--text-muted);">Fetching history from Neon PostgreSQL Database...</div>';
+    historyLines.innerHTML = '<div style="padding:15px; text-align:center; color:var(--text-muted);">Fetching history...</div>';
     fetch(`${API_BASE}/api/history?user_id=${encodeURIComponent(u.id)}`)
-      .then(res => res.json())
+      .then(res => res.ok ? res.json().catch(() => ({})) : {})
       .then(resData => {
-        const rows = Array.isArray(resData) ? resData : (resData.rows || []);
-        const dbBadge = `<div style="background:rgba(110,139,122,0.12); border:1px solid rgba(110,139,122,0.3); border-radius:10px; padding:8px 12px; margin-bottom:12px; font-size:0.75rem; color:var(--teal); display:flex; align-items:center; justify-content:space-between;">
-          <span>🐘 <strong>Neon PostgreSQL Connected:</strong> ep-purple-dream-atlcv0hx-pooler.c-9.us-east-1.aws.neon.tech/neondb</span>
-          <span style="font-size:0.7rem; color:var(--gold-soft);">User: ${u.name}</span>
-        </div>`;
+        const rows = Array.isArray(resData) ? resData : (resData && resData.rows ? resData.rows : []);
 
         if (!rows || rows.length === 0) {
-          historyLines.innerHTML = dbBadge + '<div style="padding:20px; text-align:center; color:var(--text-muted);">No search chats stored in Neon DB yet. Ask any question to start saving!</div>';
+          historyLines.innerHTML = '<div style="padding:20px; text-align:center; color:var(--text-muted);">No search chats stored yet. Ask any question to start saving!</div>';
           return;
         }
 
@@ -7582,10 +7748,12 @@ FORMATTING RULES:
       if (u) {
         try {
           const res = await fetch(`${API_BASE}/api/academic-profile/${u.id}`);
-          const data = await res.json();
-          if (data && data.profile) {
-            profile = data.profile;
-            localStorage.setItem('userAcademicProfile', JSON.stringify(profile));
+          if (res.ok) {
+            const data = await res.json().catch(() => null);
+            if (data && data.profile) {
+              profile = data.profile;
+              localStorage.setItem('userAcademicProfile', JSON.stringify(profile));
+            }
           }
         } catch(e) {}
       }
@@ -7625,7 +7793,8 @@ FORMATTING RULES:
       const classEnc = encodeURIComponent(profile.current_class);
       const streamEnc = encodeURIComponent(profile.stream || '');
       const res = await fetch(`${API_BASE}/api/class-suggestions/${stateEnc}/${classEnc}?stream=${streamEnc}`);
-      const sug = await res.json();
+      if (!res.ok) throw new Error('API error ' + res.status);
+      const sug = await res.json().catch(() => ({}));
 
       renderEducationPanelContent(profile, sug);
     } catch(err) {
