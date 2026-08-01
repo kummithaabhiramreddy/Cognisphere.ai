@@ -178,6 +178,13 @@ async function upsertOAuthUser({ name, email, avatar_url, provider }) {
   return { token, user: { id: user.id, name: user.name, email: user.email, plan: user.plan || 'Pro', avatar_initials: initials } };
 }
 
+function getAppUrl(req) {
+  if (process.env.APP_URL) return process.env.APP_URL;
+  const proto = req.headers['x-forwarded-proto'] || (req.connection && req.connection.encrypted ? 'https' : 'http');
+  const host = req.headers.host || '127.0.0.1:3000';
+  return `${proto}://${host}`;
+}
+
 // ─── AUTH: Google OAuth 2.0 — redirect to Google ─────────────────────
 app.get('/api/auth/google', async (req, res) => {
   const clientId = process.env.GOOGLE_CLIENT_ID;
@@ -191,7 +198,8 @@ app.get('/api/auth/google', async (req, res) => {
     });
     return res.redirect(`/oauth-callback.html?token=${encodeURIComponent(token)}&user=${encodeURIComponent(JSON.stringify(user))}`);
   }
-  const redirectUri = encodeURIComponent(`${process.env.APP_URL || 'http://127.0.0.1:3000'}/api/auth/google/callback`);
+  const APP_URL = getAppUrl(req);
+  const redirectUri = encodeURIComponent(`${APP_URL}/api/auth/google/callback`);
   const scope = encodeURIComponent('openid email profile');
   const state = jwt.sign({ ts: Date.now() }, JWT_SECRET, { expiresIn: '10m' });
   const url = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=code&scope=${scope}&state=${encodeURIComponent(state)}&access_type=offline&prompt=select_account`;
@@ -201,7 +209,7 @@ app.get('/api/auth/google', async (req, res) => {
 // ─── AUTH: Google OAuth 2.0 — callback ───────────────────────────────
 app.get('/api/auth/google/callback', async (req, res) => {
   const { code, error } = req.query;
-  const APP_URL = process.env.APP_URL || 'http://127.0.0.1:3000';
+  const APP_URL = getAppUrl(req);
   if (error || !code) {
     return res.redirect(`/oauth-callback.html?error=${encodeURIComponent(error || 'Google auth cancelled')}`);
   }
@@ -263,7 +271,8 @@ app.get('/api/auth/github', async (req, res) => {
     });
     return res.redirect(`/oauth-callback.html?token=${encodeURIComponent(token)}&user=${encodeURIComponent(JSON.stringify(user))}`);
   }
-  const redirectUri = encodeURIComponent(`${process.env.APP_URL || 'http://127.0.0.1:3000'}/api/auth/github/callback`);
+  const APP_URL = getAppUrl(req);
+  const redirectUri = encodeURIComponent(`${APP_URL}/api/auth/github/callback`);
   const state = jwt.sign({ ts: Date.now() }, JWT_SECRET, { expiresIn: '10m' });
   const url = `https://github.com/login/oauth/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&scope=user:email&state=${encodeURIComponent(state)}`;
   res.redirect(url);
@@ -272,7 +281,7 @@ app.get('/api/auth/github', async (req, res) => {
 // ─── AUTH: GitHub OAuth — callback ───────────────────────────────────
 app.get('/api/auth/github/callback', async (req, res) => {
   const { code, error } = req.query;
-  const APP_URL = process.env.APP_URL || 'http://127.0.0.1:3000';
+  const APP_URL = getAppUrl(req);
   if (error || !code) {
     return res.redirect(`/oauth-callback.html?error=${encodeURIComponent(error || 'GitHub auth cancelled')}`);
   }

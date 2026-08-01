@@ -437,7 +437,8 @@
 </div>
 
 <script>
-  const API_HOST = 'http://127.0.0.1:3000';
+  const isLocalHost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+  const API_HOST = isLocalHost ? 'http://127.0.0.1:3000' : '';
   let authMode = 'login';
 
   let currentStats = { queries: 0, users: 0, latency: 0 };
