@@ -287,9 +287,7 @@
       <div class="brand-sub">SUPERHUMAN AUTONOMOUS INTELLIGENCE</div>
     </div>
   </a>
-  <div class="nav-right">
-    <button class="btn-nav-main" onclick="openAuth('register')" style="background:var(--gold); color:#0a0c10;">Sign Up Free</button>
-  </div>
+  <!-- nav-right intentionally empty: no header buttons -->
 </nav>
 
 <!-- HERO -->
@@ -443,12 +441,15 @@
   let authMode = 'login';
 
   let currentStats = { queries: 0, users: 0, latency: 0 };
+  let liveGraphLeft  = [0.35, 0.45, 0.38, 0.5, 0.4, 0.88, 0.42, 0.38, 0.48, 0.35, 0.4, 0.36];
+  let liveGraphRight = [0.45, 0.55, 0.7, 0.58, 0.85, 0.95, 0.72, 0.6, 0.48, 0.42, 0.5, 0.38];
+  let currentGraphMode = 'avoid';
 
   window.addEventListener('DOMContentLoaded', () => {
     fetchStats();
-    renderStaticGraph('avoid');
-    // Live auto-refresh metrics every 3 seconds from Neon DB
-    setInterval(fetchStats, 3000);
+    renderLiveGraph(currentGraphMode);
+    // Live auto-refresh metrics AND graph every 5 seconds from Neon DB
+    setInterval(fetchStats, 5000);
   });
 
   async function fetchStats() {
@@ -477,6 +478,28 @@
         currentStats.latency = d.avg_response_ms;
         pulseCard('cardLatency');
       }
+
+      // ── Update live graph with real Neon DB data ──
+      if (Array.isArray(d.graph_left) && d.graph_left.length > 0) {
+        liveGraphLeft = d.graph_left;
+      }
+      if (Array.isArray(d.graph_right) && d.graph_right.length > 0) {
+        liveGraphRight = d.graph_right;
+      }
+
+      // Update live badge values with real query peak load
+      if (d.peak_load_pct) {
+        const badgeLoadSpan = document.querySelector('#badgeLeft .badge-red');
+        if (badgeLoadSpan) badgeLoadSpan.textContent = d.peak_load_pct + '%';
+      }
+      if (d.raw_users_total) {
+        const badgeScaleSpan = document.querySelector('#badgeRight .badge-green');
+        if (badgeScaleSpan) badgeScaleSpan.textContent = '+' + d.raw_users_total + ' users';
+      }
+
+      // Redraw graph with fresh live data
+      renderLiveGraph(currentGraphMode);
+
     } catch(e) {}
   }
 
@@ -515,9 +538,10 @@
     }, 1200);
   }
 
-  // ── CLEAN STATIC GRAPH DRAWING ──
-  function renderStaticGraph(mode) {
+  // ── LIVE GRAPH DRAWING — powered by real Neon DB data ──
+  function renderLiveGraph(mode) {
     const canvas = document.getElementById('staticGraphCanvas');
+    if (!canvas) return;
     const container = canvas.parentElement;
     canvas.width = container.offsetWidth || 800;
     canvas.height = container.offsetHeight || 190;
@@ -527,45 +551,46 @@
 
     ctx.clearRect(0, 0, W, H);
 
-    // Left half: Without Neon (Spike)
-    const leftPts = [0.35, 0.45, 0.38, 0.5, 0.4, 0.88, 0.42, 0.38, 0.48, 0.35];
+    // ── LEFT HALF: Live query load from Neon DB (red spike line) ──
+    const leftPts = liveGraphLeft.slice(0, Math.ceil(liveGraphLeft.length / 2));
     const lW = midX - 20;
 
-    // Draw baseline
+    // Baseline
     ctx.strokeStyle = 'rgba(255,255,255,0.15)'; ctx.lineWidth = 1;
     ctx.beginPath(); ctx.moveTo(10, H * 0.45); ctx.lineTo(midX - 10, H * 0.45); ctx.stroke();
 
-    // Red spike area
+    // Live query load area (red)
     ctx.beginPath(); ctx.moveTo(10, H);
     leftPts.forEach((v, i) => {
-      const x = 10 + (i / (leftPts.length - 1)) * lW;
-      const y = H - v * H * 0.85;
+      const x = 10 + (i / Math.max(leftPts.length - 1, 1)) * lW;
+      const y = H - Math.min(v, 1) * H * 0.85;
       ctx.lineTo(x, y);
     });
     ctx.lineTo(midX - 10, H); ctx.closePath();
     ctx.fillStyle = 'rgba(248,104,104,0.18)'; ctx.fill();
 
-    // Red line
-    ctx.beginPath(); ctx.strokeStyle = 'rgba(248,104,104,0.8)'; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.strokeStyle = 'rgba(248,104,104,0.85)'; ctx.lineWidth = 2;
     leftPts.forEach((v, i) => {
-      const x = 10 + (i / (leftPts.length - 1)) * lW;
-      const y = H - v * H * 0.85;
+      const x = 10 + (i / Math.max(leftPts.length - 1, 1)) * lW;
+      const y = H - Math.min(v, 1) * H * 0.85;
       i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
     });
     ctx.stroke();
 
-    // Right half: With Neon Autoscaling (Green Bars)
-    const rightPts = mode === 'save' 
-      ? [0.4, 0.35, 0.5, 0.38, 0.42, 0.3, 0.38, 0.45, 0.32, 0.3]
-      : [0.45, 0.55, 0.7, 0.58, 0.85, 0.95, 0.72, 0.6, 0.48, 0.42];
+    // ── RIGHT HALF: Live user/scaling bars from Neon DB (green bars) ──
+    const rightPts = mode === 'save'
+      ? liveGraphLeft.slice(Math.ceil(liveGraphLeft.length / 2))   // right half of queries (lower = saved)
+      : liveGraphRight;                                             // user scaling bars
     const rStart = midX + 10, rW = W - midX - 20;
-    const barW = rW / rightPts.length - 3;
+    const barW = Math.max(rW / Math.max(rightPts.length, 1) - 3, 4);
 
     rightPts.forEach((v, i) => {
       const x = rStart + i * (barW + 3);
-      const bH = v * H * 0.82;
+      const bH = Math.min(v, 1) * H * 0.82;
+      if (bH < 2) return;
       const grd = ctx.createLinearGradient(0, H - bH, 0, H);
-      grd.addColorStop(0, '#00ffaa'); grd.addColorStop(1, 'rgba(0,255,170,0.2)');
+      grd.addColorStop(0, '#00ffaa');
+      grd.addColorStop(1, 'rgba(0,255,170,0.15)');
       ctx.fillStyle = grd;
       ctx.fillRect(x, H - bH, barW, bH);
     });
@@ -573,17 +598,33 @@
     // Divider line
     ctx.strokeStyle = 'rgba(255,255,255,0.12)'; ctx.lineWidth = 1;
     ctx.beginPath(); ctx.moveTo(midX, 0); ctx.lineTo(midX, H); ctx.stroke();
+
+    // Live dot on last left point
+    const lastV = leftPts[leftPts.length - 1] || 0.4;
+    const lastX = midX - 10;
+    const lastY = H - Math.min(lastV, 1) * H * 0.85;
+    ctx.beginPath();
+    ctx.arc(lastX, lastY, 4, 0, Math.PI * 2);
+    ctx.fillStyle = '#f86868';
+    ctx.fill();
+    // Pulse ring
+    ctx.beginPath();
+    ctx.arc(lastX, lastY, 7, 0, Math.PI * 2);
+    ctx.strokeStyle = 'rgba(248,104,104,0.35)';
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
   }
 
   function setMode(mode, btn) {
     document.querySelectorAll('.perf-tab').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
-    renderStaticGraph(mode);
+    currentGraphMode = mode;
+    renderLiveGraph(mode);
     if (mode === 'save') {
       document.getElementById('graphCap').textContent = 'Cognisphere.ai saves compute costs with smart resource scaling per request';
       document.getElementById('badgeLeft').style.display = 'none';
     } else {
-      document.getElementById('graphCap').textContent = 'Cognisphere.ai handles thousands of live queries daily with intelligent autoscaling';
+      document.getElementById('graphCap').textContent = 'Cognisphere.ai live query load — powered by real Neon DB data';
       document.getElementById('badgeLeft').style.display = 'block';
     }
   }
