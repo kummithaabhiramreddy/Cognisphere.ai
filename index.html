@@ -629,23 +629,9 @@
     }
   }
 
-  // ── LOGIN GATE: user must have registered account first ──
+  // ── LOGIN BUTTON: opens login page directly ──
   function openLoginGated() {
-    // Check if user has ever registered (csUser set means they registered before)
-    const storedUser = localStorage.getItem('csUser');
-    const storedToken = localStorage.getItem('csToken');
-    if (storedUser && storedToken) {
-      // Already has account — allow login
-      openAuth('login');
-    } else {
-      // No account found — force register first
-      const errEl = document.getElementById('authError');
-      openAuth('register');
-      if (errEl) {
-        errEl.textContent = '⚠️ No account found. Please create an account first before logging in.';
-        errEl.classList.add('show');
-      }
-    }
+    openAuth('login');
   }
 
   // ── AUTH MODAL HANDLERS ──
@@ -692,23 +678,11 @@
       return;
     }
 
-    // ── REGISTER-FIRST GATE: login requires a registered account ──
-    if (authMode === 'login') {
-      const storedUser = localStorage.getItem('csUser');
-      const storedToken = localStorage.getItem('csToken');
-      if (!storedUser || !storedToken) {
-        errEl.textContent = '⚠️ No account found for this device. Please create an account first.';
-        errEl.classList.add('show');
-        setTimeout(() => toggleAuthMode('register'), 1800);
-        return;
-      }
-    }
-
     btn.disabled = true;
     btn.textContent = authMode === 'register' ? 'Creating account...' : 'Logging in...';
 
     const endpoint = authMode === 'register' ? '/api/auth/register' : '/api/auth/login';
-    const payload = authMode === 'register' ? { name, email, password } : { email, password };
+    const payload  = authMode === 'register' ? { name, email, password } : { email, password };
 
     try {
       const r = await fetch(API_HOST + endpoint, {
@@ -719,23 +693,28 @@
       const data = await r.json();
 
       if (!r.ok || !data.success) {
-        // If login fails with 'not found' type error, guide user to register
-        if (authMode === 'login' && (data.error || '').toLowerCase().includes('not found')) {
-          errEl.textContent = '⚠️ Account not found. Please create an account first.';
-          errEl.classList.add('show');
-          setTimeout(() => toggleAuthMode('register'), 2000);
-          btn.disabled = false;
-          btn.textContent = 'Log in';
-          return;
+        // ── User tried to log in but is not registered in Neon DB ──
+        if (authMode === 'login') {
+          const errMsg = (data.error || '').toLowerCase();
+          if (errMsg.includes('not found') || errMsg.includes('no user') ||
+              errMsg.includes('invalid') || errMsg.includes('does not exist') ||
+              r.status === 404 || r.status === 401) {
+            errEl.style.cssText = 'background:rgba(248,104,104,0.12); border:1px solid rgba(248,104,104,0.4); color:#ff8080; padding:10px 14px; border-radius:8px; font-size:0.8rem; display:block; text-align:left; margin-bottom:12px;';
+            errEl.innerHTML = '<strong>❌ You are not registered as a user for Cognisphere AI.</strong><br><span style="font-size:0.76rem; opacity:0.85;">Please create a new account to get started.</span>';
+            btn.disabled = false;
+            btn.textContent = 'Log in';
+            return;
+          }
         }
-        throw new Error(data.error || 'Authentication failed. Check your credentials.');
+        throw new Error(data.error || 'Authentication failed. Please check your credentials.');
       }
 
       localStorage.setItem('csToken', data.token);
       localStorage.setItem('csUser', JSON.stringify(data.user));
       window.location.href = 'home.html';
     } catch(err) {
-      errEl.textContent = err.message;
+      errEl.style.cssText = '';
+      errEl.innerHTML = err.message;
       errEl.classList.add('show');
       btn.disabled = false;
       btn.textContent = authMode === 'register' ? 'Create Account' : 'Log in';
