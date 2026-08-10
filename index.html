@@ -305,12 +305,12 @@
   <!-- METRICS (REAL-TIME LIVE NEON DB UPDATES) -->
   <div class="metrics-grid">
     <div class="metric-card" id="cardQueries">
-      <div class="metric-num" id="statQueries">24,810</div>
-      <div class="metric-label">Queries</div>
+      <div class="metric-num" id="statQueries">0</div>
+      <div class="metric-label">Total Queries</div>
     </div>
     <div class="metric-card" id="cardUsers">
       <div class="metric-num" id="statUsers">0</div>
-      <div class="metric-label">Active Users</div>
+      <div class="metric-label">Registered Users</div>
     </div>
     <div class="metric-card" id="cardUptime">
       <div class="metric-num" id="statUptime">99.97%</div>
@@ -458,14 +458,14 @@
       const r = await fetch(`${API_HOST}/api/stats?_t=` + Date.now());
       const d = await r.json();
 
-      if (d.queries_processed && d.queries_processed !== currentStats.queries) {
-        animateCounter('statQueries', currentStats.queries || (d.queries_processed - 20), d.queries_processed, 800, true);
+      if (typeof d.queries_processed === 'number' && d.queries_processed !== currentStats.queries) {
+        animateCounter('statQueries', currentStats.queries || 0, d.queries_processed, 800, true);
         currentStats.queries = d.queries_processed;
         pulseCard('cardQueries');
       }
 
-      if (d.active_users && d.active_users !== currentStats.users) {
-        animateCounter('statUsers', currentStats.users || (d.active_users - 5), d.active_users, 800, true);
+      if (typeof d.active_users === 'number' && d.active_users !== currentStats.users) {
+        animateCounter('statUsers', currentStats.users || 0, d.active_users, 800, true);
         currentStats.users = d.active_users;
         pulseCard('cardUsers');
       }

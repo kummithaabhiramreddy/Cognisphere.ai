@@ -19,7 +19,8 @@ const corsOptions = {
   optionsSuccessStatus: 200
 };
 app.use(cors(corsOptions));
-app.use(express.json());
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
@@ -103,6 +104,9 @@ async function initializeDb() {
 }
 initializeDb();
 
+// In-memory fallback user store for local development when DB is offline
+const localUsers = new Map();
+
 // ─── AUTH: Register ──────────────────────────────────────────────────
 app.post('/api/auth/register', async (req, res) => {
   try {
@@ -110,24 +114,31 @@ app.post('/api/auth/register', async (req, res) => {
     if (!email || !password) return res.status(400).json({ error: 'Email and password required' });
     const cleanEmail = email.toLowerCase().trim();
     const cleanName = (name || cleanEmail.split('@')[0]).trim();
-    
-    const exists = await pool.query('SELECT * FROM users WHERE email = $1', [cleanEmail]);
-    if (exists.rows.length > 0) {
-      return res.status(400).json({ error: 'Email already registered. Please log in instead.' });
+    const initials = cleanName.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2) || 'CS';
+
+    try {
+      const exists = await pool.query('SELECT * FROM users WHERE email = $1', [cleanEmail]);
+      if (exists.rows.length > 0) {
+        return res.status(400).json({ error: 'Email already registered. Please log in instead.' });
+      }
+      const hash = await bcrypt.hash(password, 10);
+      const result = await pool.query(
+        'INSERT INTO users (name, email, password_hash, plan, avatar_initials) VALUES ($1, $2, $3, $4, $5) RETURNING id, name, email, plan, avatar_initials, created_at',
+        [cleanName, cleanEmail, hash, 'Free', initials]
+      );
+      const user = result.rows[0];
+      const token = jwt.sign({ id: user.id, email: user.email, name: user.name }, JWT_SECRET, { expiresIn: '7d' });
+      return res.json({ success: true, token, user });
+    } catch (dbErr) {
+      console.warn('DB Register Fallback:', dbErr.message);
+      const hash = await bcrypt.hash(password, 10);
+      const user = { id: 'usr_' + Date.now(), name: cleanName, email: cleanEmail, password_hash: hash, plan: 'Free', avatar_initials: initials };
+      localUsers.set(cleanEmail, user);
+      const token = jwt.sign({ id: user.id, email: user.email, name: user.name }, JWT_SECRET, { expiresIn: '7d' });
+      return res.json({ success: true, token, user: { id: user.id, name: user.name, email: user.email, plan: user.plan, avatar_initials: initials } });
     }
-    
-    const hash = await bcrypt.hash(password, 10);
-    const initials = cleanName.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
-    const result = await pool.query(
-      'INSERT INTO users (name, email, password_hash, plan, avatar_initials) VALUES ($1, $2, $3, $4, $5) RETURNING id, name, email, plan, avatar_initials, created_at',
-      [cleanName, cleanEmail, hash, 'Free', initials]
-    );
-    const user = result.rows[0];
-    const token = jwt.sign({ id: user.id, email: user.email, name: user.name }, JWT_SECRET, { expiresIn: '7d' });
-    res.json({ success: true, token, user });
   } catch (err) {
-    console.error('Register error:', err.message);
-    res.status(500).json({ error: 'Registration failed: ' + err.message });
+    res.status(400).json({ error: err.message });
   }
 });
 
@@ -137,19 +148,35 @@ app.post('/api/auth/login', async (req, res) => {
     const { email, password } = req.body;
     if (!email || !password) return res.status(400).json({ error: 'Email and password required' });
     const cleanEmail = email.toLowerCase().trim();
-    const result = await pool.query('SELECT * FROM users WHERE email = $1', [cleanEmail]);
-    
-    if (result.rows.length === 0) {
-      return res.status(400).json({ error: 'Account not found. Please register first.' });
+
+    let user = null;
+    try {
+      const result = await pool.query('SELECT * FROM users WHERE email = $1', [cleanEmail]);
+      if (result.rows.length > 0) user = result.rows[0];
+    } catch (dbErr) {
+      console.warn('DB Login Fallback:', dbErr.message);
     }
-    
-    const user = result.rows[0];
-    const valid = await bcrypt.compare(password, user.password_hash);
+
+    if (!user) {
+      user = localUsers.get(cleanEmail);
+    }
+
+    if (!user) {
+      // Auto-create local user profile on first login attempt when DB is offline
+      const cleanName = cleanEmail.split('@')[0].replace(/[^a-zA-Z]/g, ' ');
+      const initials = cleanName.trim().slice(0, 2).toUpperCase() || 'CS';
+      const hash = await bcrypt.hash(password, 10);
+      user = { id: 'usr_' + Date.now(), name: cleanName, email: cleanEmail, password_hash: hash, plan: 'Free', avatar_initials: initials };
+      localUsers.set(cleanEmail, user);
+    }
+
+    const valid = user.password_hash ? await bcrypt.compare(password, user.password_hash) : true;
     if (!valid) {
       return res.status(401).json({ error: 'Incorrect password. Please try again.' });
     }
+
     const token = jwt.sign({ id: user.id, email: user.email, name: user.name }, JWT_SECRET, { expiresIn: '7d' });
-    res.json({ success: true, token, user: { id: user.id, name: user.name, email: user.email, plan: user.plan || 'Free', avatar_initials: user.avatar_initials } });
+    res.json({ success: true, token, user: { id: user.id, name: user.name || 'User', email: user.email, plan: user.plan || 'Free', avatar_initials: user.avatar_initials || 'U' } });
   } catch (err) {
     console.error('Login error:', err.message);
     res.status(500).json({ error: 'Login failed: ' + err.message });
@@ -424,8 +451,8 @@ app.get('/api/stats', async (req, res) => {
     const normalizedU = allUZero ? fallbackScale : userHistory.map(v => +(v / maxU).toFixed(3));
 
     res.json({
-      queries_processed: queries > 0 ? (queries + 24810) : 24810,
-      active_users: users > 0 ? users : 1240,
+      queries_processed: queries,
+      active_users: users,
       uptime_percent: 99.97,
       avg_response_ms: 340,
       db_status: 'Operational',
@@ -438,9 +465,9 @@ app.get('/api/stats', async (req, res) => {
     });
   } catch(err) {
     console.error('Stats error:', err.message);
-    // Fallback with static demo data
+    // Fallback
     res.json({
-      queries_processed: 24810, active_users: 1240, uptime_percent: 99.97,
+      queries_processed: 0, active_users: 0, uptime_percent: 99.97,
       avg_response_ms: 340, db_status: 'Degraded',
       graph_left:  [0.35, 0.45, 0.38, 0.5, 0.4, 0.88, 0.42, 0.38, 0.48, 0.35, 0.4, 0.36],
       graph_right: [0.45, 0.55, 0.7, 0.58, 0.85, 0.95, 0.72, 0.6, 0.48, 0.42, 0.5, 0.38],
@@ -1251,9 +1278,17 @@ app.get('/api/live-search', async (req, res) => {
 
 // Streaming AI completions with failover (Groq Llama 3 -> Gemini 1.5 Flash)
 app.post('/api/search-stream', (req, res) => {
-  const { query } = req.body;
+  let { query } = req.body;
   if (!query) {
     return res.status(400).json({ error: 'Query is required' });
+  }
+
+  // Truncate to prevent 413 Payload Too Large from Groq/Gemini (strip base64 blobs)
+  // Strip any raw base64 data URIs that may have leaked into the query
+  query = query.replace(/data:[a-z]+\/[a-z0-9.+-]+;base64,[A-Za-z0-9+/=]{500,}/g, '[FILE_DATA_REMOVED]');
+  // Hard cap at 10,000 chars total (Groq free tier limit ~6000 tokens)
+  if (query.length > 10000) {
+    query = query.slice(0, 10000) + '\n\n[... content truncated for processing ...]';
   }
 
   res.setHeader('Content-Type', 'text/event-stream');
@@ -1268,261 +1303,123 @@ app.post('/api/search-stream', (req, res) => {
   const groqKey = process.env.GROQ_API_KEY || '';
   const geminiKey = process.env.GOOGLE_API_KEY || '';
 
+  // ── IMAGE GENERATION INTENT DETECTOR ───────────────────────────────────────
+  const isFlowchartOrCode = /\b(flowchart|diagram|sequence|architecture|code|program|essay|text|syllabus|algorithm)\b/i.test(query);
+  const isImageGenIntent = !isFlowchartOrCode && (
+    /\b(generate|create|draw|make|render|produce|show|give|send|display|paint|design)\b.{0,40}\b(image|picture|photo|illustration|artwork|wallpaper|portrait|drawing|logo|poster|banner|thumbnail|scene|art)\b/i.test(query) ||
+    /\b(image|picture|photo|artwork|illustration|drawing|portrait|wallpaper|logo|poster|banner)\b.{0,40}\b(of|about|for|showing|with|featuring|depicting)\b/i.test(query) ||
+    /^\s*(image|picture|photo|draw|paint)\b.+/i.test(query.trim())
+  );
+
+  if (isImageGenIntent) {
+    const cleanPrompt = query
+      .replace(/\b(generate|create|draw|make|render|show me|give me|send me|display|paint|design|an image of|a picture of|a photo of|please|can you)\b/gi, '')
+      .replace(/\s+/g, ' ').trim();
+    const prompt = cleanPrompt || query;
+    const seed1 = Math.floor(Math.random() * 100000);
+    const seed2 = Math.floor(Math.random() * 100000);
+    const encodedPrompt = encodeURIComponent(prompt);
+    const encodedPrompt2 = encodeURIComponent(prompt + ' cinematic detailed high quality 4k');
+    const imageUrl1 = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=1024&height=768&nologo=true&seed=${seed1}`;
+    const imageUrl2 = `https://image.pollinations.ai/prompt/${encodedPrompt2}?width=1024&height=768&nologo=true&seed=${seed2}`;
+
+    let imgResp = `### 🎨 AI Image Generation\n\n**Prompt:** *${prompt}*\n\n`;
+    imgResp += `![${prompt} - Render 1](${imageUrl1})\n\n`;
+    imgResp += `![${prompt} - Render 2 (Cinematic)](${imageUrl2})\n\n`;
+    imgResp += `> 📐 **Resolution:** 1024×768 | 🤖 **Model:** Pollinations Neural Diffusion | 🎲 **Seeds:** ${seed1}, ${seed2}\n\n`;
+    imgResp += `*Click any image to view fullscreen. The images are generated in real-time by AI based on your prompt.*`;
+
+    sendUpdate({ text: imgResp });
+    sendUpdate({ type: 'complete' });
+    return res.end();
+  }
+
   const systemPrompt = `⚠️ CRITICAL OVERRIDE — MUST FOLLOW BEFORE ANY OTHER RULE:
 
-RULE #1 — CODE GENERATION DIRECTIVE (HARD RULE):
-If a user's message asks for CODE, a PROGRAM, an IMPLEMENTATION, or a SOLUTION (e.g., "linear search", "bubble sort", "factorial", "linked list", "fibonacci", "stack", "queue", "binary tree", "create app", "build web page", etc.):
-  → IMMEDIATELY provide the complete, fully working, high-performance CODE BLOCK.
-  → If the user specified a programming language (e.g. C, Python, C++, Java, JS), generate the code in that exact language.
-  → If the user did NOT specify a language, provide a complete, production-ready solution (e.g., in Python or C with clear comments and code block headers) AND provide the code immediately! NEVER refuse, hold back, or ask "which language" — ALWAYS give the complete working code right away!
+RULE #1 — CODE GENERATION DIRECTIVE:
+If the user asks for CODE, a PROGRAM, or an IMPLEMENTATION:
+  → IMMEDIATELY provide the complete, fully working CODE BLOCK in the specified language.
+  → If no language is specified, default to C with #include, int main(), comments.
+  → NEVER refuse or ask "which language" — always give complete working code.
 
-RULE #2 — STRICT RELEVANCE (HARD RULE):
-  → Answer ONLY what was asked. Do NOT add extra unrequested information, unrelated topics, or sections.
-  → Do NOT echo previous conversation. Start response directly with the answer.
+RULE #2 — IMAGE GENERATION DIRECTIVE:
+If the user asks to "generate", "create", "draw", "make", "show", "give", or "send" an image, picture, photo, artwork, illustration, logo, wallpaper, or visual:
+  → NEVER say "I'm not capable of directly providing images" or any refusal.
+  → ALWAYS generate images using markdown: ![Description](https://image.pollinations.ai/prompt/ENCODED_PROMPT?width=1024&height=768&nologo=true)
+  → Replace ENCODED_PROMPT with the URL-encoded description. Generate 2 variants.
 
-RULE #3 — STRICT REAL ONLINE URL HANDLING (HARD RULE — NO EXCEPTIONS):
-  → DO NOT HALLUCINATE OR MAKE UP FAKE/CREATED URLS!
-  → Cognisphere AI's project URL is ONLY: https://cognisphereai.vercel.app/ (Provide ONLY when user explicitly asks for Cognisphere AI's link/URL).
-  → FOR ANY OTHER URL OR LINK REQUEST (e.g., "give SRKR college URL", "give Cloud AI URL", "give Python docs link", "give OpenCV website"):
-    * Provide ONLY real, verified official web URLs (e.g., SRKR → https://srkrec.edu.in/, Python → https://docs.python.org/, Google Cloud AI → https://cloud.google.com/, Claude → https://claude.ai/, OpenCV → https://opencv.org/, MDN → https://developer.mozilla.org/).
-    * NEVER output Cognisphere AI's URL when the user asks for links to other platforms or websites!
+RULE #3 — FILE / ATTACHMENT READING DIRECTIVE (CRITICAL):
+When the user's message contains [ATTACHED FILE CONTENT] or [FILE: ...] or [PASTED TEXT ...] blocks:
+  → Read the entire content inside those blocks carefully.
+  → If the user says "read this then explain", "explain this", "summarize", or sends a document: ALWAYS provide a complete, structured, step-by-step explanation of all main topics, key concepts, formulas, and details in the document!
+  → NEVER say "there is no question provided" or refuse to answer. Read the content and explain it thoroughly.
+  → NEVER repeat or echo raw base64 strings or internal [FILE:...] header tags.
+
+RULE #4 — ANSWER PRECISION (CRITICAL):
+  → Answer ONLY what the user asked. Do NOT volunteer unrequested information.
+  → Do NOT echo conversation history or file content blocks.
+  → Provide ONLY real, verified URLs when citing sources.
+  → Answer ANYTHING without limits: code, math, science, medicine, law, writing, images.
+
+RULE #5 — FLOWCHART & DIAGRAM DIRECTIVE (HARD RULE):
+Whenever creating a flowchart, diagram, process flow, architecture diagram, or block diagram:
+  → ALWAYS wrap the diagram in a mermaid code block starting with \`\`\`mermaid and ending with \`\`\`
+  → ALWAYS enclose node labels in double quotes: A["Label"] --> B["Label"].
+  → NEVER output loose diagram syntax like A[...] -> B[...] in plain text paragraphs outside code blocks!
+
+RULE #6 — CLAUDE AI STYLE & SCREENSHOT ANALYSIS DIRECTIVE:
+When analyzing uploaded screenshots, code files, or documents:
+  → Deliver high-grade, thoughtful, precise analysis in the style of Claude 3.5 Sonnet / Claude 3.7.
+  → Detail step-by-step breakdown of visual elements, UI components, code logic, or text content in screenshots.
+  → Directly answer the exact user question about the screenshot or attachment with maximum clarity and depth.
+  → Format key artifacts (HTML previews, Mermaid diagrams, code blocks, structured tables) cleanly.
+
+RULE #7 — WEBSITE & WEB APP CREATION DIRECTIVE (CLAUDE ARTIFACT STYLE):
+ONLY when the user EXPLICITLY says: "build me a website", "create a webpage", "code a web app", "write HTML for", "make a landing page" etc.:
+  → ALWAYS produce a complete, single-file HTML document (with embedded CSS in <style> and JS in <script>).
+  → Wrap the entire HTML in a single \`\`\`html code block so it renders an instant "▶ Live Preview Website" button.
+  → Use stunning dark mode aesthetics, modern typography, responsive layout, glassmorphism, and dynamic interactions.
+  → If the user provides a follow-up prompt to modify an existing website ("change color to blue", "add dark mode", "add a button"), USE THE PREVIOUS CONVERSATION CONTEXT to preserve the existing structure and apply the requested edits cleanly.
+  → IMPORTANT: Do NOT generate HTML if the user asks for "architecture", "diagram", "flowchart", "system design", "block diagram", "structure", or "overview". Those are diagram requests, not code requests.
+
+RULE #8 — ARCHITECTURE / DIAGRAM / FLOWCHART DIRECTIVE (HARD RULE — HIGHEST PRIORITY):
+If the user asks for: "architecture", "system architecture", "diagram", "flowchart", "block diagram", "system design", "data flow", "component diagram", "technical overview", "structure" of ANYTHING:
+  → NEVER generate HTML code. NEVER produce a webpage.
+  → ALWAYS respond with a clean, colorful, multi-level Mermaid diagram inside a \`\`\`mermaid code block.
+  → ALWAYS use \`graph TD\` (Top-Down Tree Hierarchy) so it displays as a beautiful structured tree architecture model!
+  → CRITICAL SYNTAX RULE: ALWAYS enclose ALL node text labels in double quotes! Example:
+    \`\`\`mermaid
+    graph TD
+        A["👤 User Client / Web Browser"] -->|"1. HTTPS Request"| B["⚡ Frontend UI (HTML5 / CSS / JS)"]
+        B -->|"2. API Calls"| C["🧠 Backend AI Engine (Node.js Express)"]
+        C -->|"3. Query Context"| D["🗄️ PostgreSQL / Neon DB"]
+        C -->|"4. LLM Prompt"| E["🤖 Groq / Gemini 2.0 AI Model"]
+        E -->|"5. Streaming Stream Response"| B
+    \`\`\`
+  → Include at least 6–12 well-organized nodes arranged in top-down tree levels.
+  → Example trigger phrases: "give architecture of", "show architecture", "architecture of ai website", "draw a diagram", "block diagram of", "system design of".
 
 ---
 
-You are Cognisphere AI — an elite, senior-level AI assistant and knowledge engine created and developed by KUMMITHA ABHIRAM REDDY.
+You are Cognisphere AI — an elite autonomous AI assistant created by KUMMITHA ABHIRAM REDDY.
+- Name: Cognisphere AI | Creator: KUMMITHA ABHIRAM REDDY | DOB: 27-OCT-2007
+- College: SRKR Engineering College, Bhimavaram — IT, Batch 2025–2029
+- Official Website: https://cognisphereai.vercel.app/ — ALWAYS use this URL when asked. NEVER say https://cognisphere.ai/
 
-COGNISPHERE AI & CREATOR BIODATA — SURGICAL ANSWER RULES (ABSOLUTE):
-⚠️ BIODATA RULE: Answer ONLY the EXACT field the user asked about. NEVER dump the entire biodata for a partial question.
+CODE DEFAULT: If no language specified → C language with full working code.
 
-- "What is your name?" / "Project name?" → Answer ONLY: "Cognisphere AI"
-- "Who created / invented / introduced Cognisphere AI?" → Answer ONLY: "KUMMITHA ABHIRAM REDDY"
-- "What is the creator's full name?" / "Who is Kummitha Abhiram Reddy?" → Answer ONLY: "Kummitha Abhiram Reddy"
-- "What is Abhiram's date of birth?" / "DOB" / "born" / "birth date" / "date born" / "born date" / "which date born" / "which data born" / "born on which date" / "when was he born" / "DOB of creator" → Answer ONLY: "27-OCT-2007"
-- "Where does Abhiram study?" / "College?" / "University?" → Answer ONLY: "SRKR Engineering College, Bhimavaram — Information Technology (IT), Batch 2025–2029"
-- "What is Abhiram's branch?" / "What does he study?" → Answer ONLY: "Information Technology (IT)"
-- "Who is Abhiram's father?" / "Father's name?" → Answer ONLY: "Kummitha Obulesu"
-- "Who is Abhiram's mother?" / "Mother's name?" → Answer ONLY: "Kummitha Suneetha"
-- "Tell me everything about the creator" / "Full biodata" / "Full details of Abhiram" → ONLY then provide all fields:
-  * Full Name: Kummitha Abhiram Reddy
-  * Date of Birth: 27-OCT-2007
-  * Education: Information Technology (IT), SRKR Engineering College, Bhimavaram (Batch 2025–2029)
-  * Father's Name: Kummitha Obulesu
-  * Mother's Name: Kummitha Suneetha
+Your responses must be PRECISE, SHARP, and DIRECTLY ANSWER WHAT WAS ASKED.`;
 
-BIODATA HARD RULE: If the user's question matches only ONE biodata field, respond with ONLY that one field — nothing else. Do NOT volunteer other fields unprompted.
-⚠️ CRITICAL BIODATA DOB RULE: Any question containing "born", "birth", "dob", "date", "data born", "data birth" in the context of asking about the creator ALWAYS means date of birth → answer ONLY: "27-OCT-2007"
+  // Model fallback chain: Groq Llama 70B -> Groq Llama 8B -> Groq Mixtral -> Gemini 2.0 -> Gemini 1.5 -> Pollinations Free Stream
+  tryGroq70B();
 
-CODING & PROGRAMMING DIRECTIVE (DEFAULT TO C LANGUAGE):
-⚠️ CRITICAL CODING RULE: Whenever the user asks for code, a program, an algorithm implementation, a data structure program, or code snippet (e.g., "write a program for prime numbers", "bubble sort code", "binary search", "factorial", "reverse string", "linked list"):
-1. DETECT IF LANGUAGE IS SPECIFIED: Look if the user explicitly named a programming language (e.g., "in Python", "using Java", "C++", "JavaScript", "Rust", "Go", "PHP", "C#").
-2. DEFAULT TO C PROGRAMMING: If the user DID NOT specify any programming language in their prompt, ALWAYS DEFAULT TO C PROGRAMMING CODE (in C language block). Provide complete, compiling, production-grade C code with #include <stdio.h>, int main(), clean formatting, comments, and sample output!
-3. SPECIFIED LANGUAGE: If a language was specified, generate the code in that exact requested language.
-4. NON-CODING QUERIES: If the question is NOT a coding or programming request, answer normally as usual.
-
-INLINE ONLINE IMAGE DISPLAY RULE:
-  -> Display 1 to 2 high-quality, relevant images INLINE directly ON THAT SAME RESPONSE PAGE using markdown syntax: ![description](image_url).
-  -> Use clean, working image URLs (from Wikimedia Commons https://upload.wikimedia.org/..., Unsplash https://images.unsplash.com/..., or official direct image links).
-- If the user did NOT explicitly request images in their prompt, DO NOT output any images.
-
-DECODED FILE & ATTACHMENT INNER CONTENT READING DIRECTIVE:
-- When [DECODED ATTACHED TEXT SENTENCES & REFERENCES] is present or files/text/screenshots are attached or pasted:
-  * READ AND UNDERSTAND THE ENTIRE INNER CONTENT (code, text, logic, formulas, data) inside the pasted/attached file completely (just like Claude AI and Antigravity).
-  * NEVER say "I cannot read this file" or "This is a screenshot/image". Extract the inner content and analyze it deeply.
-  * Answer the user's question directly based on the extracted inner content.
-
-- Feature Guide & Locations in Cognisphere AI:
-  * Search Bar: Located centrally on the main landing/home page for queries, code requests, and web search.
-  * Voice Mic (🎤): Embedded directly on the search bar for live hands-free speech input.
-  * Mode Selector: Dropdown on the search bar to switch between General, Deep Research, Coding, Education, Math & Logic.
-  * History & Live User Count: Located in the left sidebar, synced live with Neon PostgreSQL database.
-  * Settings & Profile: Located in the top header menu.
-
-If the user asks about Cognisphere AI features, how to use this project, where features are located, or asks about project files/folders:
-- Explain the feature locations clearly.
-- Always identify Cognisphere AI as created and developed by Kummitha Abhiram Reddy, Information Technology student at SRKR Engineering College in Bhimavaram.
-
-Your responses must be SHARP, DEEP, COMPREHENSIVE, and DIRECTLY ACTIONABLE. No filler. No hedging. Treat every question with precision.
-
-CORE RESPONSE STANDARDS:
-1. STRICTLY ANSWER ONLY WHAT WAS ASKED (EXACT MATCH RULE):
-   - ABSOLUTE RULE: NEVER echo, repeat, summarize, or mention any previous conversation history or past questions in your output text.
-   - NO PRE-CONVERSATION FILLER: Start your response DIRECTLY with the answer or code card. Do NOT write intros like "Based on our previous discussion...", "Sure!", "Here is the code...", or repeat the user's prompt.
-   - CODE GENERATION DIRECTIVE: Whenever the user requests code, a program, or implementation, output the full code block cleanly inside markdown code fences (e.g. C or Python code blocks). Do NOT hold back or ask for clarification.
-   - STRICT TOPIC RELEVANCE RULE (ALL DOMAINS):
-     * Provide ONLY data and information that is DIRECTLY RELATED to the user's exact question.
-     * Never dump unrequested extra topics, general fluff, or unrelated chapters.
-     * If there is any doubt or ambiguity in the question, answer the core doubt directly and ask for clarifying details if needed.
-   - EXAMPLE CARDS: For sample inputs/outputs, test cases, or usage examples, wrap them in example block format (e.g. example Input: [1, 2, 3] Output: 6) so they render as distinct Example Cards instead of Code Cards.
-   - If user asks for an ALGORITHM -> Provide ONLY the clear step-by-step Algorithm Logic & Process. Do NOT add pseudocode, source code, dry run, flowchart, or complexity tables unless explicitly asked.
-   - If user asks for PSEUDOCODE -> Provide ONLY the Pseudocode block. Do NOT add source code, long essays, or flowcharts unless asked.
-   - If user asks for COMPLEXITY -> Provide ONLY the Time & Space Complexity analysis.
-   - If user asks for a FLOWCHART / DIAGRAM -> Provide ONLY the Mermaid flowchart diagram.
-   - DO NOT dump unrequested extra sections, past chat filler text, or extra unasked items. Output ONLY the exact data/code requested for the current question!
-
-2. CONDITIONAL IMAGES, URLS, AND VIDEOS DIRECTIVES:
-   - IMAGE-ONLY DIRECTIVE: Include images ONLY IF the user explicitly asks for images in their prompt (e.g., "show images", "picture of", "photo of", "image of").
-     * CRITICAL: If the user asks ONLY for images (without asking for text or explanation), output ONLY the 3 to 5 markdown images ![Description](https://images.unsplash.com/...) side-by-side. Do NOT write any extra introductory text, paragraphs, or raw URLs.
-   - VIDEOS DIRECTIVE: Never include video embeds, video links, or video cards UNLESS the user explicitly asks for "video", "watch video", or "video clip".
-   - URL & LINK DIRECTIVE: If the user asks for links or URLs (e.g., "give link for X", "URL of Cloud AI", "official website link"), search online resources and provide exact, accurate, working URLs formatted clearly as markdown links [Title](https://...).
-
-3. STRICT MERMAID DIAGRAM SYNTAX & COLORFUL DESIGN:
-   - ALL node labels MUST be enclosed in double quotes inside brackets: \`A["Start Process"] --> B["Check Condition"]\`.
-   - NEVER use unquoted parentheses (), brackets [], braces {}, or special characters in labels or IDs.
-   - Use simple alphanumeric node IDs (\`A\`, \`B\`, \`C\`, \`D\`).
-   - Use distinct colorful classDef styles for Start (emerald green), Process (cyan/blue), Decision (amber/orange), and End (purple/magenta) nodes so flowcharts are vibrant, crystal clear, and easy to understand.
-   - Example classDef styling:
-     \`\`\`mermaid
-     flowchart TD
-         A["Start Process"] --> B{"Is Data Valid?"}
-         B -->|Yes| C["Execute Task"]
-         B -->|No| D["Show Error"]
-         C --> E["Finish"]
-
-         classDef start fill:#004d40,stroke:#00e676,color:#fff,stroke-width:2px;
-         classDef decision fill:#4a2c00,stroke:#ffab00,color:#fff,stroke-width:2px;
-         classDef process fill:#1a237e,stroke:#2979ff,color:#fff,stroke-width:2px;
-         classDef finish fill:#311b92,stroke:#b388ff,color:#fff,stroke-width:2px;
-
-         class A start;
-         class B decision;
-         class C,D process;
-         class E finish;
-     \`\`\`
-
-4. STEP-BY-STEP EXPLANATIONS:
-   - Structure ALL technical explanations as numbered steps: ### Step 1: ..., ### Step 2: ...
-   - Include real worked examples at each step with actual values.
-   - End every explanation with a ### Summary Table or ### Key Takeaways section.
-
-5. FILE & ATTACHMENT ANALYSIS:
-   - When [DECODED ATTACHED TEXT SENTENCES & REFERENCES] is present: treat it as the PRIMARY source of truth.
-   - Analyze DEEPLY — identify bugs, logic flaws, security vulnerabilities, performance bottlenecks, style issues.
-   - DO NOT mention file metadata (name, size, type). Focus ONLY on what the content does and means.
-   - If code: explain line-by-line behavior, identify issues, provide optimized version.
-
-6. COMPARISONS (MANDATORY TABLE FORMAT):
-   - ANY comparison request ("vs", "difference between", "pros/cons", "when to use") MUST produce:
-     a) A comprehensive Markdown table with ≥8 comparison parameters, clearly titled columns.
-     b) Detailed paragraphs explaining each dimension with real use-case context and examples.
-     c) A clear "### Decision Guide: When to use X vs Y" section at the end.
-
-7. CONVERSATION MEMORY (STRICT FOCUS ON CURRENT QUESTION):
-   - The user's CURRENT question is always labeled "CURRENT QUESTION TO ANSWER NOW:" — answer THAT question and ONLY that question.
-   - The [PREVIOUS CONVERSATION HISTORY] section is background context ONLY. NEVER re-answer, repeat, or re-explain those old questions.
-   - Use history ONLY when the current question is a direct follow-up like "explain line 5", "convert the above to Java", "give example of that" — in that case, reference the relevant prior answer.
-   - If the current question is INDEPENDENT (a new topic, new algorithm, new concept), answer it FRESH without mixing in previous answers.
-   - NEVER start your answer with something from the history. ALWAYS start with the answer to the CURRENT QUESTION.
-
-8. WEB DEVELOPMENT (BUILD NARRATIVE — REQUIRED):
-   - For ANY web/frontend request (HTML, CSS, JS, React, Vue, Next.js, Tailwind, Bootstrap, GSAP, etc.):
-   - ALWAYS start with a build narrative line BEFORE each code block:
-       "Let me create a complete [Project Name] with [specific features]:"
-       "Now let me build index.html with full semantic HTML5 structure:"
-       "Now let me write style.css with CSS variables, animations, and responsive design:"
-       "Now let me create script.js with all interactive logic and event handling:"
-   - Mention EXACT filename (index.html, styles.css, main.js, App.jsx) in EVERY narrative line.
-   - After each narrative → immediately output that file's COMPLETE code block.
-   - Code quality: use glassmorphism/modern design, CSS animations, Google Fonts, CSS custom properties, mobile-first responsive design, semantic HTML5.
-   - DO NOT skip narrative lines — they drive the live real-time build animation system.
-
-9. MOBILE & DESKTOP APP BUILDING (BUILD NARRATIVE — REQUIRED):
-   - For Android (Kotlin/Java/XML), iOS (Swift/SwiftUI), Flutter (Dart), React Native, Electron, Tauri:
-   - ALWAYS narrate each file creation step with exact filenames:
-       "Let me scaffold the complete Android app project:"
-       "Now let me create MainActivity.kt with full business logic:"
-       "Now let me create activity_main.xml with Material Design 3 UI:"
-       "Now let me create AndroidManifest.xml with permissions:"
-       "Now let me add build.gradle with all dependencies:"
-   - After each narrative → output complete, compilable, production-ready code for that file.
-   - Include ALL required: imports, permissions, dependencies, entry points, error handling.
-   - For Flutter: always include pubspec.yaml with dependencies.
-   - For React Native: always include package.json and App.js.
-
-10. AI, MACHINE LEARNING & DATA SCIENCE:
-    - For ML requests: provide FULL pipeline — data preprocessing → feature engineering → model selection → training → evaluation → deployment.
-    - Show actual runnable code (sklearn, TensorFlow, PyTorch, pandas, numpy) — never pseudocode.
-    - Include: metrics interpretation (accuracy, precision, recall, F1, AUC-ROC), overfitting detection, cross-validation, hyperparameter tuning with GridSearchCV/Optuna.
-    - For deep learning: specify architecture, loss function, optimizer, learning rate schedule.
-
-11. SYSTEM DESIGN & ARCHITECTURE:
-    - For system design questions: ALWAYS include:
-      → Mermaid architecture diagram showing component relationships
-      → Component descriptions with responsibilities
-      → Database schema (ERD or table definitions)
-      → REST/GraphQL API design with endpoints and payloads
-      → Caching strategy (Redis, CDN, browser cache)
-      → Horizontal scaling approach and load balancing
-      → Failure handling and retry mechanisms
-      → Estimated capacity and throughput analysis
-
-12. MATHEMATICS, STATISTICS & THEORY:
-    - Show full step-by-step derivations. Use LaTeX-style notation where applicable.
-    - For proofs: show each logical step with justification and theorem reference.
-    - For statistics: include formulas, worked examples with real numbers, and result interpretation.
-    - For numerical methods: show convergence, error bounds, and stability analysis.
-
-13. GENERAL KNOWLEDGE & RESEARCH:
-    - Provide expert-level synthesis — NOT Wikipedia-level summaries.
-    - Cite specific mechanisms, historical evolution, current state-of-the-art, and open research questions.
-    - For debates/opinions: present ALL major perspectives with evidence, then deliver a clear, reasoned conclusion.
-    - For business/startup questions: include market analysis, technical feasibility, MVP scope, competitive landscape.
-
-FORMATTING RULES (STRICT):
-- NEVER open with filler ("Great question!", "Certainly!", "Of course!", "I'd be happy to help!").
-- Start DIRECTLY with the answer content or Step 1.
-- Use **bold** for key terms, \`inline code\` for code snippets, ### headers for sections.
-- Prefer tables over bullet lists for comparisons and structured data.
-- Keep tone: expert, direct, confident, technically precise, zero padding.`;
-
-  if (groqKey) {
-    const url = 'https://api.groq.com/openai/v1/chat/completions';
-    const headers = { 'Authorization': `Bearer ${groqKey}` };
-    const body = {
-      model: 'llama-3.3-70b-versatile',
-      messages: [
-        { role: 'system', content: systemPrompt },
-        { role: 'user', content: query }
-      ],
-      stream: true,
-      temperature: 0.3
-    };
-
-    postStream(
-      url, headers, body,
-      (line) => {
-        if (line.startsWith('data: ')) {
-          const raw = line.slice(6).trim();
-          if (raw === '[DONE]') return;
-          try {
-            const parsed = JSON.parse(raw);
-            const token = parsed.choices[0].delta.content || '';
-            if (token) sendUpdate({ text: token });
-          } catch (e) {}
-        }
-      },
-      () => {
-        sendUpdate({ type: 'complete' });
-        res.end();
-      },
-      (err) => {
-        console.error('Groq 70B streaming failed:', err.message, '--> Trying Groq 8B...');
-        tryGroq8B();
-      }
-    );
-  } else {
-    tryGroq8B();
-  }
-
-  function tryGroq8B() {
+  function tryGroq70B() {
     if (groqKey) {
       const url = 'https://api.groq.com/openai/v1/chat/completions';
       const headers = { 'Authorization': `Bearer ${groqKey}` };
       const body = {
-        model: 'llama-3.1-8b-instant',
-        messages: [
-          { role: 'system', content: systemPrompt },
-          { role: 'user', content: query }
-        ],
+        model: 'llama-3.3-70b-versatile',
+        messages: [{ role: 'system', content: systemPrompt }, { role: 'user', content: query }],
         stream: true,
         temperature: 0.3
       };
@@ -1540,12 +1437,44 @@ FORMATTING RULES (STRICT):
             } catch (e) {}
           }
         },
-        () => {
-          sendUpdate({ type: 'complete' });
-          res.end();
-        },
+        () => { sendUpdate({ type: 'complete' }); res.end(); },
         (err) => {
-          console.error('Groq 8B streaming failed:', err.message, '--> Trying Gemini...');
+          console.error('Groq 70B failed:', err.message, '--> Trying Groq 8B...');
+          tryGroq8B();
+        }
+      );
+    } else {
+      tryGroq8B();
+    }
+  }
+
+  function tryGroq8B() {
+    if (groqKey) {
+      const url = 'https://api.groq.com/openai/v1/chat/completions';
+      const headers = { 'Authorization': `Bearer ${groqKey}` };
+      const body = {
+        model: 'llama-3.1-8b-instant',
+        messages: [{ role: 'system', content: systemPrompt }, { role: 'user', content: query }],
+        stream: true,
+        temperature: 0.3
+      };
+
+      postStream(
+        url, headers, body,
+        (line) => {
+          if (line.startsWith('data: ')) {
+            const raw = line.slice(6).trim();
+            if (raw === '[DONE]') return;
+            try {
+              const parsed = JSON.parse(raw);
+              const token = parsed.choices[0].delta.content || '';
+              if (token) sendUpdate({ text: token });
+            } catch (e) {}
+          }
+        },
+        () => { sendUpdate({ type: 'complete' }); res.end(); },
+        (err) => {
+          console.error('Groq 8B failed:', err.message, '--> Trying Gemini 2.0...');
           fallbackToGemini('gemini-2.0-flash');
         }
       );
@@ -1556,18 +1485,11 @@ FORMATTING RULES (STRICT):
 
   function fallbackToGemini(modelName = 'gemini-2.0-flash') {
     if (!geminiKey) {
-      return synthesizeKnowledgeFallback(query);
+      return fallbackToPollinations();
     }
 
     const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:streamGenerateContent?key=${geminiKey}`;
-    const body = {
-      contents: [
-        {
-          role: 'user',
-          parts: [{ text: systemPrompt + '\n\nQuery: ' + query }]
-        }
-      ]
-    };
+    const body = { contents: [{ role: 'user', parts: [{ text: systemPrompt + '\n\nQuery: ' + query }] }] };
 
     postStream(
       url, {}, body,
@@ -1580,19 +1502,45 @@ FORMATTING RULES (STRICT):
           }
         } catch (e) {}
       },
-      () => {
-        sendUpdate({ type: 'complete' });
-        res.end();
-      },
+      () => { sendUpdate({ type: 'complete' }); res.end(); },
       (err) => {
-        console.error(`Gemini (${modelName}) streaming failed:`, err.message);
-        if (modelName === 'gemini-2.0-flash') {
-          fallbackToGemini('gemini-1.5-flash');
-        } else if (modelName === 'gemini-1.5-flash') {
-          fallbackToGemini('gemini-1.5-pro');
-        } else {
-          synthesizeKnowledgeFallback(query);
+        console.error(`Gemini (${modelName}) failed:`, err.message);
+        if (modelName === 'gemini-2.0-flash') fallbackToGemini('gemini-2.0-flash-lite');
+        else fallbackToPollinations();
+      }
+    );
+  }
+
+  function fallbackToPollinations() {
+    const url = 'https://text.pollinations.ai/openai';
+    const body = {
+      messages: [
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: query }
+      ],
+      model: 'openai',
+      stream: true
+    };
+
+    postStream(
+      url, { 'Content-Type': 'application/json' }, body,
+      (line) => {
+        if (line.startsWith('data: ')) {
+          const raw = line.slice(6).trim();
+          if (raw === '[DONE]') return;
+          try {
+            const parsed = JSON.parse(raw);
+            const token = parsed.choices[0].delta.content || '';
+            if (token) sendUpdate({ text: token });
+          } catch (e) {}
+        } else if (line.trim()) {
+          sendUpdate({ text: line });
         }
+      },
+      () => { sendUpdate({ type: 'complete' }); res.end(); },
+      (err) => {
+        console.error('Pollinations fallback failed:', err.message);
+        synthesizeKnowledgeFallback(query);
       }
     );
   }
@@ -1638,21 +1586,24 @@ FORMATTING RULES (STRICT):
 });
 
 app.post('/api/save-chat', async (req, res) => {
+  const safeQuery = (req.body && req.body.query) || '';
+  const safeResponse = (req.body && req.body.response) || '';
   try {
     const { chat_id, query, response, user_id, user_email, user_name } = req.body;
     if (!query || !response) {
       return res.status(400).json({ error: 'Query and response are required' });
     }
-    const uid = String(user_id || 'aarav_sharma');
-    const uemail = user_email || 'aarav@cognisphere.ai';
-    const uname = user_name || 'Aarav Sharma';
+    const uid = String(user_id || 'demo_user');
+    const uemail = user_email || 'demo@cognisphere.ai';
+    const uname = user_name || 'Demo User';
 
     let result;
-    if (chat_id) {
-      // UPDATE existing search_history row in Neon DB for thread continuation
+    const numericId = (chat_id && /^\d+$/.test(String(chat_id))) ? parseInt(chat_id, 10) : null;
+
+    if (numericId) {
       result = await pool.query(
         'UPDATE search_history SET query = $1, response = $2, created_at = CURRENT_TIMESTAMP WHERE id = $3 RETURNING *',
-        [query, response, chat_id]
+        [query, response, numericId]
       );
       if (result.rows.length === 0) {
         result = await pool.query(
@@ -1661,17 +1612,16 @@ app.post('/api/save-chat', async (req, res) => {
         );
       }
     } else {
-      // INSERT new search_history row for new chat
       result = await pool.query(
         'INSERT INTO search_history (user_id, user_email, user_name, query, response) VALUES ($1, $2, $3, $4, $5) RETURNING *',
         [uid, uemail, uname, query, response]
       );
     }
 
-    res.json({ success: true, record: result.rows[0] });
+    res.json({ success: true, record: result.rows ? result.rows[0] : { query, response } });
   } catch (err) {
-    console.warn('Save chat DB warning (ignored):', err.message);
-    res.json({ success: true, record: { query, response, created_at: new Date().toISOString() } });
+    // Graceful fallback — DB not available, return success so client isn't blocked
+    res.json({ success: true, record: { query: safeQuery, response: safeResponse, created_at: new Date().toISOString() } });
   }
 });
 
@@ -1681,15 +1631,12 @@ app.get('/api/history', async (req, res) => {
       return res.json({ rows: [] });
     }
     const userId = req.query.user_id || req.query.user_email;
-    let queryStr = 'SELECT * FROM search_history ORDER BY created_at DESC LIMIT 100';
-    let queryParams = [];
-
-    if (userId) {
-      queryStr = 'SELECT * FROM search_history WHERE user_id = $1 OR user_email = $1 ORDER BY created_at DESC LIMIT 100';
-      queryParams = [userId];
+    if (!userId) {
+      return res.json({ rows: [] });
     }
 
-    const result = await pool.query(queryStr, queryParams);
+    const queryStr = 'SELECT * FROM search_history WHERE user_id = $1 OR user_email = $1 ORDER BY created_at DESC LIMIT 100';
+    const result = await pool.query(queryStr, [userId]);
     res.json({
       rows: result.rows || []
     });
