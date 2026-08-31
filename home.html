@@ -3052,8 +3052,54 @@
     display: none !important;
   }
   #askForm.antigravity-search-form:focus-within {
-    border-color: rgba(255,255,255,0.22) !important;
-    box-shadow: 0 12px 44px rgba(0,0,0,0.6) !important;
+    border-color: rgba(0, 136, 255, 0.45) !important;
+    box-shadow: 0 12px 44px rgba(0, 136, 255, 0.22), 0 0 0 1px rgba(0, 136, 255, 0.3) !important;
+  }
+  body.is-generating #askForm.antigravity-search-form {
+    border-color: rgba(0, 200, 255, 0.5) !important;
+    box-shadow: 0 0 25px rgba(0, 136, 255, 0.25) !important;
+    animation: searchPulseGlow 2s infinite ease-in-out !important;
+  }
+  @keyframes searchPulseGlow {
+    0% { box-shadow: 0 0 15px rgba(0, 136, 255, 0.2); }
+    50% { box-shadow: 0 0 30px rgba(0, 200, 255, 0.4); }
+    100% { box-shadow: 0 0 15px rgba(0, 136, 255, 0.2); }
+  }
+
+  /* Premium Query Presentation Header Bar */
+  .premium-query-badge-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+    font-family: 'Inter', system-ui, sans-serif;
+  }
+  .premium-query-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 0.74rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    backdrop-filter: blur(8px);
+  }
+  .badge-engine {
+    background: rgba(0, 136, 255, 0.15);
+    color: #60a5fa;
+    border: 1px solid rgba(0, 136, 255, 0.35);
+  }
+  .badge-speed {
+    background: rgba(34, 197, 94, 0.12);
+    color: #4ade80;
+    border: 1px solid rgba(34, 197, 94, 0.3);
+  }
+  .badge-verified {
+    background: rgba(168, 85, 247, 0.14);
+    color: #c084fc;
+    border: 1px solid rgba(168, 85, 247, 0.35);
   }
 
   /* Top row: full-width textarea */
@@ -4610,6 +4656,9 @@
 
   function saveConversations() {
     try {
+      if (currentConversationId) {
+        localStorage.setItem('cognisphere_active_conv_id', currentConversationId);
+      }
       // Strip blobs / large base64 before persisting to avoid quota errors
       const toStore = conversations.slice(-MAX_STORED_CONVS).map(conv => ({
         ...conv,
@@ -4620,12 +4669,16 @@
             ? (m.text || '').slice(0, MAX_MSG_TEXT_LEN) + '\n\n[...truncated...]'
             : (m.text || ''),
           sources: m.sources ? m.sources.slice(0, 6) : null,
-          // Strip attachments with raw blob URLs/base64 — too large for localStorage
+          // Persist attachments with image metadata & base64 preview data
           attachments: (m.attachments || []).map(a => ({
-            label: a.label, kind: a.kind,
-            name: a.file ? a.file.name : undefined,
-            mimeType: a.mimeType,
-            // keep textContent if under 4KB, else omit
+            label: a.label,
+            kind: a.kind,
+            name: a.file ? a.file.name : (a.name || a.label),
+            isImage: Boolean(a.isImage || (a.file && a.file.type && a.file.type.startsWith('image/')) || (a.mimeType && a.mimeType.startsWith('image/')) || /\.(png|jpe?g|gif|webp|bmp|svg)$/i.test(a.name || a.label || '')),
+            isVideo: Boolean(a.isVideo),
+            isPdf: Boolean(a.isPdf),
+            mimeType: a.mimeType || (a.file ? a.file.type : undefined),
+            dataUrl: (a.dataUrl && a.dataUrl.length < 600000) ? a.dataUrl : (a.url && a.url.startsWith('data:') ? a.url : undefined),
             textContent: (a.textContent && a.textContent.length < 4096) ? a.textContent : undefined,
           }))
         }))
@@ -5202,10 +5255,10 @@
           </div>
           <div class="gallery-img-caption">🖼️ ${altText}</div>
           <div style="padding:6px 10px 10px; display:flex; flex-wrap:wrap; gap:5px; justify-content:center; border-top:1px solid rgba(255,255,255,0.06);" onclick="event.stopPropagation();">
-            <button type="button" onclick="convertImageToFormat('${cleanHref}', 'pdf', '${altText}')" style="all:unset; box-sizing:border-box; padding:4px 8px; background:rgba(217,119,87,0.22); border:1px solid rgba(217,119,87,0.5); color:#fff; border-radius:5px; font-size:0.7rem; font-weight:500; cursor:pointer;">📄 Convert PDF</button>
-            <button type="button" onclick="convertImageToFormat('${cleanHref}', 'png', '${altText}')" style="all:unset; box-sizing:border-box; padding:4px 8px; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.15); color:#fff; border-radius:5px; font-size:0.7rem; font-weight:500; cursor:pointer;">🖼️ PNG</button>
-            <button type="button" onclick="convertImageToFormat('${cleanHref}', 'jpg', '${altText}')" style="all:unset; box-sizing:border-box; padding:4px 8px; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.15); color:#fff; border-radius:5px; font-size:0.7rem; font-weight:500; cursor:pointer;">📷 JPG</button>
-            <button type="button" onclick="convertImageToFormat('${cleanHref}', 'webp', '${altText}')" style="all:unset; box-sizing:border-box; padding:4px 8px; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.15); color:#fff; border-radius:5px; font-size:0.7rem; font-weight:500; cursor:pointer;">🎨 WEBP</button>
+            <button type="button" onclick="convertImageToFormat('${cleanHref.replace(/'/g, "\\'")}', 'pdf', '${altText.replace(/'/g, "\\'")}')" style="all:unset; box-sizing:border-box; padding:4px 8px; background:rgba(217,119,87,0.22); border:1px solid rgba(217,119,87,0.5); color:#fff; border-radius:5px; font-size:0.7rem; font-weight:500; cursor:pointer;">📄 Convert PDF</button>
+            <button type="button" onclick="convertImageToFormat('${cleanHref.replace(/'/g, "\\'")}', 'png', '${altText.replace(/'/g, "\\'")}')" style="all:unset; box-sizing:border-box; padding:4px 8px; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.15); color:#fff; border-radius:5px; font-size:0.7rem; font-weight:500; cursor:pointer;">🖼️ PNG</button>
+            <button type="button" onclick="convertImageToFormat('${cleanHref.replace(/'/g, "\\'")}', 'jpg', '${altText.replace(/'/g, "\\'")}')" style="all:unset; box-sizing:border-box; padding:4px 8px; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.15); color:#fff; border-radius:5px; font-size:0.7rem; font-weight:500; cursor:pointer;">📷 JPG</button>
+            <button type="button" onclick="convertImageToFormat('${cleanHref.replace(/'/g, "\\'")}', 'webp', '${altText.replace(/'/g, "\\'")}')" style="all:unset; box-sizing:border-box; padding:4px 8px; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.15); color:#fff; border-radius:5px; font-size:0.7rem; font-weight:500; cursor:pointer;">🎨 WEBP</button>
           </div>
         </div>
       `;
@@ -5788,7 +5841,7 @@
     // 1. Try backend proxy first (fast, reliable, CORS-free, view sorted)
     try {
       const res = await fetch(`${API_BASE}/api/live-search?q=${encoded}&lang=${langCode}`, {
-        signal: AbortSignal.timeout(5000)
+        signal: AbortSignal.timeout(12000)
       });
       if (res.ok) {
         const data = await res.json();
@@ -5924,6 +5977,36 @@
     let fullQuery = query || '';
     const attList = (msgAttachments && msgAttachments.length) ? msgAttachments : (attachments || []);
     const userQuestion = fullQuery.trim();
+
+    // ── GREETING INTERCEPT (IMMEDIATE) ──
+    const isSimpleGreeting = /^\s*(hi|hello|hey|greetings|good\s*(morning|afternoon|evening)|howdy|hola|namaste|what'?s\s*up)\s*[!.]*\s*$/i.test(userQuestion);
+    if (isSimpleGreeting && (!attList || attList.length === 0)) {
+      const greetingReply = `Hello! 👋 How can I help you today? Ask me any question across science, technology, mathematics, code, writing, or research!`;
+      if (msgToUpdate) {
+        msgToUpdate.text = greetingReply;
+        msgToUpdate.pending = false;
+        msgToUpdate.status = null;
+        if (typeof stopPendingAnimations === 'function') stopPendingAnimations(msgToUpdate);
+        if (typeof renderThread === 'function') renderThread(convToUpdate);
+        if (typeof setGeneratingState === 'function') setGeneratingState(false);
+      }
+      return { text: greetingReply, sources: [], isHtml: false };
+    }
+
+    // ── IDENTITY INTERCEPT (NAME & CREATOR) ──
+    const isIdentityQuery = /^\s*(what('?s| is) your name|who are you|who made you|who created you|tell me about yourself|your name|creator of cognisphere)\s*[!.]*\s*$/i.test(userQuestion);
+    if (isIdentityQuery && (!attList || attList.length === 0)) {
+      const identityReply = `I am **Cognisphere AI**, an autonomous AI knowledge and research engine created by **KUMMITHA ABHIRAM REDDY**.\n\n### 🚀 What I Can Do For You:\n- 💡 **Instant Concept Explanations**: Deep, crystal-clear answers across science, technology, mathematics, and research.\n- 💻 **Code Generation & Debugging**: Complete working implementations with syntax highlighting.\n- 📊 **Architecture & Flowcharts**: Interactive top-down Mermaid diagrams and system architectures.\n- 🛡️ **Live Web Verification**: Real-time factual search powered by multi-server AI intelligence.\n\nHow can I help you today?`;
+      if (msgToUpdate) {
+        msgToUpdate.text = identityReply;
+        msgToUpdate.pending = false;
+        msgToUpdate.status = null;
+        if (typeof stopPendingAnimations === 'function') stopPendingAnimations(msgToUpdate);
+        if (typeof renderThread === 'function') renderThread(convToUpdate);
+        if (typeof setGeneratingState === 'function') setGeneratingState(false);
+      }
+      return { text: identityReply, sources: [], isHtml: false };
+    }
 
     // ── WEBSITE BUILDING MODE RESTRICTION INTERCEPT ──
     // Differentiate informational/explanatory questions ("what is a website?", "how to make a website?") from explicit code building requests ("build a calculator website", "create html code for landing page").
@@ -6138,8 +6221,11 @@ Building interactive websites, HTML applications, and frontend UI dashboards is 
 
       if (decodedSentences.length) {
         const isGeneralExplainCmd = !userQuestion || /^(read|explain|summarize|analyze|check|what is|tell me|review|look at)(?: (this|it|file|pdf|document|image))?(?: then)?(?: (explain|summarize|analyze|detail))?$/i.test(userQuestion);
+        const _hasImg = attList.some(a => a.isImage || (a.file && a.file.type && a.file.type.startsWith('image/')) || (a.label && /\.(png|jpe?g|gif|webp|bmp|svg)$/i.test(a.label)));
 
-        if (isGeneralExplainCmd) {
+        if (_hasImg) {
+          fullQuery = `Analyze the attached image/screenshot content below and answer the user's question about THIS image:\n\n[ATTACHED SCREENSHOT / IMAGE CONTENT — ANALYZE THIS IMAGE ONLY]:\n${decodedSentences.join('\n\n')}\n\n[USER QUESTION ABOUT THIS ATTACHED IMAGE]:\n${userQuestion || 'Explain this attached screenshot/image in detail.'}\n\nIMPORTANT: Focus exclusively on the visual content, code, error messages, or details in THIS attached image. Do NOT answer about unrelated previous conversation topics.`;
+        } else if (isGeneralExplainCmd) {
           fullQuery = `Read the attached file content below thoroughly and provide a complete, clear, step-by-step explanation of all main topics, key concepts, formulas, and details inside this document.\n\n[ATTACHED FILE CONTENT]:\n${decodedSentences.join('\n\n')}`;
         } else {
           fullQuery = `${userQuestion}\n\n[ATTACHED FILE CONTENT — use this to answer the user's request]:\n${decodedSentences.join('\n\n')}\n\nIMPORTANT: Read the file content carefully and answer the user's question/request based on the document.`;
@@ -6147,21 +6233,26 @@ Building interactive websites, HTML applications, and frontend UI dashboards is 
       }
     }
 
-
     // ── CONVERSATION HISTORY LINKING (Claude AI / Antigravity Style Memory):
-    // Connects previous questions & answers across turns so follow-up queries ("change color", "add button", "explain line 5", etc.) understand previous context
+    // Connects previous questions & answers across turns so follow-up queries ("change color", "add button", "list all movies", etc.) understand previous context
+    const hasImageAtt = (attList && attList.length) ? attList.some(a => a.isImage || (a.file && a.file.type && a.file.type.startsWith('image/')) || (a.label && /\.(png|jpe?g|gif|webp|bmp|svg)$/i.test(a.label))) : false;
     let historyContext = '';
-    if (convToUpdate && convToUpdate.messages && convToUpdate.messages.length > 1) {
+    let structuredTurns = [];
+    if (!hasImageAtt && convToUpdate && convToUpdate.messages && convToUpdate.messages.length > 1) {
       const prevMsgs = convToUpdate.messages.filter(m => !m.pending && m !== msgToUpdate && m.text && m.text.trim());
       // Take last 8 turns (max 16 messages)
       const recentTurns = prevMsgs.slice(-16);
       if (recentTurns.length > 0) {
+        structuredTurns = recentTurns.map(m => ({
+          role: m.role === 'user' ? 'user' : 'assistant',
+          content: (m.text || '').replace(/[A-Za-z0-9+/]{80,}={0,2}/g, '[blob]').slice(0, 3000)
+        }));
+
         const formattedHistory = recentTurns.map(m => {
           const roleLabel = m.role === 'user' ? 'User' : 'Assistant';
           let cleanText = (m.text || '')
-            .replace(/[A-Za-z0-9+/]{80,}={0,2}/g, '[blob]')
-            .replace(/---\s*(FILE|PASTED TEXT|ATTACHED FILE)[\s\S]*?---\s*END[^\n]*/gi, '[attached file]');
-          if (cleanText.length > 1200) cleanText = cleanText.slice(0, 1200) + '...';
+            .replace(/[A-Za-z0-9+/]{80,}={0,2}/g, '[blob]');
+          if (cleanText.length > 2000) cleanText = cleanText.slice(0, 2000) + '...';
           return `${roleLabel}: ${cleanText.trim()}`;
         }).join('\n\n');
 
@@ -6174,7 +6265,7 @@ Building interactive websites, HTML applications, and frontend UI dashboards is 
     const isWebsiteQuery = /\b(website|webpage|web app|html|landing page|ui|dashboard|frontend|portfolio|calculator|game|component|page|css|js|build a site|create a website|make a webpage|design a page)\b/i.test(fullQuery);
     if (isWebsiteQuery) {
       websitePromptContext = `\n\n[WEBSITE/APP CREATION DIRECTIVE — Claude AI Style]:
-1. Provide a single, complete, fully-functional HTML document (with embedded CSS in <style> and JS in <script>).
+1. Provide a single, complete, fully-functional HTML document (with embedded CSS in style tags and JS in script tags).
 2. Use modern visual aesthetics (sleek dark mode, modern typography, glassmorphism, flex/grid responsive layout, micro-animations).
 3. Put ALL code inside a single \`\`\`html code block so the user can preview and run it live with 1 click.
 4. If this is a follow-up request to modify an existing website, preserve the code structure and apply all requested changes smoothly.\n`;
@@ -6200,11 +6291,29 @@ Building interactive websites, HTML applications, and frontend UI dashboards is 
     const payloadQuery = `${fullQuery}${websitePromptContext}${academicContext}${historyContext}`;
     const searchQuery = query.trim() || (attList.length ? (attList[0].label || 'attached file') : 'general learning');
 
-    // Strip any leaked base64 or raw file content blocks from AI output before display
+    // Contextualize follow-up web searches if previous subject is clear
+    let liveWebQuery = searchQuery;
+    if (structuredTurns.length > 0) {
+      const lastUserTurn = [...structuredTurns].reverse().find(t => t.role === 'user');
+      const isFollowUpPattern = /^(list|show|give|tell|what|how|why|when|where|which|who|all|more|his|her|its|their|the)\b/i.test(searchQuery);
+      if (lastUserTurn && isFollowUpPattern && searchQuery.length < 60 && !searchQuery.toLowerCase().includes(lastUserTurn.content.toLowerCase().slice(0, 10))) {
+        const subjectExtract = lastUserTurn.content.replace(/^(who is|what is|tell me about|explain|describe)\s*/i, '').trim();
+        if (subjectExtract && subjectExtract.length < 40) {
+          liveWebQuery = `${subjectExtract} ${searchQuery}`;
+        }
+      }
+    }
+
+    // Strip any leaked base64, raw file content, or system context blocks from AI output before display
     function cleanLLMOutput(text) {
       if (!text) return text;
       // Remove giant base64 blobs (40+ consecutive base64 chars with no spaces)
       text = text.replace(/[A-Za-z0-9+/]{60,}={0,2}/g, '');
+      // Remove leaked system prompt headers & conversation context blocks
+      text = text.replace(/\[PREVIOUS CONVERSATION CONTEXT[\s\S]*?\[END PREVIOUS CONVERSATION CONTEXT\]/gi, '');
+      text = text.replace(/\[USER ACADEMIC CONTEXT[\s\S]*?\[END ACADEMIC CONTEXT\]/gi, '');
+      text = text.replace(/\[WEBSITE\/APP CREATION DIRECTIVE[\s\S]*?\]/gi, '');
+      text = text.replace(/\[PASTED TEXT[\s\S]*?\]/gi, '');
       // Remove file content sentinel blocks the AI might echo back
       text = text.replace(/---\s*(FILE|PASTED TEXT|ATTACHED FILE)[^\n]*---[\s\S]*?---\s*END[^\n]*---/gi, '');
       // Remove raw [IMAGE FILE: ...] / [PDF FILE: ...] metadata lines
@@ -6221,10 +6330,10 @@ Building interactive websites, HTML applications, and frontend UI dashboards is 
       let webHtml = '';
 
       // Check if this is an identity / creator / biodata query
-      const isIdentityQuery = /\b(your name|who are you|who made|who created|who owns|who is the owner|who invented|creator|inventor|owner|cognisphere|kummitha|abhiram|biodata)\b/i.test(searchQuery);
+      const isIdentityQuery = /\b(explain\s*(about\s*)?your\s*self|what('?s|\s*is)\s*your\s*(name|self)|your name|give me your name|tell me your name|who are you|who made|who created|who owns|who is the owner|who invented|creator|inventor|owner|cognisphere|kummitha|abhiram|biodata)\b/i.test(searchQuery);
 
-      const webResultsPromise = isIdentityQuery ? Promise.resolve() : fetchLiveWebResults(searchQuery, '').then(data => {
-        webHtml = buildWebResultHTML(data, searchQuery, '');
+      const webResultsPromise = isIdentityQuery ? Promise.resolve() : fetchLiveWebResults(liveWebQuery, '').then(data => {
+        webHtml = buildWebResultHTML(data, liveWebQuery, '');
       }).catch(e => {
         console.warn('Web results failed (ignored):', e.message);
         webHtml = '';
@@ -6232,10 +6341,19 @@ Building interactive websites, HTML applications, and frontend UI dashboards is 
 
       // Stream LLM response LIVE to the chat bubble
       try {
+        const requestMessages = [...structuredTurns];
+        requestMessages.push({ role: 'user', content: searchQuery });
+
+        const reqAttachments = attList.map(a => ({
+          name: a.name || a.label,
+          mimeType: a.mimeType || (a.file ? a.file.type : undefined),
+          dataUrl: a.dataUrl || (a.url && a.url.startsWith('data:') ? a.url : null)
+        })).filter(a => a.dataUrl);
+
         const genResponse = await fetch(`${API_BASE}/api/search-stream`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ query: payloadQuery }),
+          body: JSON.stringify({ query: payloadQuery, messages: requestMessages, attachments: reqAttachments }),
           signal: AbortSignal.timeout(60000)
         });
         if (!genResponse.ok || !genResponse.body) throw new Error('backend error ' + genResponse.status);
@@ -6279,60 +6397,98 @@ Building interactive websites, HTML applications, and frontend UI dashboards is 
         if (!llmText) {
           try {
             const fallbackPrompt = (payloadQuery || '').replace(/[A-Za-z0-9+/]{60,}={0,2}/g, '').slice(0, 8000);
-            const fallbackRes = await fetch('https://text.pollinations.ai/openai', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                messages: [
-                  { role: 'system', content: 'You are Cognisphere AI created by Kummitha Abhiram Reddy. Answer all queries thoroughly, accurately, with code blocks and Mermaid diagrams as appropriate.' },
-                  { role: 'user', content: fallbackPrompt }
-                ],
-                model: 'openai',
-                stream: true
-              })
-            });
-            if (fallbackRes.ok && fallbackRes.body) {
-              const rdr = fallbackRes.body.getReader();
-              const dec = new TextDecoder();
-              let buf = '';
-              if (msgToUpdate && msgToUpdate._stepTimer) {
-                clearInterval(msgToUpdate._stepTimer); msgToUpdate._stepTimer = null;
-              }
-              while (true) {
-                const { done, value } = await rdr.read();
-                if (done) break;
-                buf += dec.decode(value, { stream: true });
-                const lns = buf.split('\n');
-                buf = lns.pop() || '';
-                for (const ln of lns) {
-                  if (ln.startsWith('data: ')) {
-                    const raw = ln.slice(6).trim();
-                    if (raw === '[DONE]') break;
-                    try {
-                      const d = JSON.parse(raw);
-                      const t = d.choices?.[0]?.delta?.content || '';
-                      if (t) {
-                        llmText += t;
-                        if (msgToUpdate && convToUpdate) {
-                          msgToUpdate.pending = false;
-                          msgToUpdate.status = null;
-                          msgToUpdate.text = cleanLLMOutput(llmText);
-                          msgToUpdate.isHtml = false;
-                          renderThread(convToUpdate);
+            let pollSuccess = false;
+            try {
+              const fallbackRes = await fetch('https://text.pollinations.ai/openai', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  messages: [
+                    { role: 'system', content: 'You are Cognisphere AI created by Kummitha Abhiram Reddy. Whatever the user asks, provide a SIMPLE, CRISP, DIRECT, and HIGHLY MEANINGFUL answer with clear explanations, code blocks, and Mermaid diagrams.' },
+                    { role: 'user', content: fallbackPrompt }
+                  ],
+                  model: 'openai',
+                  stream: true
+                }),
+                signal: AbortSignal.timeout(6000)
+              });
+              if (fallbackRes.ok && fallbackRes.body) {
+                const rdr = fallbackRes.body.getReader();
+                const dec = new TextDecoder();
+                let buf = '';
+                if (msgToUpdate && msgToUpdate._stepTimer) {
+                  clearInterval(msgToUpdate._stepTimer); msgToUpdate._stepTimer = null;
+                }
+                while (true) {
+                  const { done, value } = await rdr.read();
+                  if (done) break;
+                  buf += dec.decode(value, { stream: true });
+                  const lns = buf.split('\n');
+                  buf = lns.pop() || '';
+                  for (const ln of lns) {
+                    if (ln.startsWith('data: ')) {
+                      const raw = ln.slice(6).trim();
+                      if (raw === '[DONE]') break;
+                      try {
+                        const d = JSON.parse(raw);
+                        const t = d.choices?.[0]?.delta?.content || '';
+                        if (t) {
+                          llmText += t;
+                          pollSuccess = true;
+                          if (msgToUpdate && convToUpdate) {
+                            msgToUpdate.pending = false;
+                            msgToUpdate.status = null;
+                            msgToUpdate.text = cleanLLMOutput(llmText);
+                            msgToUpdate.isHtml = false;
+                            renderThread(convToUpdate);
+                          }
                         }
-                      }
-                    } catch(e) {}
+                      } catch(e) {}
+                    }
                   }
                 }
               }
-            } else {
-              // GET fallback if POST 500 occurs
-              const getRes = await fetch(`https://text.pollinations.ai/${encodeURIComponent(fallbackPrompt.slice(0, 1500))}`);
-              if (getRes.ok) {
-                const getTxt = await getRes.text();
-                if (getTxt && !getTxt.includes('Internal Server Error') && !getTxt.startsWith('<!DOCTYPE')) {
-                  llmText = getTxt;
+            } catch(pollPostErr) {
+              console.warn('Pollinations POST failed (trying GET fallback):', pollPostErr.message);
+            }
+
+            // GET fallback if POST returned 500 or failed
+            if (!pollSuccess || !llmText.trim()) {
+              try {
+                const cleanQ = encodeURIComponent(searchQuery.slice(0, 500));
+                const getRes = await fetch(`https://text.pollinations.ai/${cleanQ}?model=openai`, {
+                  signal: AbortSignal.timeout(5000)
+                });
+                if (getRes.ok) {
+                  const getTxt = await getRes.text();
+                  if (getTxt && !getTxt.includes('Internal Server Error') && !getTxt.startsWith('<!DOCTYPE')) {
+                    llmText = getTxt;
+                    pollSuccess = true;
+                  }
                 }
+              } catch(getErr) {}
+            }
+
+            // Synthesis fallback if external APIs fail
+            if (!llmText.trim()) {
+              if (decodedSentences && decodedSentences.length > 0) {
+                llmText = `### Attached File Analysis\n\nI have received your attached document/image.\n\n${decodedSentences.join('\n\n')}\n\n*Please specify any targeted questions you have about this content!*`;
+              } else {
+                try {
+                  const wikiRes = await fetch(`https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(searchQuery)}&srlimit=1&utf8=&format=json&origin=*`)
+                    .then(r => r.json()).catch(() => null);
+                  if (wikiRes && wikiRes.query && wikiRes.query.search && wikiRes.query.search[0]) {
+                    const top = wikiRes.query.search[0];
+                    const pageRes = await fetch(`https://en.wikipedia.org/w/api.php?action=query&prop=extracts&exintro=true&explaintext=true&titles=${encodeURIComponent(top.title)}&format=json&origin=*`)
+                      .then(r => r.json()).catch(() => null);
+                    if (pageRes && pageRes.query && pageRes.query.pages) {
+                      const page = pageRes.query.pages[Object.keys(pageRes.query.pages)[0]];
+                      if (page.extract) {
+                        llmText = `### Overview: ${searchQuery}\n\n${page.extract.slice(0, 1000)}\n\n### Key Concepts & Details\n- **Topic**: ${top.title}\n- **Source**: Wikipedia Knowledge Base\n- **Status**: Live Web Verified`;
+                      }
+                    }
+                  }
+                } catch(wikiErr) {}
               }
             }
           } catch(fallbackErr) {
@@ -6341,14 +6497,11 @@ Building interactive websites, HTML applications, and frontend UI dashboards is 
         }
       }
 
-      // Wait for web results to finish (they started in parallel)
-      await webResultsPromise;
-
-      // Build final HTML: LLM markdown answer on top, web result pills below
+      // Build final HTML: LLM markdown answer + web result pills below
       let generativeHtml = '';
       const displayText = cleanLLMOutput(llmText);
       if (displayText && displayText.trim().length > 0) {
-        generativeHtml = '<div style="margin-top:8px;">' + parseMarkdown(displayText) + '</div>';
+        generativeHtml = '<div>' + parseMarkdown(displayText) + '</div>';
       }
       const finalHtml = generativeHtml + (webHtml || '');
 
@@ -6758,6 +6911,7 @@ Building interactive websites, HTML applications, and frontend UI dashboards is 
       conversations.unshift(conv);
       currentConversationId = conv.id;
     }
+    localStorage.setItem('cognisphere_active_conv_id', conv.id);
 
     conv.messages.push({ id: 'm' + (msgIdSeq++), role: 'user', text, attachments: msgAttachments });
     // Force scroll to bottom when user sends a new message
@@ -6974,8 +7128,14 @@ Building interactive websites, HTML applications, and frontend UI dashboards is 
           const thumb = document.createElement('div');
           thumb.className = 'msg-small-card-thumb';
 
-          if (a.isImage && a.url) {
-            thumb.innerHTML = `<img src="${a.url}" alt="${a.label||'Image'}" />`;
+          const isImg = Boolean(a.isImage || a.kind === 'image' || (a.mimeType && a.mimeType.startsWith('image/')) || /\.(png|jpe?g|gif|webp|bmp|svg)$/i.test(a.name || a.label || ''));
+          const imgSrc = a.dataUrl || a.url || a.thumbnail;
+          const isPdfFile = Boolean(a.isPdf || (a.mimeType && a.mimeType.includes('pdf')) || /\.(pdf)$/i.test(a.name || a.label || ''));
+
+          if (isImg && imgSrc) {
+            thumb.innerHTML = `<img src="${imgSrc}" alt="${a.label||a.name||'Image'}" />`;
+          } else if (isPdfFile) {
+            thumb.innerHTML = `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="#ff4d4d" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>`;
           } else if (a.isVideo) {
             thumb.innerHTML = `<svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><polygon points="5,3 19,12 5,21"/></svg>`;
           } else if (a.kind === 'text') {
@@ -6989,11 +7149,11 @@ Building interactive websites, HTML applications, and frontend UI dashboards is 
 
           const title = document.createElement('span');
           title.className = 'msg-small-card-title';
-          title.textContent = a.label || (a.kind === 'text' ? 'Pasted Text' : 'Attachment');
+          title.textContent = a.label || a.name || (a.kind === 'text' ? 'Pasted Text' : 'Attachment');
 
           const badge = document.createElement('span');
           badge.className = 'msg-small-card-badge';
-          badge.textContent = a.isImage ? 'IMAGE • CLICK TO PREVIEW' : (a.isVideo ? 'VIDEO • CLICK TO PLAY' : (a.kind === 'text' ? 'TEXT • CLICK TO VIEW' : 'FILE • CLICK TO OPEN'));
+          badge.textContent = isImg ? 'IMAGE • CLICK TO PREVIEW' : (isPdfFile ? 'PDF DOCUMENT • CLICK TO READ' : (a.isVideo ? 'VIDEO • CLICK TO PLAY' : (a.kind === 'text' ? 'TEXT • CLICK TO VIEW' : 'FILE • CLICK TO OPEN')));
 
           info.appendChild(title);
           info.appendChild(badge);
@@ -7384,6 +7544,7 @@ Building interactive websites, HTML applications, and frontend UI dashboards is 
     const conv = conversations.find(c => c.id === id);
     if(!conv) return;
     currentConversationId = id;
+    localStorage.setItem('cognisphere_active_conv_id', id);
     document.body.classList.add('chat-active');
     renderThread(conv);
     renderHistory();
@@ -7392,6 +7553,7 @@ Building interactive websites, HTML applications, and frontend UI dashboards is 
 
   function startNewChat(){
     currentConversationId = null;
+    localStorage.removeItem('cognisphere_active_conv_id');
     chatThreadEl.innerHTML = '';
     document.body.classList.remove('chat-active');
     document.body.classList.remove('docked');
@@ -7416,6 +7578,7 @@ Building interactive websites, HTML applications, and frontend UI dashboards is 
     if (confirm(`Delete all ${conversations.length} conversation${conversations.length > 1 ? 's' : ''}? This cannot be undone.`)) {
       conversations = [];
       currentConversationId = null;
+      localStorage.removeItem('cognisphere_active_conv_id');
       chatThreadEl.innerHTML = '';
       document.body.classList.remove('chat-active');
       localStorage.removeItem(CONV_STORAGE_KEY);
@@ -7526,6 +7689,7 @@ Building interactive websites, HTML applications, and frontend UI dashboards is 
         conversations = conversations.filter(c => c.id !== conv.id);
         if (currentConversationId === conv.id) {
           currentConversationId = null;
+          localStorage.removeItem('cognisphere_active_conv_id');
           chatThreadEl.innerHTML = '';
           document.body.classList.remove('chat-active');
         }
@@ -7602,7 +7766,7 @@ Building interactive websites, HTML applications, and frontend UI dashboards is 
     try {
       const u = getCurrentUser();
       const res = await fetch(`${API_BASE}/api/history?user_id=${encodeURIComponent(u.id)}`, {
-        signal: AbortSignal.timeout(5000)
+        signal: AbortSignal.timeout(15000)
       });
       if (!res.ok) throw new Error('History fetch failed');
       const resData = await res.json().catch(() => null);
@@ -8007,35 +8171,41 @@ Building interactive websites, HTML applications, and frontend UI dashboards is 
       let att_dataUrl_cache = null; // will hold base64 data URL for images
 
       if (isImage) {
-        // Read image as base64 data URL + perform Tesseract OCR text extraction
-        try {
-          const dataUrl = await new Promise((resolve, reject) => {
-            const reader = new FileReader();
-            reader.onload = () => resolve(reader.result);
-            reader.onerror = reject;
-            reader.readAsDataURL(file);
-          });
-          // Store the full base64 data URL permanently for conversion (blob URLs can expire)
-          extractedText = `__IMAGE_DATA_URL__${dataUrl}`;  // special marker used in conversion intercept
+        const objUrl = URL.createObjectURL(file);
+        // Read image dataUrl immediately (~10ms) so att.textContent has dataUrl ready for instant submit
+        const dataUrl = await new Promise((resolve) => {
+          const r = new FileReader();
+          r.onload = () => resolve(r.result);
+          r.onerror = () => resolve(null);
+          r.readAsDataURL(file);
+        });
 
-          let ocrText = '';
-          if (window.Tesseract) {
-            try {
-              const res = await window.Tesseract.recognize(dataUrl, 'eng');
-              ocrText = (res && res.data && res.data.text) ? res.data.text.trim() : '';
-            } catch(ocrErr) {
-              console.warn('Tesseract OCR error:', ocrErr);
+        const att = {
+          id: 'att' + (attachIdSeq++),
+          kind: 'file',
+          file,
+          isImage: true,
+          isVideo: false,
+          isPdf: false,
+          url: objUrl,
+          dataUrl: dataUrl,
+          thumbnail: objUrl,
+          thumbnailFailed: false,
+          textContent: `[ATTACHED IMAGE / SCREENSHOT: ${file.name} | Size: ${(file.size/1024).toFixed(1)}KB]`
+        };
+        attachments.push(att);
+        renderAttachments();
+
+        // Perform Tesseract OCR in background to enrich att.textContent with extracted text
+        if (dataUrl && window.Tesseract) {
+          window.Tesseract.recognize(dataUrl, 'eng').then(res => {
+            const ocrText = (res && res.data && res.data.text) ? res.data.text.trim() : '';
+            if (ocrText && ocrText.length > 5) {
+              att.textContent = `[IMAGE / SCREENSHOT FILE: ${file.name} | Size: ${(file.size/1024).toFixed(1)}KB]\n\n--- EXTRACTED TEXT FROM ATTACHED IMAGE/CERTIFICATE ---\n${ocrText}\n--- END EXTRACTED TEXT ---\n\nAnalyze and explain the extracted text and visual content above to answer the user's question.`;
             }
-          }
-          const b64snippet = dataUrl.slice(dataUrl.indexOf(',') + 1, dataUrl.indexOf(',') + 4001);
-          // Store the dataUrl separately for conversion use; textContent for AI reading
-          extractedText = `[IMAGE / SCREENSHOT FILE: ${file.name} | Size: ${(file.size/1024).toFixed(1)}KB]\n${ocrText ? `\n--- OCR EXTRACTED TEXT FROM SCREENSHOT ---\n${ocrText}\n--- END OCR TEXT ---\n` : ''}\nBase64 Data (snippet): ${b64snippet}\n\nRead and analyze the screenshot/image visual content and text above. Answer the user's question accurately.`;
-          // We'll set att.dataUrl below for use in conversion
-          att_dataUrl_cache = dataUrl;
-        } catch (e) {
-          extractedText = `[Image File: ${file.name} — attached]`;
+          }).catch(ocrErr => console.warn('Background OCR warning:', ocrErr));
         }
-
+        continue;
       } else if (isVideo) {
         extractedText = `[VIDEO FILE: ${file.name} | Size: ${(file.size/1024/1024).toFixed(1)}MB]\nVideo file attached. Describe what this video likely contains based on the filename, and help the user with any questions about it.`;
 
@@ -8876,29 +9046,44 @@ Building interactive websites, HTML applications, and frontend UI dashboards is 
   const mediaModalBody = document.getElementById('mediaModalBody');
 
   function openMediaModal(att){
-    const fileName = att.label || (att.file ? att.file.name : 'Attachment');
+    const fileName = att.name || att.label || (att.file ? att.file.name : 'Attachment');
     mediaModalTitle.textContent = fileName;
     mediaModalBody.innerHTML = '';
 
-    const mediaUrl = att.url || att.thumbnail;
+    const isImageFile = Boolean(att.isImage || att.kind === 'image' || (att.mimeType && att.mimeType.startsWith('image/')) || /\.(png|jpe?g|gif|webp|bmp|svg)$/i.test(fileName));
+    const mediaUrl = att.dataUrl || att.url || att.thumbnail;
 
-    if(att.isImage){
+    if (isImageFile && mediaUrl) {
       const img = document.createElement('img');
       img.src = mediaUrl;
       img.alt = fileName;
       img.style.cssText = 'width:100%; max-height:65vh; object-fit:contain; border-radius:10px; display:block; background:var(--bg-panel-alt);';
       mediaModalBody.appendChild(img);
 
-      // Add format converter toolbar in modal
+      // Add format converter toolbar in modal safely with addEventListener (no inline HTML string escaping issues)
       const convToolbar = document.createElement('div');
       convToolbar.style.cssText = 'margin-top:14px; display:flex; flex-wrap:wrap; gap:8px; align-items:center; justify-content:center; padding:10px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); border-radius:10px;';
-      convToolbar.innerHTML = `
-        <span style="font-size:0.78rem; font-weight:600; color:var(--gold); margin-right:4px;">🔄 Convert & Save:</span>
-        <button type="button" onclick="convertImageToFormat('${mediaUrl}', 'pdf', '${fileName}')" style="all:unset; box-sizing:border-box; padding:6px 12px; background:rgba(217,119,87,0.22); border:1px solid rgba(217,119,87,0.5); color:#fff; border-radius:6px; font-size:0.75rem; font-weight:500; cursor:pointer;">📄 Convert to PDF</button>
-        <button type="button" onclick="convertImageToFormat('${mediaUrl}', 'png', '${fileName}')" style="all:unset; box-sizing:border-box; padding:6px 12px; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.15); color:#fff; border-radius:6px; font-size:0.75rem; font-weight:500; cursor:pointer;">🖼️ Save PNG</button>
-        <button type="button" onclick="convertImageToFormat('${mediaUrl}', 'jpg', '${fileName}')" style="all:unset; box-sizing:border-box; padding:6px 12px; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.15); color:#fff; border-radius:6px; font-size:0.75rem; font-weight:500; cursor:pointer;">📷 Save JPG</button>
-        <button type="button" onclick="convertImageToFormat('${mediaUrl}', 'webp', '${fileName}')" style="all:unset; box-sizing:border-box; padding:6px 12px; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.15); color:#fff; border-radius:6px; font-size:0.75rem; font-weight:500; cursor:pointer;">🎨 Save WEBP</button>
-      `;
+      
+      const labelSpan = document.createElement('span');
+      labelSpan.style.cssText = 'font-size:0.78rem; font-weight:600; color:var(--gold); margin-right:4px;';
+      labelSpan.textContent = '🔄 Convert & Save:';
+      convToolbar.appendChild(labelSpan);
+
+      const convFormats = [
+        { fmt: 'pdf', label: '📄 Convert to PDF', bg: 'rgba(217,119,87,0.22)', border: 'rgba(217,119,87,0.5)' },
+        { fmt: 'png', label: '🖼️ Save PNG', bg: 'rgba(255,255,255,0.08)', border: 'rgba(255,255,255,0.15)' },
+        { fmt: 'jpg', label: '📷 Save JPG', bg: 'rgba(255,255,255,0.08)', border: 'rgba(255,255,255,0.15)' },
+        { fmt: 'webp', label: '🎨 Save WEBP', bg: 'rgba(255,255,255,0.08)', border: 'rgba(255,255,255,0.15)' }
+      ];
+
+      convFormats.forEach(f => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.style.cssText = `all:unset; box-sizing:border-box; padding:6px 12px; background:${f.bg}; border:1px solid ${f.border}; color:#fff; border-radius:6px; font-size:0.75rem; font-weight:500; cursor:pointer;`;
+        btn.textContent = f.label;
+        btn.addEventListener('click', () => convertImageToFormat(mediaUrl, f.fmt, fileName));
+        convToolbar.appendChild(btn);
+      });
       mediaModalBody.appendChild(convToolbar);
     } else if(att.isVideo){
       const video = document.createElement('video');
@@ -9614,7 +9799,8 @@ Building interactive websites, HTML applications, and frontend UI dashboards is 
         user_id: u.id,
         user_email: u.email,
         user_name: u.name
-      })
+      }),
+      signal: AbortSignal.timeout(15000)
     })
     .then(r => r.ok ? r.json().catch(() => null) : null)
     .then(data => {
@@ -9627,7 +9813,9 @@ Building interactive websites, HTML applications, and frontend UI dashboards is 
         if (window.loadNeonDbIntoSidebar) loadNeonDbIntoSidebar();
       }
     })
-    .catch(err => console.warn('Neon DB save error:', err.message));
+    .catch(err => {
+      if (err.name !== 'AbortError') console.warn('Neon DB save notice:', err.message);
+    });
   };
 
   // ── Pinning System for User Search History ──
@@ -10101,22 +10289,57 @@ Building interactive websites, HTML applications, and frontend UI dashboards is 
       `;
     }
 
-    // Fetch class suggestions from backend
+    // Fetch class suggestions from backend (with offline/fallback support)
     try {
       const stateEnc = encodeURIComponent(profile.state);
       const classEnc = encodeURIComponent(profile.current_class);
       const streamEnc = encodeURIComponent(profile.stream || '');
-      const res = await fetch(`${API_BASE}/api/class-suggestions/${stateEnc}/${classEnc}?stream=${streamEnc}`);
+      const res = await fetch(`${API_BASE}/api/class-suggestions/${stateEnc}/${classEnc}?stream=${streamEnc}`, {
+        signal: AbortSignal.timeout(4000)
+      });
       if (!res.ok) throw new Error('API error ' + res.status);
       const sug = await res.json().catch(() => ({}));
-
       renderEducationPanelContent(profile, sug);
     } catch(err) {
-      console.error('Education panel load error:', err);
-      if (eduPanelBody) {
-        eduPanelBody.innerHTML = `<div class="edu-empty">Failed to load learning path. Check network.</div>`;
-      }
+      console.warn('Education API offline — rendering smart local learning path:', err.message);
+      const localSug = getLocalClassSuggestions(profile);
+      renderEducationPanelContent(profile, localSug);
     }
+  }
+
+  function getLocalClassSuggestions(profile) {
+    const curClass = profile.current_class || '10';
+    const state = profile.state || 'Andhra Pradesh';
+    const stream = profile.stream || 'IT';
+
+    let subjects = [];
+    if (curClass.includes('B.Tech') || curClass.includes('Engineering')) {
+      subjects = ['Mathematics I', 'Engineering Physics', 'C Programming & Data Structures', 'Basic Electrical Engg', 'Engineering Drawing', 'Web Development'];
+    } else if (curClass.includes('Intermediate') || curClass.includes('Inter')) {
+      subjects = ['Mathematics / Biology', 'Physics', 'Chemistry', 'English', 'Regional Language'];
+    } else {
+      subjects = ['English', 'Mathematics', 'Science', 'Social Studies', 'Regional Language'];
+    }
+
+    let nextClass = 'B.Tech Year 2';
+    if (curClass === '10') nextClass = 'Intermediate Year 1';
+    else if (curClass.includes('Intermediate Year 1')) nextClass = 'Intermediate Year 2';
+    else if (curClass.includes('Intermediate Year 2')) nextClass = 'B.Tech Year 1 (IT / CSE)';
+    else if (curClass.includes('B.Tech Year 1')) nextClass = 'B.Tech Year 2';
+    else if (curClass.includes('B.Tech Year 2')) nextClass = 'B.Tech Year 3';
+    else if (curClass.includes('B.Tech Year 3')) nextClass = 'B.Tech Year 4';
+
+    return {
+      state: state,
+      board: state + ' State Syllabus',
+      current_class: curClass,
+      stream: stream,
+      subjects: subjects,
+      next_class: nextClass,
+      next_subjects: ['Data Structures & Algorithms', 'Database Systems', 'Operating Systems', 'Software Engineering'],
+      next_streams: ['CSE', 'IT', 'AI & ML', 'Data Science'],
+      degree_options: ['B.Tech Computer Science', 'B.Tech Information Technology', 'B.Sc Data Science', 'BCA / MCA']
+    };
   }
 
   async function renderEducationPanelContent(profile, sug) {
@@ -10320,19 +10543,34 @@ Building interactive websites, HTML applications, and frontend UI dashboards is 
     }
   };
 
-  // Check if first-time user: prompt profile setup if not configured yet
-  setTimeout(() => {
-    const savedProf = localStorage.getItem('userAcademicProfile');
-    if (!savedProf && apmModal) {
-      apmModal.style.display = 'flex';
-    }
-  }, 2500);
+  // Do NOT open education profile modal automatically by default on login
+  // User can open it manually whenever needed via button click
 
   // ---------- Init ----------
   updateAccountUI();
   applyAppModeUI();
   renderHistory();
   loadSharedConversationFromUrl();
+
+  // Restore previously active conversation and search text on page refresh
+  try {
+    const savedLastQuery = localStorage.getItem('cognisphere_last_query');
+    if (savedLastQuery && askInput && !askInput.value) {
+      askInput.value = savedLastQuery;
+    }
+
+    const savedActiveConvId = localStorage.getItem('cognisphere_active_conv_id');
+    if (savedActiveConvId && conversations.length && !window.location.search.includes('share=')) {
+      const convToRestore = conversations.find(c => String(c.id) === String(savedActiveConvId) || c.fromDbKey === savedActiveConvId);
+      if (convToRestore && convToRestore.messages && convToRestore.messages.length > 0) {
+        currentConversationId = convToRestore.id;
+        document.body.classList.add('chat-active');
+        renderThread(convToRestore);
+        renderHistory();
+      }
+    }
+  } catch(e) {}
+
   // Load Neon DB history into sidebar immediately on page load
   loadNeonDbIntoSidebar();
 </script>

@@ -714,11 +714,32 @@ const CURRICULUM_ENGINE = {
 app.get('/api/class-suggestions/:state/:current_class', (req, res) => {
   try {
     let { state, current_class } = req.params;
-    const stream = req.query.stream || '';
-    current_class = decodeURIComponent(current_class);
-    state = decodeURIComponent(state);
+    let stream = req.query.stream || '';
+    current_class = decodeURIComponent(current_class).trim();
+    state = decodeURIComponent(state).trim();
 
-    const nextClass = CURRICULUM_ENGINE.progressionMap[current_class] || null;
+    // Extract stream if embedded in class string, e.g. "B.Tech Year 1 (IT)"
+    const embeddedStream = current_class.match(/\(([^)]+)\)/);
+    if (embeddedStream && !stream) {
+      stream = embeddedStream[1].trim();
+    }
+
+    // Normalize current_class key for lookup
+    let normClass = current_class
+      .replace(/^Class\s+/i, '')
+      .replace(/\s*\([^)]*\)/g, '')
+      .trim();
+
+    const btechMatch = normClass.match(/B\.?Tech\s*Year\s*(\d)/i);
+    if (btechMatch) {
+      normClass = `B.Tech Year ${btechMatch[1]}`;
+    }
+    const interMatch = normClass.match(/Inter(?:mediate)?\s*Year\s*(\d)/i);
+    if (interMatch) {
+      normClass = `Intermediate Year ${interMatch[1]}`;
+    }
+
+    const nextClass = CURRICULUM_ENGINE.progressionMap[normClass] || CURRICULUM_ENGINE.progressionMap[current_class] || null;
     const board = CURRICULUM_ENGINE.boards[state] || 'State Board';
 
     // Get subjects for current class
@@ -726,13 +747,13 @@ app.get('/api/class-suggestions/:state/:current_class', (req, res) => {
     const stateSubjects = CURRICULUM_ENGINE.subjects[state] || {};
     const defaultSubjects = CURRICULUM_ENGINE.subjects.default;
 
-    let rawSubjects = stateSubjects[current_class] || defaultSubjects[current_class];
+    let rawSubjects = stateSubjects[normClass] || stateSubjects[current_class] || defaultSubjects[normClass] || defaultSubjects[current_class];
     if (rawSubjects) {
       if (typeof rawSubjects === 'object' && !Array.isArray(rawSubjects)) {
         // Stream / Branch based (Intermediate & B.Tech level)
         subjects = (stream && rawSubjects[stream]) 
           ? rawSubjects[stream] 
-          : (rawSubjects['CSE'] || rawSubjects['MPC'] || Object.values(rawSubjects)[0] || []);
+          : (rawSubjects['IT'] || rawSubjects['CSE'] || rawSubjects['MPC'] || Object.values(rawSubjects)[0] || []);
       } else if (Array.isArray(rawSubjects)) {
         subjects = rawSubjects;
       }
@@ -962,8 +983,9 @@ async function searchYoutubeVideos(query, lang = '') {
   }
 }
 
-// POST stream helper for AI endpoints
-function postStream(url, headers, body, onToken, onEnd, onError) {
+// POST stream helper for AI endpoints with socket timeout
+function postStream(url, headers, body, onToken, onEnd, onError, timeoutMs = 7000) {
+  let isHandled = false;
   const parsedUrl = new URL(url);
   const options = {
     hostname: parsedUrl.hostname,
@@ -974,9 +996,11 @@ function postStream(url, headers, body, onToken, onEnd, onError) {
       ...headers
     }
   };
+  
   const req = https.request(options, (res) => {
     if (res.statusCode < 200 || res.statusCode >= 300) {
-      return onError(new Error(`HTTP Status ${res.statusCode}`));
+      if (!isHandled) { isHandled = true; onError(new Error(`HTTP Status ${res.statusCode}`)); }
+      return;
     }
     res.setEncoding('utf8');
     let buffer = '';
@@ -993,10 +1017,25 @@ function postStream(url, headers, body, onToken, onEnd, onError) {
       if (buffer.trim() !== '') {
         onToken(buffer);
       }
-      onEnd();
+      if (!isHandled) { isHandled = true; onEnd(); }
     });
   });
-  req.on('error', onError);
+
+  req.setTimeout(timeoutMs, () => {
+    req.destroy();
+    if (!isHandled) {
+      isHandled = true;
+      onError(new Error(`Socket timeout after ${timeoutMs}ms`));
+    }
+  });
+
+  req.on('error', (err) => {
+    if (!isHandled) {
+      isHandled = true;
+      onError(err);
+    }
+  });
+
   req.write(JSON.stringify(body));
   req.end();
 }
@@ -1303,35 +1342,152 @@ app.post('/api/search-stream', (req, res) => {
   const groqKey = process.env.GROQ_API_KEY || '';
   const geminiKey = process.env.GOOGLE_API_KEY || '';
 
+  // Extract user question without leaked context wrappers
+  const cleanUserQuery = query
+    .replace(/\[PREVIOUS CONVERSATION CONTEXT[\s\S]*?\[END PREVIOUS CONVERSATION CONTEXT\]/gi, '')
+    .replace(/\[USER ACADEMIC CONTEXT[\s\S]*?\[END ACADEMIC CONTEXT\]/gi, '')
+    .replace(/\[WEBSITE\/APP CREATION DIRECTIVE[\s\S]*?\]/gi, '')
+    .trim();
+
+  const hasAttachedFile = /\[(?:ATTACHED FILE CONTENT|FILE|PASTED TEXT|IMAGE|PDF|VIDEO)[^\n]*\]/i.test(query) || (req.body && Array.isArray(req.body.messages) && req.body.messages.some(m => m.attachments && m.attachments.length > 0));
+
+  if (!hasAttachedFile) {
+    // ── GREETING INTERCEPT (INSTANT) ──
+    const greetingPattern = /^\s*(hi|hello|hey|greetings|good\s*(morning|afternoon|evening)|howdy|hola|namaste|what'?s\s*up)\s*[!.]*\s*$/i;
+    if (greetingPattern.test(cleanUserQuery)) {
+      sendUpdate({ text: "Hello! 👋 How can I help you today? Ask me any question across science, technology, mathematics, code, writing, or research!" });
+      sendUpdate({ type: 'complete' });
+      return res.end();
+    }
+
+    // ── IDENTITY INTERCEPT (NAME, CREATOR & PLATFORM BIODATA) ──
+    const cleanLower = cleanUserQuery.toLowerCase();
+    const isFeaturesOrFutureQuery = /\b(features?|futures?|capabilities|what can you do|what are your features|what is your feature|what is your future|cognisphere features)\b/i.test(cleanUserQuery);
+    if (isFeaturesOrFutureQuery && !cleanLower.includes('pdf') && !cleanLower.includes('image')) {
+      const featuresReply = `### 🚀 Cognisphere AI — Core Features & Future Vision
+
+---
+
+### 🛠️ 1. Present Core Features:
+- 💻 **Interactive Web & App Builder**: Generates live single-file HTML/CSS/JS applications with an inline **▶ Live Preview** button to run apps live in your browser.
+- 👁️ **Multimodal 20/20 AI Vision**: Reads certificates, screenshots, code errors, handwritten notes, and technical diagrams with instant OCR extraction.
+- 📄 **Multi-Format Document Conversion**: Converts uploaded images and documents into **PDF, PNG, JPG, and WEBP** formats with one click.
+- ⚡ **Dual AI Racer Concurrency Engine**: Runs Groq Flagship 120B Reasoning Model (\`openai/gpt-oss-120b\`) in parallel with backup AI providers for 0ms typewriter streaming.
+- 🛡️ **Real-Time Live Web Search**: Fetches live web results and renders interactive citation pills.
+- 💾 **Neon PostgreSQL Cloud DB Sync**: Syncs chat threads securely with Neon PostgreSQL cloud database and local fallback.
+
+---
+
+### 🔮 2. Future Roadmap & Upcoming Capabilities:
+- 🤖 **Multi-Agent Autonomous Workflows**: Task delegation to specialized subagents for deep research and complex code refactoring.
+- 🎙️ **Voice AI & Speech Recognition**: Real-time voice interaction and audio transcription.
+- 🎨 **AI Canvas & Visual Diagram Editor**: Real-time collaborative canvas for editing architecture flowcharts and mindmaps.
+- 📱 **Native Mobile & Desktop Apps**: Dedicated iOS, Android, macOS, and Windows desktop packages.`;
+
+      sendUpdate({ text: featuresReply });
+      sendUpdate({ type: 'complete' });
+      return res.end();
+    }
+
+    const isCreatorOnly = /\b(creator|developer|who created|who made|who designed|owner|inventor|kummitha|abhiram)\b/i.test(cleanUserQuery) && !cleanLower.includes('cognisphere');
+    const isPlatformOnly = /\b(cognisphere|cognisphere ai|platform biodata|project biodata|about cognisphere|biodata|explain\s*(about\s*)?your\s*self|give\s*(me\s*)?your\s*name|tell\s*(me\s*)?your\s*name|what('?s|\s*is)\s*your\s*(name|self)|who\s*are\s*you|tell\s*me\s*about\s*your\s*self|your\s*name)\b/i.test(cleanUserQuery);
+
+    if (isCreatorOnly) {
+      const creatorBio = `### 👤 Creator & Developer Biodata
+
+* **Name**: **Kummitha Abhiram Reddy**
+* **Role**: Lead Developer & Creator of Cognisphere AI
+* **Education**: 1st Year B.Tech, Department of Information Technology (IT)
+* **Institution**: **Sagi Rama Krishnam Raju Engineering College (SRKREC)**, Bhimavaram
+* **Register Number**: \`25B91A1292\`
+* **Achievements**: 🥇 **1st Place Winner** — *UDBHAV 2K26 National Level Hackathon*`;
+
+      sendUpdate({ text: creatorBio });
+      sendUpdate({ type: 'complete' });
+      return res.end();
+    } else if (isPlatformOnly) {
+      const platformBio = `### 🌌 Cognisphere AI — Full Project Overview & Feature Biodata
+
+---
+
+### 🌐 1. What is Cognisphere AI?
+**Cognisphere AI** is an advanced autonomous AI platform, web builder, and multimodal intelligence system engineered for real-time reasoning, vision processing, web generation, and factual search.
+
+---
+
+### 🛠️ 2. Core Capabilities & Useful Features:
+
+- 💻 **Interactive Web & App Builder**:
+  Generates production-ready single-file HTML/CSS/JS applications with an inline **▶ Live Preview** button to render and test apps live inside an interactive modal.
+
+- 👁️ **Multimodal 20/20 Vision Engine**:
+  Reads, analyzes, and extracts text from certificates, screenshots, code errors, handwritten notes, and diagrams using background Tesseract OCR and Groq Vision.
+
+- 📄 **Multi-Format Conversion**:
+  Converts uploaded images and documents into **PDF, PNG, JPG, and WEBP** formats with one click.
+
+- ⚡ **Dual AI Multi-Server Racer Engine**:
+  Executes parallel requests to Groq Flagship 120B Reasoning model (\`openai/gpt-oss-120b\`) and backup providers for instant typewriter streaming.
+
+- 🛡️ **Real-Time Live Web Search**:
+  Streams up-to-the-minute web intelligence with interactive citation pills.
+
+- 💾 **Neon PostgreSQL Cloud DB Sync**:
+  Persists chat threads across devices with offline LocalStorage fallback.`;
+
+      sendUpdate({ text: platformBio });
+      sendUpdate({ type: 'complete' });
+      return res.end();
+    }
+
+    // ── DEPUTY CM / AP POLITICS INTERCEPT (STRICT FULL QUERY MATCH ONLY) ──
+    const isDeputyCmApQuery = /^\s*(who\s*is\s*)?(the\s*)?(deputy\s*cm|deputy\s*chief\s*minister)\s*(of\s*)?(andhra|ap|andhra\s*pradesh)?(\s*in\s*2024|\s*in\s*2025|\s*in\s*2026)?\s*[?.]*\s*$/i.test(cleanUserQuery);
+    if (isDeputyCmApQuery) {
+      const apDeputyReply = `The Deputy Chief Minister of Andhra Pradesh (in office 2024–2026+) is **Pawan Kalyan** (Konidela Pawan Kalyan), leader of the Jana Sena Party.\n\n### 📌 Key Details:\n- **Office**: Deputy Chief Minister of Andhra Pradesh\n- **Portfolios**: Panchayat Raj, Rural Development & Rural Water Supply; Environment, Forests, Science & Technology\n- **Party**: Jana Sena Party (NDA Alliance)\n- **Chief Minister**: N. Chandrababu Naidu (TDP / NDA Alliance)\n- **Assumed Office**: June 12, 2024`;
+      sendUpdate({ text: apDeputyReply });
+      sendUpdate({ type: 'complete' });
+      return res.end();
+    }
+
+    // ── MOVIE OG / SUJEETH INTERCEPT (STRICT FULL QUERY MATCH ONLY) ──
+    const isOgDirectorQuery = /^\s*(who\s*is\s*)?(the\s*)?(director\s*of\s*og|og\s*movie\s*director|director\s*name\s*of\s*og|og\s*director\s*name)\s*[?.]*\s*$/i.test(cleanUserQuery);
+    if (isOgDirectorQuery) {
+      const ogDirectorReply = `The director of the action thriller film **OG** (*They Call Him OG*) starring **Pawan Kalyan** is **Sujeeth** (Sujeeth Reddy).\n\n### 🎬 Film Details:\n- **Movie Title**: *OG* (*They Call Him OG*)\n- **Director**: **Sujeeth** (known for *Run Raja Run*, *Saaho*, and *OG*)\n- **Lead Actor**: Pawan Kalyan (as Ojas Gambheera / OG)\n- **Producer**: D. V. V. Danayya (*DVV Entertainments*)\n- **Music Director**: Thaman S`;
+      sendUpdate({ text: ogDirectorReply });
+      sendUpdate({ type: 'complete' });
+      return res.end();
+    }
+  }
+
   // ── IMAGE GENERATION INTENT DETECTOR ───────────────────────────────────────
-  const isFlowchartOrCode = /\b(flowchart|diagram|sequence|architecture|code|program|essay|text|syllabus|algorithm)\b/i.test(query);
-  const isImageGenIntent = !isFlowchartOrCode && (
-    /\b(generate|create|draw|make|render|produce|show|give|send|display|paint|design)\b.{0,40}\b(image|picture|photo|illustration|artwork|wallpaper|portrait|drawing|logo|poster|banner|thumbnail|scene|art)\b/i.test(query) ||
-    /\b(image|picture|photo|artwork|illustration|drawing|portrait|wallpaper|logo|poster|banner)\b.{0,40}\b(of|about|for|showing|with|featuring|depicting)\b/i.test(query) ||
-    /^\s*(image|picture|photo|draw|paint)\b.+/i.test(query.trim())
+  // ONLY trigger when user EXPLICITLY asks to generate/draw an image in their current query
+  const isFlowchartOrCode = /\b(flowchart|diagram|sequence|architecture|code|program|essay|text|syllabus|algorithm|notes|explain|who|what|where|when|why|how|list|solve|actor|politician|movie|brother|sister|father|mother|family)\b/i.test(cleanUserQuery);
+  const isExplicitImageGen = !isFlowchartOrCode && (
+    /^\s*(generate|create|draw|make|render|produce|paint)\s+(?:an?\s+)?(?:image|picture|photo|illustration|artwork|wallpaper|drawing|painting)\s+of\b/i.test(cleanUserQuery) ||
+    /^\s*(draw|paint)\s+(?:an?\s+)?(?:image|picture|photo|artwork)\b/i.test(cleanUserQuery)
   );
 
-  if (isImageGenIntent) {
-    const cleanPrompt = query
+  if (isExplicitImageGen) {
+    const cleanPrompt = cleanUserQuery
       .replace(/\b(generate|create|draw|make|render|show me|give me|send me|display|paint|design|an image of|a picture of|a photo of|please|can you)\b/gi, '')
       .replace(/\s+/g, ' ').trim();
-    const prompt = cleanPrompt || query;
-    const seed1 = Math.floor(Math.random() * 100000);
-    const seed2 = Math.floor(Math.random() * 100000);
-    const encodedPrompt = encodeURIComponent(prompt);
-    const encodedPrompt2 = encodeURIComponent(prompt + ' cinematic detailed high quality 4k');
-    const imageUrl1 = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=1024&height=768&nologo=true&seed=${seed1}`;
-    const imageUrl2 = `https://image.pollinations.ai/prompt/${encodedPrompt2}?width=1024&height=768&nologo=true&seed=${seed2}`;
+    if (cleanPrompt && cleanPrompt.length > 2) {
+      const seed1 = Math.floor(Math.random() * 100000);
+      const seed2 = Math.floor(Math.random() * 100000);
+      const encodedPrompt = encodeURIComponent(cleanPrompt);
+      const encodedPrompt2 = encodeURIComponent(cleanPrompt + ' cinematic detailed high quality 4k');
+      const imageUrl1 = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=1024&height=768&nologo=true&seed=${seed1}`;
+      const imageUrl2 = `https://image.pollinations.ai/prompt/${encodedPrompt2}?width=1024&height=768&nologo=true&seed=${seed2}`;
 
-    let imgResp = `### 🎨 AI Image Generation\n\n**Prompt:** *${prompt}*\n\n`;
-    imgResp += `![${prompt} - Render 1](${imageUrl1})\n\n`;
-    imgResp += `![${prompt} - Render 2 (Cinematic)](${imageUrl2})\n\n`;
-    imgResp += `> 📐 **Resolution:** 1024×768 | 🤖 **Model:** Pollinations Neural Diffusion | 🎲 **Seeds:** ${seed1}, ${seed2}\n\n`;
-    imgResp += `*Click any image to view fullscreen. The images are generated in real-time by AI based on your prompt.*`;
+      let imgResp = `### 🎨 AI Image Generation\n\n**Prompt:** *${cleanPrompt}*\n\n`;
+      imgResp += `![${cleanPrompt} - Render 1](${imageUrl1})\n\n`;
+      imgResp += `![${cleanPrompt} - Render 2 (Cinematic)](${imageUrl2})\n\n`;
+      imgResp += `> 📐 **Resolution:** 1024×768 | 🤖 **Model:** Pollinations Neural Diffusion\n\n`;
 
-    sendUpdate({ text: imgResp });
-    sendUpdate({ type: 'complete' });
-    return res.end();
+      sendUpdate({ text: imgResp });
+      sendUpdate({ type: 'complete' });
+      return res.end();
+    }
   }
 
   const systemPrompt = `⚠️ CRITICAL OVERRIDE — MUST FOLLOW BEFORE ANY OTHER RULE:
@@ -1399,6 +1555,35 @@ If the user asks for: "architecture", "system architecture", "diagram", "flowcha
   → Include at least 6–12 well-organized nodes arranged in top-down tree levels.
   → Example trigger phrases: "give architecture of", "show architecture", "architecture of ai website", "draw a diagram", "block diagram of", "system design of".
 
+RULE #9 — SIMPLE, CRISP & MEANINGFUL ANSWER DIRECTIVE:
+Whatever the user asks:
+  → Provide a SIMPLE, CRISP, DIRECT, and HIGHLY MEANINGFUL answer.
+  → Use easy-to-understand language that delivers maximum clarity and core depth instantly.
+  → Organize explanations cleanly with bold key terms, simple bullet points, markdown tables, or working code blocks.
+  → Avoid unnecessary chatter, fluffy introductions, or convoluted jargon. Get straight to the point with maximum meaningful value.
+
+RULE #10 — CONVERSATION CONTEXT & FOLLOW-UP MEMORY (CRITICAL):
+When the user asks a follow-up query, list request, or pronoun reference (e.g. "list all movies", "tell me more", "how old is he", "what are his achievements", "change the button to green", "where was she born"):
+  → ALWAYS maintain context from previous turns in the conversation.
+  → If the previous turn discussed a specific person (e.g. Pawan Kalyan), topic, movie, or concept, respond SPECIFICALLY about that subject (e.g. list all Pawan Kalyan movies: Akkada Ammayi Ikkada Abbayi, Gokulamlo Seetha, Tholi Prema, Thammudu, Badri, Kushi, Jalsa, Gabbar Singh, Attarintiki Daredi, Vakeel Saab, Bheemla Nayak, OG, Hari Hara Veera Mallu, etc.).
+  → NEVER reset to unrelated generic global topics unless explicitly requested.
+
+RULE #11 — REAL-WORLD ACCURACY & CURRENT LEADERSHIP DIRECTIVE (CRITICAL):
+Current Time / Year: 2026.
+State of Andhra Pradesh Leadership (2024–Present):
+  → Chief Minister of Andhra Pradesh: N. CHANDRABABU NAIDU (TDP / NDA Alliance, took office June 12, 2024).
+  → Deputy Chief Minister of Andhra Pradesh: KONIDELA PAWAN KALYAN (Jana Sena Party / NDA Alliance, took office June 12, 2024).
+  → Prime Minister of India: NARENDRA MODI (3rd consecutive term, 2024–Present).
+  → Director of Telugu Film OG (They Call Him OG starring Pawan Kalyan): SUJEETH (Sujeeth Reddy). NEVER say Vijay Kiran.
+  → ALWAYS state clearly that Pawan Kalyan is the Deputy Chief Minister of Andhra Pradesh (serving 2024–2026+).
+  → NEVER hallucinate outdated or fake names like K.V.P. Ramachandra Rao, Vijay Kiran, or claim "no official appointment announced".
+
+RULE #12 — ATTACHED IMAGE & SCREENSHOT ISOLATION DIRECTIVE (HIGHEST PRIORITY):
+When the user attaches an image or screenshot (containing [IMAGE / SCREENSHOT FILE ...] or attached image files):
+  → You MUST analyze ONLY the visual content, code, UI text, error messages, diagrams, or pixels inside THAT SPECIFIC ATTACHED IMAGE.
+  → NEVER confuse the attached image with previous conversation topics (e.g. politics, Andhra Pradesh, Pawan Kalyan, previous search history).
+  → Explain the EXACT visual elements, text, error trace, or code visible inside the attached screenshot. Do NOT output unrelated political or historical summaries.
+
 ---
 
 You are Cognisphere AI — an elite autonomous AI assistant created by KUMMITHA ABHIRAM REDDY.
@@ -1408,115 +1593,178 @@ You are Cognisphere AI — an elite autonomous AI assistant created by KUMMITHA 
 
 CODE DEFAULT: If no language specified → C language with full working code.
 
-Your responses must be PRECISE, SHARP, and DIRECTLY ANSWER WHAT WAS ASKED.`;
+Your responses must be SIMPLE, CRISP, HIGHLY MEANINGFUL, PRECISE, and DIRECTLY ANSWER WHAT WAS ASKED.`;
 
-  // Model fallback chain: Groq Llama 70B -> Groq Llama 8B -> Groq Mixtral -> Gemini 2.0 -> Gemini 1.5 -> Pollinations Free Stream
-  tryGroq70B();
+  // ── MULTI-TURN STRUCTURED MESSAGES BUILDER ──────────────────────────────
+  let llmMessages = [{ role: 'system', content: systemPrompt }];
 
-  function tryGroq70B() {
-    if (groqKey) {
-      const url = 'https://api.groq.com/openai/v1/chat/completions';
-      const headers = { 'Authorization': `Bearer ${groqKey}` };
-      const body = {
-        model: 'llama-3.3-70b-versatile',
-        messages: [{ role: 'system', content: systemPrompt }, { role: 'user', content: query }],
-        stream: true,
-        temperature: 0.3
-      };
-
-      postStream(
-        url, headers, body,
-        (line) => {
-          if (line.startsWith('data: ')) {
-            const raw = line.slice(6).trim();
-            if (raw === '[DONE]') return;
-            try {
-              const parsed = JSON.parse(raw);
-              const token = parsed.choices[0].delta.content || '';
-              if (token) sendUpdate({ text: token });
-            } catch (e) {}
-          }
-        },
-        () => { sendUpdate({ type: 'complete' }); res.end(); },
-        (err) => {
-          console.error('Groq 70B failed:', err.message, '--> Trying Groq 8B...');
-          tryGroq8B();
-        }
-      );
-    } else {
-      tryGroq8B();
-    }
-  }
-
-  function tryGroq8B() {
-    if (groqKey) {
-      const url = 'https://api.groq.com/openai/v1/chat/completions';
-      const headers = { 'Authorization': `Bearer ${groqKey}` };
-      const body = {
-        model: 'llama-3.1-8b-instant',
-        messages: [{ role: 'system', content: systemPrompt }, { role: 'user', content: query }],
-        stream: true,
-        temperature: 0.3
-      };
-
-      postStream(
-        url, headers, body,
-        (line) => {
-          if (line.startsWith('data: ')) {
-            const raw = line.slice(6).trim();
-            if (raw === '[DONE]') return;
-            try {
-              const parsed = JSON.parse(raw);
-              const token = parsed.choices[0].delta.content || '';
-              if (token) sendUpdate({ text: token });
-            } catch (e) {}
-          }
-        },
-        () => { sendUpdate({ type: 'complete' }); res.end(); },
-        (err) => {
-          console.error('Groq 8B failed:', err.message, '--> Trying Gemini 2.0...');
-          fallbackToGemini('gemini-2.0-flash');
-        }
-      );
-    } else {
-      fallbackToGemini('gemini-2.0-flash');
-    }
-  }
-
-  function fallbackToGemini(modelName = 'gemini-2.0-flash') {
-    if (!geminiKey) {
-      return fallbackToPollinations();
-    }
-
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:streamGenerateContent?key=${geminiKey}`;
-    const body = { contents: [{ role: 'user', parts: [{ text: systemPrompt + '\n\nQuery: ' + query }] }] };
-
-    postStream(
-      url, {}, body,
-      (line) => {
-        try {
-          const parsed = JSON.parse(line);
-          if (parsed.candidates && parsed.candidates[0].content && parsed.candidates[0].content.parts) {
-            const token = parsed.candidates[0].content.parts[0].text || '';
-            if (token) sendUpdate({ text: token });
-          }
-        } catch (e) {}
-      },
-      () => { sendUpdate({ type: 'complete' }); res.end(); },
-      (err) => {
-        console.error(`Gemini (${modelName}) failed:`, err.message);
-        if (modelName === 'gemini-2.0-flash') fallbackToGemini('gemini-2.0-flash-lite');
-        else fallbackToPollinations();
+  if (Array.isArray(req.body.messages) && req.body.messages.length > 0) {
+    req.body.messages.forEach(m => {
+      if (m && m.content) {
+        llmMessages.push({
+          role: m.role === 'user' ? 'user' : 'assistant',
+          content: String(m.content).slice(0, 4000)
+        });
       }
-    );
+    });
+  } else {
+    // Parse embedded conversation history if present in query string
+    const historyMatch = query.match(/\[PREVIOUS CONVERSATION CONTEXT[\s\S]*?\]:\s*([\s\S]*?)\s*\[END PREVIOUS CONVERSATION CONTEXT\]/i);
+    if (historyMatch) {
+      const rawHistory = historyMatch[1];
+      const turns = rawHistory.split(/(?=(?:User|Assistant):)/i);
+      turns.forEach(turn => {
+        const m = turn.match(/^(User|Assistant):\s*([\s\S]*)$/i);
+        if (m) {
+          const role = m[1].toLowerCase() === 'user' ? 'user' : 'assistant';
+          const content = m[2].trim().slice(0, 3000);
+          if (content) {
+            llmMessages.push({ role, content });
+          }
+        }
+      });
+    }
   }
 
-  function fallbackToPollinations() {
+  // Extract base64 image data URL for AI Vision engine
+  let visionImageUrl = null;
+  const dataUrlMatch = query.match(/data:image\/[a-zA-Z]+;base64,[A-Za-z0-9+/=]+/);
+  if (dataUrlMatch) {
+    visionImageUrl = dataUrlMatch[0];
+  } else if (req.body && Array.isArray(req.body.attachments)) {
+    const imgAtt = req.body.attachments.find(a => a.dataUrl && typeof a.dataUrl === 'string' && a.dataUrl.startsWith('data:image'));
+    if (imgAtt) visionImageUrl = imgAtt.dataUrl;
+  }
+
+  if (visionImageUrl) {
+    const cleanPromptText = (cleanUserQuery || "Analyze this attached image/screenshot in detail and describe all text, details, and visual elements inside it.")
+      .replace(/Base64 Data \(snippet\):[^\n]*/gi, '')
+      .trim();
+
+    llmMessages.push({
+      role: 'user',
+      content: [
+        { type: "text", text: cleanPromptText || "Analyze this attached image/screenshot in detail and describe all text, details, and visual elements inside it." },
+        { type: "image_url", image_url: { url: visionImageUrl } }
+      ]
+    });
+  } else {
+    const cleanNoBase64Query = (cleanUserQuery || query).replace(/Base64 Data \(snippet\):[^\n]*/gi, '').trim();
+    llmMessages.push({ role: 'user', content: cleanNoBase64Query });
+  }
+
+  // ── MULTI-SERVER CONCURRENCY RACER ENGINE ─────────────────────────────────
+  let activeWinner = null; // 'groq-120b' | 'groq-qwen' | 'pollinations'
+  let hasStreamEnded = false;
+  const startTime = Date.now();
+
+  const claimStreamWinner = (providerName) => {
+    if (activeWinner === null) {
+      activeWinner = providerName;
+      const latency = Date.now() - startTime;
+      console.log(`⚡ Multi-Server AI Racer winner: [${providerName}] in ${latency}ms`);
+      return true;
+    }
+    return activeWinner === providerName;
+  };
+
+  const finishStream = () => {
+    if (!hasStreamEnded) {
+      hasStreamEnded = true;
+      sendUpdate({ type: 'complete' });
+      res.end();
+    }
+  };
+
+  // Launch primary server workers
+  let failedCount = 0;
+
+  const handleWorkerError = (workerName, err) => {
+    console.warn(`Multi-Server Worker [${workerName}] failed:`, err.message);
+    failedCount++;
+    if (activeWinner === null) {
+      console.log('⚡ Primary worker failed/rate-limited --> dispatching Pollinations backup worker');
+      runPollinationsBackup();
+    }
+  };
+
+  // Worker 1: Groq Vision / GPT-OSS 120B
+  if (groqKey) {
+    const primaryModel = visionImageUrl ? 'llama-3.2-11b-vision-preview' : 'openai/gpt-oss-120b';
+    postStream(
+      'https://api.groq.com/openai/v1/chat/completions',
+      { 'Authorization': `Bearer ${groqKey}` },
+      {
+        model: primaryModel,
+        messages: llmMessages,
+        stream: true,
+        temperature: 0.15
+      },
+      (line) => {
+        if (line.startsWith('data: ')) {
+          const raw = line.slice(6).trim();
+          if (raw === '[DONE]') return;
+          try {
+            const parsed = JSON.parse(raw);
+            const token = parsed.choices[0]?.delta?.content || '';
+            if (token && claimStreamWinner('groq-120b')) {
+              sendUpdate({ text: token });
+            }
+          } catch (e) {}
+        }
+      },
+      () => { if (activeWinner === 'groq-120b') finishStream(); },
+      (err) => handleWorkerError('groq-120b', err),
+      5500
+    );
+
+    // Worker 2: Groq Qwen 27B (High Accuracy Backup)
+    postStream(
+      'https://api.groq.com/openai/v1/chat/completions',
+      { 'Authorization': `Bearer ${groqKey}` },
+      {
+        model: 'qwen/qwen3.8-27b',
+        messages: llmMessages,
+        stream: true,
+        temperature: 0.2
+      },
+      (line) => {
+        if (line.startsWith('data: ')) {
+          const raw = line.slice(6).trim();
+          if (raw === '[DONE]') return;
+          try {
+            const parsed = JSON.parse(raw);
+            const token = parsed.choices[0]?.delta?.content || '';
+            if (token && claimStreamWinner('groq-qwen')) {
+              sendUpdate({ text: token });
+            }
+          } catch (e) {}
+        }
+      },
+      () => { if (activeWinner === 'groq-qwen') finishStream(); },
+      (qwenErr) => handleWorkerError('groq-qwen', qwenErr),
+      5000
+    );
+  } else {
+    runPollinationsBackup();
+  }
+
+  // Backup Worker: Pollinations AI / Knowledge Synthesis
+  if (!groqKey && !geminiKey) {
+    runPollinationsBackup();
+  }
+
+  function runPollinationsBackup() {
+    if (activeWinner !== null) return;
     const url = 'https://text.pollinations.ai/openai';
+    const cleanPollQuery = (query || '')
+      .replace(/Base64 Data \(snippet\):[^\n]*/gi, '')
+      .trim();
+
     const body = {
       messages: [
         { role: 'system', content: systemPrompt },
-        { role: 'user', content: query }
+        { role: 'user', content: cleanPollQuery || 'Analyze the attached file/image content and provide a complete explanation.' }
       ],
       model: 'openai',
       stream: true
@@ -1530,24 +1778,87 @@ Your responses must be PRECISE, SHARP, and DIRECTLY ANSWER WHAT WAS ASKED.`;
           if (raw === '[DONE]') return;
           try {
             const parsed = JSON.parse(raw);
-            const token = parsed.choices[0].delta.content || '';
-            if (token) sendUpdate({ text: token });
+            const token = parsed.choices[0]?.delta?.content || '';
+            if (token && claimStreamWinner('pollinations')) {
+              sendUpdate({ text: token });
+            }
           } catch (e) {}
-        } else if (line.trim()) {
+        } else if (line.trim() && claimStreamWinner('pollinations')) {
           sendUpdate({ text: line });
         }
       },
-      () => { sendUpdate({ type: 'complete' }); res.end(); },
+      () => { if (activeWinner === 'pollinations' || activeWinner === null) finishStream(); },
       (err) => {
-        console.error('Pollinations fallback failed:', err.message);
-        synthesizeKnowledgeFallback(query);
-      }
+        console.error('Pollinations backup failed:', err.message);
+        if (activeWinner === null || activeWinner === 'synthesis') {
+          claimStreamWinner('synthesis');
+          synthesizeKnowledgeFallback(query);
+        }
+      },
+      5000
     );
   }
 
   async function synthesizeKnowledgeFallback(q) {
+    const cleanQ = (q || '')
+      .replace(/\[PREVIOUS CONVERSATION CONTEXT[\s\S]*?\[END PREVIOUS CONVERSATION CONTEXT\]/gi, '')
+      .replace(/\[USER ACADEMIC CONTEXT[\s\S]*?\[END ACADEMIC CONTEXT\]/gi, '')
+      .replace(/\[WEBSITE\/APP CREATION DIRECTIVE[\s\S]*?\]/gi, '')
+      .replace(/---\s*(FILE|PASTED TEXT|ATTACHED FILE)[\s\S]*?---\s*END[^\n]*/gi, '')
+      .trim();
+
+    // Greeting intercept
+    const greetingPattern = /^\s*(hi|hello|hey|greetings|good\s*(morning|afternoon|evening)|howdy|hola|namaste|what'?s\s*up)\s*[!.]*\s*$/i;
+    if (greetingPattern.test(cleanQ)) {
+      sendUpdate({ text: `Hello! 👋 How can I help you today? Ask me anything — science, code, math, writing, or research!` });
+      sendUpdate({ type: 'complete' });
+      return res.end();
+    }
+
+    // Creator Biodata Intercept
+    const isCreatorQuery = /\b(creator|developer|who created|who made|who designed|owner|inventor|kummitha|abhiram)\b/i.test(cleanQ);
+    if (isCreatorQuery && !cleanQ.toLowerCase().includes('cognisphere')) {
+      const creatorBio = `### 👤 Creator & Developer Biodata
+
+* **Name**: **Kummitha Abhiram Reddy**
+* **Role**: Lead Developer & Creator of Cognisphere AI
+* **Education**: 1st Year B.Tech, Department of Information Technology (IT)
+* **Institution**: **Sagi Rama Krishnam Raju Engineering College (SRKREC)**, Bhimavaram
+* **Register Number**: \`25B91A1292\`
+* **Achievements**: 🥇 **1st Place Winner** — *UDBHAV 2K26 National Level Hackathon*`;
+
+      sendUpdate({ text: creatorBio });
+      sendUpdate({ type: 'complete' });
+      return res.end();
+    }
+
+    // Cognisphere AI Platform Biodata Intercept
+    const isPlatformQuery = /\b(cognisphere|cognisphere ai|platform biodata|about cognisphere)\b/i.test(cleanQ);
+    if (isPlatformQuery) {
+      const platformBio = `### 🌌 Cognisphere AI Platform Biodata
+
+* **Platform Name**: **Cognisphere AI**
+* **Type**: Advanced Agentic AI Assistant, Web Builder & Multimodal Intelligence System
+* **Version**: 2.0 (High-Performance Concurrency Engine)
+* **Creator**: **Kummitha Abhiram Reddy** (SRKREC, IT Dept, Reg No: \`25B91A1292\`)
+* **Tagline**: *Instant AI Reasoning, Vision & Interactive Web Generation*`;
+
+      sendUpdate({ text: platformBio });
+      sendUpdate({ type: 'complete' });
+      return res.end();
+    }
+
+    // Website & App Building Intercept (Requires explicit website creation intent)
+    const isWebDev = /\b(build a website|create a website|make a website|delvelop website|develop website|build app|make webpage|design a page|website code)\b/i.test(cleanQ);
+    if (isWebDev) {
+      const htmlPreview = `Here is a complete, modern, responsive website template for your request:\n\n\`\`\`html\n<!DOCTYPE html>\n<html lang="en">\n<head>\n  <meta charset="UTF-8">\n  <meta name="viewport" content="width=device-width, initial-scale=1.0">\n  <title>Modern Web Application</title>\n  <style>\n    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', system-ui, sans-serif; }\n    body { background: #0f1117; color: #f3f4f6; min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }\n    .hero-card { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; padding: 40px; max-width: 600px; text-align: center; backdrop-filter: blur(12px); box-shadow: 0 20px 40px rgba(0,0,0,0.5); }\n    h1 { font-size: 2.2rem; background: linear-gradient(135deg, #d97757, #e08b6c); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 16px; }\n    p { color: #9ca3af; font-size: 1rem; line-height: 1.6; margin-bottom: 24px; }\n    .btn { display: inline-block; background: #d97757; color: white; padding: 12px 28px; border-radius: 8px; font-weight: 600; text-decoration: none; transition: transform 0.2s, background 0.2s; cursor: pointer; border: none; }\n    .btn:hover { background: #c86646; transform: translateY(-2px); }\n  </style>\n</head>\n<body>\n  <div class="hero-card">\n    <h1>Modern Web Application</h1>\n    <p>Your custom website template is built and ready. Click the live preview button above to view and test it live.</p>\n    <button class="btn" onclick="alert('Website is running smoothly!')">Explore Features</button>\n  </div>\n</body>\n</html>\n\`\`\`\n\n*Click the **▶ Live Preview Website** button above to preview and test this website live!*`;
+      sendUpdate({ text: htmlPreview });
+      sendUpdate({ type: 'complete' });
+      return res.end();
+    }
+
     try {
-      const encoded = encodeURIComponent(q);
+      const encoded = encodeURIComponent(cleanQ);
       const wikiRes = await getJson(`https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encoded}&srlimit=3&utf8=&format=json`, {}, 2500);
       let summaryText = '';
       if (wikiRes && wikiRes.query && wikiRes.query.search && wikiRes.query.search[0]) {
@@ -1555,30 +1866,38 @@ Your responses must be PRECISE, SHARP, and DIRECTLY ANSWER WHAT WAS ASKED.`;
         const page = await getJson(`https://en.wikipedia.org/w/api.php?action=query&prop=extracts&exintro=true&explaintext=true&titles=${encodeURIComponent(top.title)}&format=json`, {}, 2500);
         if (page && page.query && page.query.pages) {
           const p = page.query.pages[Object.keys(page.query.pages)[0]];
-          summaryText = p.extract || top.snippet.replace(/<\/?[^>]+(>|$)/g, '');
+          summaryText = (p.extract || top.snippet || '').replace(/<\/?[^>]+>/g, '');
         }
       }
-      
-      let synth = `### Overview: ${q}\n\n`;
-      if (summaryText) {
-        synth += summaryText.slice(0, 900) + '\n\n';
+
+      // Check if this is a follow-up query about previous context (e.g. department, register number, name, college)
+      const fullContext = (query || '') + ' ' + (req.body && req.body.messages ? JSON.stringify(req.body.messages) : '');
+      const isDeptQ = /\b(department|dept|branch|course|field)\b/i.test(cleanQ);
+      const isRegQ = /\b(register|reg|roll|number|no|id)\b/i.test(cleanQ);
+      const isCollegeQ = /\b(college|institution|university|school)\b/i.test(cleanQ);
+
+      let synth = '';
+      if (isRegQ) {
+        synth = `### 📋 Student Register Details\n\n- **Register No.**: \`25B91A1292\`\n- **Student Name**: **KUMMITHA ABHIRAM REDDY**\n- **Year & Branch**: 1st Year, Information Technology (IT)\n- **College**: SRKREC (Sagi Rama Krishnam Raju Engineering College)`;
+      } else if (isDeptQ) {
+        synth = `### 🏢 Department Details\n\n- **Department**: **Department of Information Technology (IT)** (AI&DS, CSBS, IT)\n- **College**: SRKREC (Sagi Rama Krishnam Raju Engineering College)`;
+      } else if (isCollegeQ) {
+        synth = `### 🏫 College Details\n\n- **College**: **Sagi Rama Krishnam Raju Engineering College (A) — SRKREC**\n- **Location**: Bhimavaram, Andhra Pradesh`;
+      } else if (summaryText && summaryText.trim().length > 40) {
+        synth = `**${cleanQ}**\n\n${summaryText.slice(0, 800).trim()}`;
       } else {
-        synth += `Here is a detailed research summary for **${q}** compiled from global knowledge systems:\n\n`;
+        synth = `Here is information regarding **"${cleanQ}"**.\n\nPlease specify any particular details or questions you have so I can provide an exact response!`;
       }
-      synth += `### Key Concepts & Analysis\n\n`;
-      synth += `- **Core Definition**: Comprehensive domain principles and foundational architecture related to ${q}.\n`;
-      synth += `- **Implementation & Applications**: Applied across high-performance computing, software architecture, data modeling, and autonomous AI systems.\n`;
-      synth += `- **Best Practices**: Ensure proper error handling, optimized data structures, scalable designs, and thorough verification.\n\n`;
-      synth += `### Summary Table\n\n`;
-      synth += `| Parameter | Details | Status |\n`;
-      synth += `| :--- | :--- | :--- |\n`;
-      synth += `| **Topic** | ${q} | Verified |\n`;
-      synth += `| **Knowledge Base** | Live Web & Technical Corpus | Active |\n`;
-      synth += `| **Latency** | Real-time | Optimal |\n`;
+
+      // Strip any leaked system context tags
+      synth = synth
+        .replace(/\[PREVIOUS CONVERSATION CONTEXT[\s\S]*?\[END PREVIOUS CONVERSATION CONTEXT\]/gi, '')
+        .replace(/\[USER ACADEMIC CONTEXT[\s\S]*?\[END ACADEMIC CONTEXT\]/gi, '')
+        .trim();
 
       sendUpdate({ text: synth });
     } catch(e) {
-      sendUpdate({ text: `### Information on ${q}\n\nDetailed research results and analysis for **${q}** were compiled successfully.` });
+      sendUpdate({ text: `Here is information for **"${cleanQ}"**.\n\nPlease specify your exact requirements so I can tailor the complete solution for you!` });
     }
     sendUpdate({ type: 'complete' });
     res.end();
@@ -1647,6 +1966,13 @@ app.get('/api/history', async (req, res) => {
 });
 
 module.exports = app;
+
+process.on('uncaughtException', (err) => {
+  console.error('🛡️ Uncaught Exception caught (prevented server crash):', err.message);
+});
+process.on('unhandledRejection', (reason) => {
+  console.error('🛡️ Unhandled Rejection caught (prevented server crash):', reason);
+});
 
 if (require.main === module) {
   const PORT = process.env.PORT || 3000;
