@@ -1398,9 +1398,17 @@ app.post('/api/search-stream', (req, res) => {
     .replace(/\[PREVIOUS CONVERSATION CONTEXT[\s\S]*?\[END PREVIOUS CONVERSATION CONTEXT\]/gi, '')
     .replace(/\[USER ACADEMIC CONTEXT[\s\S]*?\[END ACADEMIC CONTEXT\]/gi, '')
     .replace(/\[WEBSITE\/APP CREATION DIRECTIVE[\s\S]*?\]/gi, '')
+    .replace(/Analyze the attached image\/screenshot content below[^\n]*/gi, '')
+    .replace(/\[ATTACHED SCREENSHOT \/ IMAGE CONTENT[^\n]*\]/gi, '')
+    .replace(/\[USER QUESTION ABOUT THIS ATTACHED IMAGE\]:/gi, '')
+    .replace(/IMPORTANT: Focus exclusively on the visual content[^\n]*/gi, '')
+    .replace(/Explain this attached screenshot\/image in detail\./gi, '')
     .replace(/\[ATTACHED (?:IMAGE|SCREENSHOT|FILE|PDF|VIDEO)[^\]]*\]/gi, '')
     .split('\n')
-    .filter(l => !l.trim().startsWith('[ATTACHED') && !l.trim().startsWith('Base64'))
+    .filter(l => {
+      const t = l.trim();
+      return t && !t.startsWith('[ATTACHED') && !t.startsWith('Base64') && !t.startsWith('Analyze the attached') && !t.startsWith('IMPORTANT:') && !t.startsWith('Explain this attached');
+    })
     .join(' ')
     .trim();
 
@@ -1922,10 +1930,22 @@ Your responses must be SIMPLE, CRISP, HIGHLY MEANINGFUL, PRECISE, and DIRECTLY A
       }
     }
 
-    const hasActualImageAttachment = (req.body && Array.isArray(req.body.attachments) && req.body.attachments.some(a => (a.isImage || (a.dataUrl && typeof a.dataUrl === 'string' && a.dataUrl.startsWith('data:image'))))) || /--- ATTACHED SCREENSHOT \/ IMAGE CONTENT ---/i.test(q);
+    const hasActualImageAttachment = (req.body && Array.isArray(req.body.attachments) && req.body.attachments.some(a => (a.isImage || (a.dataUrl && typeof a.dataUrl === 'string' && a.dataUrl.startsWith('data:image'))))) || /--- ATTACHED SCREENSHOT \/ IMAGE CONTENT/i.test(q) || /\[ATTACHED SCREENSHOT \/ IMAGE CONTENT/i.test(q);
     if (hasActualImageAttachment) {
-      const userPrompt = cleanUserQuery || 'your attached file/image';
-      let imgExplanation = `### 👁️ Image & Document Analysis\n\nI have received ${userPrompt}. Please specify what visual elements, code, text, or data inside this image you would like me to analyze!`;
+      let fileName = 'Image Attachment';
+      const fileMatch = q.match(/(?:ATTACHED SCREENSHOT \/ IMAGE CONTENT|FILE):\s*([^\n\-\]]+)/i);
+      if (fileMatch && fileMatch[1] && !fileMatch[1].includes('Base64')) {
+        fileName = fileMatch[1].trim();
+      }
+
+      const userQuestionText = cleanUserQuery;
+      let imgExplanation = `### 👁️ Image Received (${fileName})\n\n`;
+      if (userQuestionText && userQuestionText.length > 3) {
+        imgExplanation += `I have received your image **"${fileName}"** for request: *"${userQuestionText}"*.\n\nPlease specify what visual elements, code, text, or data inside this image you would like me to analyze!`;
+      } else {
+        imgExplanation += `I have received your attached image **"${fileName}"**.\n\nPlease ask your question or specify what visual elements, code, text, or data inside this image you would like me to analyze!`;
+      }
+
       sendUpdate({ text: imgExplanation });
       sendUpdate({ type: 'complete' });
       return res.end();
