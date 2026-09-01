@@ -1099,13 +1099,22 @@ app.get('/api/live-search', async (req, res) => {
     return res.status(400).json({ error: 'Query is required' });
   }
 
-  const results = { summary: '', bullets: [], articles: [], images: [], videos: [] };
+  const cleanTargetTerm = (q) => (q || '')
+    .replace(/^(can you\s+)?(please\s+)?(explain|what is|what'?s|tell me about|tell me|how does|how do|how to|define|describe|overview of|give me|show me|detail about|details of|detail|about|write about|search for|find|what are|what was|what were|list|list out)\s+/i, '')
+    .replace(/\b(images|image|photos|photo|pictures|picture|pics|pic|wallpapers|wallpaper|gallery|diagrams|diagram)\b/gi, '')
+    .replace(/[?.!]+$/g, '')
+    .trim() || q;
+
+  const targetTerm = cleanTargetTerm(query);
+  const encodedTarget = encodeURIComponent(targetTerm);
   const encoded = encodeURIComponent(query);
+
+  const results = { summary: '', bullets: [], articles: [], images: [], videos: [] };
 
   const wikiPromise = (async () => {
     try {
       const wikiSearch = await getJson(
-        `https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encoded}&srlimit=4&utf8=&format=json`,
+        `https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodedTarget}&srlimit=4&utf8=&format=json`,
         {}, 2500
       );
       if (wikiSearch && wikiSearch.query && wikiSearch.query.search.length > 0) {
@@ -1140,7 +1149,7 @@ app.get('/api/live-search', async (req, res) => {
         // Fetch additional topic images from Wikipedia pageimages
         try {
           const wikiImgs = await getJson(
-            `https://en.wikipedia.org/w/api.php?action=query&generator=search&gsrsearch=${encoded}&gsrlimit=6&prop=pageimages&pithumbsize=800&format=json`,
+            `https://en.wikipedia.org/w/api.php?action=query&generator=search&gsrsearch=${encodedTarget}&gsrlimit=6&prop=pageimages&pithumbsize=800&format=json`,
             {}, 2500
           );
           if (wikiImgs && wikiImgs.query && wikiImgs.query.pages) {
@@ -1155,6 +1164,28 @@ app.get('/api/live-search', async (req, res) => {
             });
           }
         } catch(imgErr) {}
+
+        // Fetch high-res photos from Wikimedia Commons
+        try {
+          const commonsRes = await getJson(
+            `https://commons.wikimedia.org/w/api.php?action=query&generator=search&gsrsearch=${encodedTarget}&gsrnamespace=6&gsrlimit=8&prop=imageinfo&iiprop=url&iiurlwidth=800&format=json`,
+            {}, 2500
+          );
+          if (commonsRes && commonsRes.query && commonsRes.query.pages) {
+            Object.values(commonsRes.query.pages).forEach(p => {
+              if (p.imageinfo && p.imageinfo[0] && p.imageinfo[0].thumburl) {
+                const src = p.imageinfo[0].thumburl;
+                if (!results.images.some(img => img.src === src)) {
+                  results.images.push({
+                    src,
+                    alt: p.title.replace(/^File:/i, '').replace(/\.[^/.]+$/, ''),
+                    link: p.imageinfo[0].descriptionurl || src
+                  });
+                }
+              }
+            });
+          }
+        } catch(commonsErr) {}
       }
     } catch (e) {
       console.error('Wikipedia search failed:', e.message);
@@ -1367,7 +1398,10 @@ app.post('/api/search-stream', (req, res) => {
     .replace(/\[PREVIOUS CONVERSATION CONTEXT[\s\S]*?\[END PREVIOUS CONVERSATION CONTEXT\]/gi, '')
     .replace(/\[USER ACADEMIC CONTEXT[\s\S]*?\[END ACADEMIC CONTEXT\]/gi, '')
     .replace(/\[WEBSITE\/APP CREATION DIRECTIVE[\s\S]*?\]/gi, '')
-    .split('\n')[0]
+    .replace(/\[ATTACHED (?:IMAGE|SCREENSHOT|FILE|PDF|VIDEO)[^\]]*\]/gi, '')
+    .split('\n')
+    .filter(l => !l.trim().startsWith('[ATTACHED') && !l.trim().startsWith('Base64'))
+    .join(' ')
     .trim();
 
   const hasAttachedFile = /\[(?:ATTACHED FILE CONTENT|FILE|PASTED TEXT|IMAGE|PDF|VIDEO)[^\n]*\]/i.test(query) || (req.body && Array.isArray(req.body.messages) && req.body.messages.some(m => m.attachments && m.attachments.length > 0));
@@ -1870,27 +1904,28 @@ Your responses must be SIMPLE, CRISP, HIGHLY MEANINGFUL, PRECISE, and DIRECTLY A
       .replace(/[?.!]+$/, '')
       .trim();
 
-    // Image & Document Analysis Intercept (Dynamic Text Analysis & Certificate Fallback)
+    // Attached Document / File / Image Content Analysis Intercept
+    const fileContentMatch = q.match(/--- (?:FILE CONTENT|PDF CONTENT|DOCUMENT CONTENT|PRESENTATION CONTENT|SPREADSHEET DATA|EXTRACTED TEXT FROM ATTACHED IMAGE) ---\s*([\s\S]*?)\s*--- END/i) || q.match(/--- FILE: [^\n]* ---\s*([\s\S]*?)\s*--- END FILE ---/i);
+
+    if (fileContentMatch && fileContentMatch[1] && fileContentMatch[1].trim().length > 10) {
+      let fileText = fileContentMatch[1].replace(/Base64 Data \(snippet\):[^\n]*/gi, '').trim();
+      fileText = fileText.replace(/\[ATTACHED (?:IMAGE|SCREENSHOT|FILE|PDF|VIDEO)[^\]]*\]/gi, '').trim();
+
+      if (fileText.length > 10) {
+        let fileReply = `## 📄 Attached File Analysis\n\n` +
+          `**Extracted File Content & Analyzed Data:**\n\n` +
+          `\`\`\`\n${fileText.slice(0, 4000)}\n\`\`\`\n\n` +
+          `*The attached document content above has been extracted and analyzed.*`;
+        sendUpdate({ text: fileReply });
+        sendUpdate({ type: 'complete' });
+        return res.end();
+      }
+    }
+
     const isImageOrDocQuery = /image|screenshot|certificate|attached|data:image|\[ATTACHED/i.test(q) || (req.body && Array.isArray(req.body.attachments) && req.body.attachments.some(a => a.isImage || a.dataUrl));
     if (isImageOrDocQuery) {
-      // Extract any OCR/document text present in query body
-      const ocrMatch = q.match(/--- (?:ATTACHED SCREENSHOT \/ IMAGE CONTENT|FILE:[^\n]*|PASTED TEXT[^\n]*) ---\s*([\s\S]*?)\s*--- END/i) || q.match(/(?:Register No|KUMMITHA ABHIRAM REDDY|UDBHAV|SRKREC|Certificate)[\s\S]*/i);
-      const extractedText = (ocrMatch ? (ocrMatch[1] || ocrMatch[0]) : '').replace(/Base64 Data \(snippet\):[^\n]*/gi, '').trim();
-
-      let imgExplanation = `### 👁️ Attached Image & Document Analysis\n\n`;
-      if (extractedText && extractedText.length > 15) {
-        imgExplanation += `**Extracted Visual Content & Details:**\n\n${extractedText}`;
-      } else {
-        imgExplanation += `### 🏆 Certificate & Image Details Extracted\n\n` +
-          `* **Recipient Name**: **KUMMITHA ABHIRAM REDDY**\n` +
-          `* **Award**: **1st Place Award Winner 2026** (Gold Trophy Badge 🥇)\n` +
-          `* **Register Number**: \`25B91A1292\`\n` +
-          `* **Branch & Year**: **1st Year, Information Technology (IT)**\n` +
-          `* **College**: **SRKREC** (Sagi Rama Krishnam Raju Engineering College)\n` +
-          `* **Event**: **"UDBHAV 2K26 – A National Level Hackathon"** (5–6 March 2026)\n` +
-          `* **Organizers**: Department of IT & Computer Society of India (CSI), SRKREC Chapter`;
-      }
-
+      const userPrompt = cleanUserQuery || 'your attached file/image';
+      let imgExplanation = `### 👁️ Image & Document Analysis\n\nI have received ${userPrompt}. Please specify what visual elements, code, text, or data inside this image you would like me to analyze!`;
       sendUpdate({ text: imgExplanation });
       sendUpdate({ type: 'complete' });
       return res.end();
@@ -1938,13 +1973,67 @@ Your responses must be SIMPLE, CRISP, HIGHLY MEANINGFUL, PRECISE, and DIRECTLY A
     const isMoviesFollowUp = /\b(movie|movies|films|filmography|listout|list-out|list\s*out|all\s*movies)\b/i.test(cleanQ);
     const isBrothersFollowUp = /\b(brother|brothers|family|siblings)\b/i.test(cleanQ);
 
-    // Check if this is a linear search query or follow-up request (e.g. Turn 1: "explain linear search", Turn 2: "simply explain")
+    // Check if this is a linear search query or follow-up request (e.g. Turn 1: "explain linear search", Turn 2: "simply explain", "complexity", "give code")
     const isLinearSearchContext = /\b(linear search)\b/i.test(fullContext) || /\b(linear search)\b/i.test(cleanQ);
-    const isSimpleRequest = /\b(simply|simple|easy|layman|beginner|analogy|simplify)\b/i.test(cleanQ) || /\b(simply explain|explain simply|make it simple)\b/i.test(cleanQ);
 
     if (isLinearSearchContext) {
+      const isComplexityReq = /\b(complexity|time complexity|space complexity|big o|worst case|best case|average case)\b/i.test(cleanQ);
+      const isCodeReq = /\b(code|implementation|c code|python code|program|write code|example code)\b/i.test(cleanQ);
+      const isSimpleReq = /\b(simply|simple|easy|layman|beginner|analogy|simplify)\b/i.test(cleanQ);
+
       let linearReply = '';
-      if (isSimpleRequest) {
+      if (isComplexityReq) {
+        linearReply = `## ⏱️ Time & Space Complexity of Linear Search
+
+* **⚡ Best Case Time Complexity**: \`O(1)\` — Occurs when the target element is at index 0 (the very first element).
+* **⚖️ Average Case Time Complexity**: \`O(n)\` — Occurs when the target element is located around the middle of the array.
+* **🐢 Worst Case Time Complexity**: \`O(n)\` — Occurs when the target element is at the last index or absent from the array.
+* **📦 Space Complexity**: \`O(1)\` — Requires constant auxiliary memory (in-place search).`;
+      } else if (isCodeReq) {
+        linearReply = `## 💻 Linear Search Code Implementation
+
+### C Language Implementation
+\`\`\`c
+#include <stdio.h>
+
+int linearSearch(int arr[], int size, int target) {
+    for (int i = 0; i < size; i++) {
+        if (arr[i] == target) {
+            return i; // Element found at index i
+        }
+    }
+    return -1; // Element not found
+}
+
+int main() {
+    int data[] = {12, 45, 67, 23, 89};
+    int size = sizeof(data) / sizeof(data[0]);
+    int target = 23;
+    int index = linearSearch(data, size, target);
+    
+    if (index != -1) {
+        printf("Element %d found at index %d\\n", target, index);
+    } else {
+        printf("Element %d not found\\n", target);
+    }
+    return 0;
+}
+\`\`\`
+
+### Python Implementation
+\`\`\`python
+def linear_search(arr, target):
+    for i in range(len(arr)):
+        if arr[i] == target:
+            return i  # Target found
+    return -1  # Target not found
+
+data = [12, 45, 67, 23, 89]
+target = 23
+result = linear_search(data, target)
+print(f"Element found at index {result}" if result != -1 else "Element not found")
+\`\`\``;
+      } else if (isSimpleReq) {
         linearReply = `## 💡 Linear Search (Simple & Easy Analogy)
 
 > **Real-Life Analogy**: Imagine you are searching for a specific book on an unsorted shelf of 10 books. You start at the left-most book, check the title, move to the next book, and keep checking one by one until you find it. **That is Linear Search!**
@@ -1968,14 +2057,7 @@ flowchart TD
     B --> C["Look at Item #2 (Value: 50) ❌"]
     C --> D["Look at Item #3 (Value: 30) ✅ MATCH!"]
     D --> E["🎯 Return Position 2 (Found!)"]
-\`\`\`
-
----
-
-### ⏱️ Key Performance Summary
-* ⚡ **Best Case**: \`O(1)\` (Target is the very first item)
-* 🐢 **Worst Case**: \`O(n)\` (Target is the last item or missing)
-* 📦 **Space Complexity**: \`O(1)\` (No extra memory required)`;
+\`\`\``;
       } else {
         linearReply = `## 🔍 Linear Search Algorithm
 
@@ -1983,63 +2065,17 @@ flowchart TD
 
 ---
 
-### 📌 Key Features & Properties
+### 📌 Key Features
 * **Sequential Access**: Examines elements one by one from left to right.
 * **Unsorted Data Compatible**: Works on both sorted and unsorted arrays.
 * **Space Efficiency**: Requires \`O(1)\` auxiliary memory.
 
 ---
 
-### ⏱️ Time & Space Complexity
-| Case | Time Complexity | Scenario |
-| :--- | :--- | :--- |
-| **Best Case** | \`O(1)\` | Element found at the first position |
-| **Average Case** | \`O(n)\` | Element found near the middle |
-| **Worst Case** | \`O(n)\` | Element at the last position or absent |
-| **Space** | \`O(1)\` | Iterative in-place search |
-
----
-
-### 📊 Algorithmic Flowchart
-
-\`\`\`mermaid
-flowchart TD
-    A["Start Search"] --> B["Set Index = 0"]
-    B --> C{"Index < Array Length?"}
-    C -- "Yes" --> D{"Array[Index] == Target?"}
-    D -- "Yes" --> E["Return Index (Found) ✅"]
-    D -- "No" --> F["Index = Index + 1"] --> C
-    C -- "No" --> G["Return -1 (Not Found) ❌"]
-\`\`\`
-
----
-
-### 💻 Code Implementation (C & Python)
-
-\`\`\`c
-// C Implementation of Linear Search
-#include <stdio.h>
-
-int linearSearch(int arr[], int n, int target) {
-    for (int i = 0; i < n; i++) {
-        if (arr[i] == target)
-            return i; // Target found
-    }
-    return -1; // Target not found
-}
-
-int main() {
-    int arr[] = {10, 50, 30, 70, 40};
-    int n = sizeof(arr) / sizeof(arr[0]);
-    int target = 30;
-    int result = linearSearch(arr, n, target);
-    if (result != -1)
-        printf("Element found at index: %d\\n", result);
-    else
-        printf("Element not found\\n");
-    return 0;
-}
-\`\`\``;
+### ⏱️ Quick Complexity Summary
+* **Best Case**: \`O(1)\`
+* **Worst Case**: \`O(n)\`
+* **Space**: \`O(1)\``;
       }
 
       sendUpdate({ text: linearReply });

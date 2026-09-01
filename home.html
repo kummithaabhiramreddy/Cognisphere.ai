@@ -5868,7 +5868,7 @@
     // 1. Try backend API first (fast YouTube scraping in ~1-2 seconds)
     try {
       const res = await fetch(`${API_BASE}/api/live-search?q=${encoded}&lang=${langCode}`, {
-        signal: AbortSignal.timeout(6000)
+        signal: safeTimeoutSignal(6000)
       });
       if (res.ok) {
         const data = await res.json();
@@ -5894,10 +5894,22 @@
     return `${m}:${String(sec).padStart(2,'0')}`;
   }
 
+  function safeTimeoutSignal(ms) {
+    try {
+      if (typeof AbortSignal !== 'undefined' && typeof AbortSignal.timeout === 'function') {
+        return AbortSignal.timeout(ms);
+      }
+    } catch(e){}
+    const controller = new AbortController();
+    setTimeout(() => controller.abort(), ms);
+    return controller.signal;
+  }
+
   async function fetchLiveWebResults(query, langCode = '') {
-    // Strip leading instruction words so "explain linear search" → "linear search" for Wikipedia/search
+    // Strip leading instruction words and image suffixes so "give me pawan kalyan images" → "pawan kalyan"
     const cleanWikiQuery = (q) => (q || '')
       .replace(/^(can you\s+)?(please\s+)?(explain|what is|what'?s|tell me about|tell me|how does|how do|how to|define|describe|overview of|give me|show me|detail about|details of|detail|about|write about|search for|find|what are|what was|what were|list|list out)\s+/i, '')
+      .replace(/\b(images|image|photos|photo|pictures|picture|pics|pic|wallpapers|wallpaper|gallery|diagrams|diagram)\b/gi, '')
       .replace(/[?.!]+$/g, '')
       .trim() || q;
     const wikiQuery = cleanWikiQuery(query);
@@ -5907,11 +5919,11 @@
     // 1. Try backend proxy first (fast, reliable, CORS-free, view sorted)
     try {
       const res = await fetch(`${API_BASE}/api/live-search?q=${encoded}&lang=${langCode}`, {
-        signal: AbortSignal.timeout(12000)
+        signal: safeTimeoutSignal(12000)
       });
       if (res.ok) {
         const data = await res.json();
-        if (data && (data.summary || data.articles?.length || data.videos?.length)) {
+        if (data && (data.summary || data.articles?.length || data.videos?.length || data.images?.length)) {
           return data;
         }
       }
@@ -5947,6 +5959,45 @@
           source: 'wikipedia.org'
         }));
       }
+
+      // Fetch additional topic images from Wikipedia generator pageimages
+      try {
+        const wikiImgs = await fetch(
+          `https://en.wikipedia.org/w/api.php?action=query&generator=search&gsrsearch=${encodedWiki}&gsrlimit=6&prop=pageimages&pithumbsize=800&format=json&origin=*`
+        ).then(r => r.json());
+        if (wikiImgs && wikiImgs.query && wikiImgs.query.pages) {
+          Object.values(wikiImgs.query.pages).forEach(p => {
+            if (p.thumbnail && p.thumbnail.source && !results.images.some(img => img.src === p.thumbnail.source)) {
+              results.images.push({
+                src: p.thumbnail.source,
+                alt: p.title,
+                link: `https://en.wikipedia.org/wiki/${encodeURIComponent(p.title)}`
+              });
+            }
+          });
+        }
+      } catch(imgErr) {}
+
+      // Fetch high-res photos from Wikimedia Commons
+      try {
+        const commonsRes = await fetch(
+          `https://commons.wikimedia.org/w/api.php?action=query&generator=search&gsrsearch=${encodedWiki}&gsrnamespace=6&gsrlimit=8&prop=imageinfo&iiprop=url&iiurlwidth=800&format=json&origin=*`
+        ).then(r => r.json());
+        if (commonsRes && commonsRes.query && commonsRes.query.pages) {
+          Object.values(commonsRes.query.pages).forEach(p => {
+            if (p.imageinfo && p.imageinfo[0] && p.imageinfo[0].thumburl) {
+              const src = p.imageinfo[0].thumburl;
+              if (!results.images.some(img => img.src === src)) {
+                results.images.push({
+                  src,
+                  alt: p.title.replace(/^File:/i, '').replace(/\.[^/.]+$/, ''),
+                  link: p.imageinfo[0].descriptionurl || src
+                });
+              }
+            }
+          });
+        }
+      } catch(commonsErr) {}
     } catch(e){}
 
     // 3. Wikidata Fallback (CORS safe with origin=*)
@@ -6335,11 +6386,15 @@ Building interactive websites, HTML applications, and frontend UI dashboards is 
       attList.forEach((a, idx) => {
         if (a.kind === 'text' && a.content) {
           decodedSentences.push(`--- PASTED TEXT ${idx + 1} ---\n${a.content}\n--- END ---`);
-        } else if (a.kind === 'file') {
+        } else if (a.kind === 'file' || a.file) {
           const fileName = (a.file && a.file.name) ? a.file.name : (a.label || `File ${idx + 1}`);
           const fileBody = a.textContent || a.content || '';
-          if (fileBody) {
+          if (fileBody && (fileBody.includes('--- FILE CONTENT ---') || fileBody.includes('--- PDF CONTENT ---') || fileBody.includes('--- DOCUMENT CONTENT ---') || fileBody.includes('--- PRESENTATION CONTENT ---') || fileBody.includes('--- SPREADSHEET DATA ---') || fileBody.includes('--- EXTRACTED TEXT FROM ATTACHED IMAGE ---'))) {
+            decodedSentences.push(fileBody);
+          } else if (fileBody && !fileBody.startsWith('[ATTACHED IMAGE / SCREENSHOT')) {
             decodedSentences.push(`--- FILE: ${fileName} ---\n${fileBody}\n--- END FILE ---`);
+          } else if (a.dataUrl || a.url) {
+            decodedSentences.push(`--- ATTACHED SCREENSHOT / IMAGE CONTENT: ${fileName} ---\nBase64 Data (snippet): ${a.dataUrl || a.url}\n--- END ---`);
           }
         }
       });
@@ -6483,7 +6538,7 @@ Building interactive websites, HTML applications, and frontend UI dashboards is 
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ query: payloadQuery, messages: requestMessages, attachments: reqAttachments }),
-          signal: AbortSignal.timeout(60000)
+          signal: safeTimeoutSignal(60000)
         });
         if (!genResponse.ok || !genResponse.body) throw new Error('backend error ' + genResponse.status);
 
@@ -6539,7 +6594,7 @@ Building interactive websites, HTML applications, and frontend UI dashboards is 
                   model: 'openai',
                   stream: true
                 }),
-                signal: AbortSignal.timeout(6000)
+                signal: safeTimeoutSignal(6000)
               });
               if (fallbackRes.ok && fallbackRes.body) {
                 const rdr = fallbackRes.body.getReader();
@@ -6586,7 +6641,7 @@ Building interactive websites, HTML applications, and frontend UI dashboards is 
               try {
                 const cleanQ = encodeURIComponent(searchQuery.slice(0, 500));
                 const getRes = await fetch(`https://text.pollinations.ai/${cleanQ}?model=openai`, {
-                  signal: AbortSignal.timeout(5000)
+                  signal: safeTimeoutSignal(5000)
                 });
                 if (getRes.ok) {
                   const getTxt = await getRes.text();
@@ -6651,11 +6706,20 @@ Building interactive websites, HTML applications, and frontend UI dashboards is 
 
     // ---- ALL OTHER TOOLS: streaming quantum backend ----
     try {
+      const serializableAtts = attList.map(a => ({
+        label: a.label || (a.file ? a.file.name : 'attachment'),
+        isImage: !!(a.isImage || (a.file && a.file.type && a.file.type.startsWith('image/')) || (a.label && /\.(png|jpe?g|gif|webp|bmp|svg)$/i.test(a.label))),
+        dataUrl: a.dataUrl || a.url || a.content || ''
+      }));
+
+      // Fetch topic images and web cards in parallel with search-stream
+      const webResultsPromise = fetchLiveWebResults(query, currentLang).catch(() => null);
+
       const response = await fetch(`${API_BASE}/api/search-stream`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ query: payloadQuery, messages: structuredTurns }),
-        signal: AbortSignal.timeout(60000)
+        body: JSON.stringify({ query: payloadQuery, messages: structuredTurns, attachments: serializableAtts }),
+        signal: safeTimeoutSignal(60000)
       });
       if (!response.ok) throw new Error('Network error');
       const reader = response.body.getReader();
@@ -6691,9 +6755,29 @@ Building interactive websites, HTML applications, and frontend UI dashboards is 
           }
         }
       }
-      const resText = accText || '';
-      if (window.saveChatToNeonDb && resText) window.saveChatToNeonDb(query, resText, convToUpdate ? convToUpdate.id : null);
-      return { text: resText || 'No response received.', sources: null };
+
+      // Attach Image Gallery & Video Cards to final HTML
+      const webData = await webResultsPromise;
+      let webHtml = '';
+      let topGalleryHtml = '';
+      if (webData) {
+        webHtml = buildWebResultHTML(webData, query, currentLang);
+        // If user explicitly asked for images/photos/pictures, place gallery at the TOP!
+        const isExplicitImageQuery = /\b(images|image|photos|photo|pictures|picture|pics|pic|gallery|wallpaper)\b/i.test(query);
+        if (isExplicitImageQuery && webData.images && webData.images.length) {
+          topGalleryHtml = buildImageGalleryHTML(webData.images, query);
+        }
+      }
+
+      let generativeHtml = '';
+      const displayText = cleanLLMOutput(accText);
+      if (displayText && displayText.trim().length > 0) {
+        generativeHtml = '<div>' + parseMarkdown(displayText) + '</div>';
+      }
+      const finalHtml = (topGalleryHtml || '') + generativeHtml + (topGalleryHtml ? '' : (webHtml || ''));
+
+      if (window.saveChatToNeonDb && accText) window.saveChatToNeonDb(query, accText, convToUpdate ? convToUpdate.id : null);
+      return { text: finalHtml, sources: null, isHtml: true };
     } catch (err) {
       return new Promise(resolve => setTimeout(() => resolve(behavior.reply(query)), behavior.delay));
     }
@@ -7911,7 +7995,7 @@ Building interactive websites, HTML applications, and frontend UI dashboards is 
     try {
       const u = getCurrentUser();
       const res = await fetch(`${API_BASE}/api/history?user_id=${encodeURIComponent(u.id)}`, {
-        signal: AbortSignal.timeout(15000)
+        signal: safeTimeoutSignal(15000)
       });
       if (!res.ok) throw new Error('History fetch failed');
       const resData = await res.json().catch(() => null);
@@ -9951,7 +10035,7 @@ Building interactive websites, HTML applications, and frontend UI dashboards is 
         user_email: u.email,
         user_name: u.name
       }),
-      signal: AbortSignal.timeout(15000)
+      signal: safeTimeoutSignal(15000)
     })
     .then(r => r.ok ? r.json().catch(() => null) : null)
     .then(data => {
@@ -10446,7 +10530,7 @@ Building interactive websites, HTML applications, and frontend UI dashboards is 
       const classEnc = encodeURIComponent(profile.current_class);
       const streamEnc = encodeURIComponent(profile.stream || '');
       const res = await fetch(`${API_BASE}/api/class-suggestions/${stateEnc}/${classEnc}?stream=${streamEnc}`, {
-        signal: AbortSignal.timeout(4000)
+        signal: safeTimeoutSignal(4000)
       });
       if (!res.ok) throw new Error('API error ' + res.status);
       const sug = await res.json().catch(() => ({}));
