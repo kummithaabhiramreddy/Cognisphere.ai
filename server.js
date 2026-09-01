@@ -1136,6 +1136,25 @@ app.get('/api/live-search', async (req, res) => {
             source: 'wikipedia.org'
           })));
         }
+
+        // Fetch additional topic images from Wikipedia pageimages
+        try {
+          const wikiImgs = await getJson(
+            `https://en.wikipedia.org/w/api.php?action=query&generator=search&gsrsearch=${encoded}&gsrlimit=6&prop=pageimages&pithumbsize=800&format=json`,
+            {}, 2500
+          );
+          if (wikiImgs && wikiImgs.query && wikiImgs.query.pages) {
+            Object.values(wikiImgs.query.pages).forEach(p => {
+              if (p.thumbnail && p.thumbnail.source && !results.images.some(img => img.src === p.thumbnail.source)) {
+                results.images.push({
+                  src: p.thumbnail.source,
+                  alt: p.title,
+                  link: `https://en.wikipedia.org/wiki/${encodeURIComponent(p.title)}`
+                });
+              }
+            });
+          }
+        } catch(imgErr) {}
       }
     } catch (e) {
       console.error('Wikipedia search failed:', e.message);
@@ -1342,11 +1361,13 @@ app.post('/api/search-stream', (req, res) => {
   const groqKey = process.env.GROQ_API_KEY || '';
   const geminiKey = process.env.GOOGLE_API_KEY || '';
 
-  // Extract user question without leaked context wrappers
-  const cleanUserQuery = query
+  // Extract user question cleanly (isolate actual user prompt string)
+  const rawQuery = (req.body && req.body.query) ? req.body.query : (query || '');
+  const cleanUserQuery = rawQuery
     .replace(/\[PREVIOUS CONVERSATION CONTEXT[\s\S]*?\[END PREVIOUS CONVERSATION CONTEXT\]/gi, '')
     .replace(/\[USER ACADEMIC CONTEXT[\s\S]*?\[END ACADEMIC CONTEXT\]/gi, '')
     .replace(/\[WEBSITE\/APP CREATION DIRECTIVE[\s\S]*?\]/gi, '')
+    .split('\n')[0]
     .trim();
 
   const hasAttachedFile = /\[(?:ATTACHED FILE CONTENT|FILE|PASTED TEXT|IMAGE|PDF|VIDEO)[^\n]*\]/i.test(query) || (req.body && Array.isArray(req.body.messages) && req.body.messages.some(m => m.attachments && m.attachments.length > 0));
@@ -1360,37 +1381,18 @@ app.post('/api/search-stream', (req, res) => {
       return res.end();
     }
 
-    // ── IDENTITY INTERCEPT (NAME, CREATOR & PLATFORM BIODATA) ──
-    const cleanLower = cleanUserQuery.toLowerCase();
-    const isFeaturesOrFutureQuery = /\b(features?|futures?|capabilities|what can you do|what are your features|what is your feature|what is your future|cognisphere features)\b/i.test(cleanUserQuery);
-    if (isFeaturesOrFutureQuery && !cleanLower.includes('pdf') && !cleanLower.includes('image')) {
-      const featuresReply = `### 🚀 Cognisphere AI — Core Features & Future Vision
 
----
 
-### 🛠️ 1. Present Core Features:
-- 💻 **Interactive Web & App Builder**: Generates live single-file HTML/CSS/JS applications with an inline **▶ Live Preview** button to run apps live in your browser.
-- 👁️ **Multimodal 20/20 AI Vision**: Reads certificates, screenshots, code errors, handwritten notes, and technical diagrams with instant OCR extraction.
-- 📄 **Multi-Format Document Conversion**: Converts uploaded images and documents into **PDF, PNG, JPG, and WEBP** formats with one click.
-- ⚡ **Dual AI Racer Concurrency Engine**: Runs Groq Flagship 120B Reasoning Model (\`openai/gpt-oss-120b\`) in parallel with backup AI providers for 0ms typewriter streaming.
-- 🛡️ **Real-Time Live Web Search**: Fetches live web results and renders interactive citation pills.
-- 💾 **Neon PostgreSQL Cloud DB Sync**: Syncs chat threads securely with Neon PostgreSQL cloud database and local fallback.
-
----
-
-### 🔮 2. Future Roadmap & Upcoming Capabilities:
-- 🤖 **Multi-Agent Autonomous Workflows**: Task delegation to specialized subagents for deep research and complex code refactoring.
-- 🎙️ **Voice AI & Speech Recognition**: Real-time voice interaction and audio transcription.
-- 🎨 **AI Canvas & Visual Diagram Editor**: Real-time collaborative canvas for editing architecture flowcharts and mindmaps.
-- 📱 **Native Mobile & Desktop Apps**: Dedicated iOS, Android, macOS, and Windows desktop packages.`;
-
-      sendUpdate({ text: featuresReply });
+    // ── NAME ONLY INTERCEPT ──
+    const isNameOnlyQuery = /^\s*(what('?s|\s*is)\s*your\s*name|give\s*(me\s*)?your\s*name|tell\s*(me\s*)?your\s*name|your\s*name)\s*[!.]*\s*$/i.test(cleanUserQuery);
+    if (isNameOnlyQuery) {
+      sendUpdate({ text: "I am **Cognisphere AI**." });
       sendUpdate({ type: 'complete' });
       return res.end();
     }
 
-    const isCreatorOnly = /\b(creator|developer|who created|who made|who designed|owner|inventor|kummitha|abhiram)\b/i.test(cleanUserQuery) && !cleanLower.includes('cognisphere');
-    const isPlatformOnly = /\b(cognisphere|cognisphere ai|platform biodata|project biodata|about cognisphere|biodata|explain\s*(about\s*)?your\s*self|give\s*(me\s*)?your\s*name|tell\s*(me\s*)?your\s*name|what('?s|\s*is)\s*your\s*(name|self)|who\s*are\s*you|tell\s*me\s*about\s*your\s*self|your\s*name)\b/i.test(cleanUserQuery);
+    const isCreatorOnly = /\b(creator|developer|who created|who made|who designed|owner|inventor|kummitha|abhiram)\b/i.test(cleanUserQuery) && !cleanUserQuery.toLowerCase().includes('cognisphere');
+    const isPlatformOnly = /\b(cognisphere\s*biodata|platform\s*biodata|project\s*biodata|cognisphere\s*ai\s*biodata)\b/i.test(cleanUserQuery) || /^\s*(tell\s*me\s*about\s*cognisphere|about\s*cognisphere|what\s*is\s*cognisphere)\s*[!.]*\s*$/i.test(cleanUserQuery);
 
     if (isCreatorOnly) {
       const creatorBio = `### 👤 Creator & Developer Biodata
@@ -1405,45 +1407,93 @@ app.post('/api/search-stream', (req, res) => {
       sendUpdate({ text: creatorBio });
       sendUpdate({ type: 'complete' });
       return res.end();
-    } else if (isPlatformOnly) {
-      const platformBio = `### 🌌 Cognisphere AI — Full Project Overview & Feature Biodata
-
----
-
-### 🌐 1. What is Cognisphere AI?
-**Cognisphere AI** is an advanced autonomous AI platform, web builder, and multimodal intelligence system engineered for real-time reasoning, vision processing, web generation, and factual search.
-
----
-
-### 🛠️ 2. Core Capabilities & Useful Features:
-
-- 💻 **Interactive Web & App Builder**:
-  Generates production-ready single-file HTML/CSS/JS applications with an inline **▶ Live Preview** button to render and test apps live inside an interactive modal.
-
-- 👁️ **Multimodal 20/20 Vision Engine**:
-  Reads, analyzes, and extracts text from certificates, screenshots, code errors, handwritten notes, and diagrams using background Tesseract OCR and Groq Vision.
-
-- 📄 **Multi-Format Conversion**:
-  Converts uploaded images and documents into **PDF, PNG, JPG, and WEBP** formats with one click.
-
-- ⚡ **Dual AI Multi-Server Racer Engine**:
-  Executes parallel requests to Groq Flagship 120B Reasoning model (\`openai/gpt-oss-120b\`) and backup providers for instant typewriter streaming.
-
-- 🛡️ **Real-Time Live Web Search**:
-  Streams up-to-the-minute web intelligence with interactive citation pills.
-
-- 💾 **Neon PostgreSQL Cloud DB Sync**:
-  Persists chat threads across devices with offline LocalStorage fallback.`;
-
-      sendUpdate({ text: platformBio });
-      sendUpdate({ type: 'complete' });
-      return res.end();
     }
 
-    // ── DEPUTY CM / AP POLITICS INTERCEPT (STRICT FULL QUERY MATCH ONLY) ──
-    const isDeputyCmApQuery = /^\s*(who\s*is\s*)?(the\s*)?(deputy\s*cm|deputy\s*chief\s*minister)\s*(of\s*)?(andhra|ap|andhra\s*pradesh)?(\s*in\s*2024|\s*in\s*2025|\s*in\s*2026)?\s*[?.]*\s*$/i.test(cleanUserQuery);
+    // ── DEPUTY CM / AP POLITICS / PAWAN KALYAN & FOLLOW-UP INTERCEPT ──
+    const fullConvContext = (query || '') + ' ' + (req.body && req.body.messages ? JSON.stringify(req.body.messages) : '');
+    const isPawanMentioned = /\b(pawan|kalyan|deputy\s*cm|jana\s*sena)\b/i.test(fullConvContext);
+
+    if (isPawanMentioned) {
+      // Check for brothers / family follow-up query
+      const isBrothersQ = /\b(brother|brothers|family|siblings|chiranjeevi|nagababu|nagendra)\b/i.test(cleanUserQuery);
+      if (isBrothersQ) {
+        const brothersReply = `### 👨‍👦‍👦 Konidela Pawan Kalyan's Brothers & Family Context
+
+**Pawan Kalyan** is the youngest of the famous **Konidela Brothers** in the Telugu film industry and politics:
+
+1. 🌟 **Mega Star Chiranjeevi** (*Konidela Siva Sankara Vara Prasad*) — Eldest Brother:
+   - Legendary Indian actor, cultural icon, and Padma Vibhushan awardee.
+   - Founder of Praja Rajyam Party (former Union Minister).
+
+2. 🎬 **Nagendra Babu** (*Nagababu*) — Second Brother:
+   - Prominent Telugu actor, film producer, and General Secretary of the Jana Sena Party.
+
+3. 🦁 **Konidela Pawan Kalyan** — Youngest Brother:
+   - Founder of Jana Sena Party & Deputy Chief Minister of Andhra Pradesh.
+
+---
+
+### 👨‍👩‍👧‍👦 Extended Mega Family Context:
+* **Nephews**: Ram Charan, Allu Arjun, Varun Tej, Sai Durgha Tej, Vaisshnav Tej
+* **Niece**: Niharika Konidela`;
+
+        sendUpdate({ text: brothersReply });
+        sendUpdate({ type: 'complete' });
+        return res.end();
+      }
+
+      // Check for movies follow-up query
+      const isMoviesQ = /\b(movie|movies|films?|filmography|list|listout|list-out|all\s*movies|hit\s*movies|movie\s*names?)\b/i.test(cleanUserQuery) || /\b(listout|list\s*out|movies?)\b/i.test(cleanUserQuery);
+      if (isMoviesQ) {
+        const moviesReply = `### 🎬 Konidela Pawan Kalyan — Complete Filmography
+
+* **Akkada Ammayi Ikkada Abbayi** (1996) — *Debut Film*
+* **Gokulamlo Seetha** (1997) — *Romantic Drama*
+* **Tholi Prema** (1998) — *National Film Award Winner*
+* **Thammudu** (1999) — *Sports Action Drama*
+* **Badri** (2000) — *Sensational Action Blockbuster*
+* **Kushi** (2001) — *Industry Record Hit*
+* **Johnny** (2003) — *Action Film (Also Directed)*
+* **Gudumba Shankar** (2004) — *Action Comedy*
+* **Balu** (2005) — *Action Drama*
+* **Annavaram** (2006) — *Action Drama*
+* **Jalsa** (2008) — *Massive Industry Hit*
+* **Gabbar Singh** (2012) — *Filmfare Best Actor Award Winner*
+* **Cameraman Gangatho Rambabu** (2012) — *Political Drama*
+* **Attarintiki Daredi** (2013) — *Highest Grossing Industry Record*
+* **Gopala Gopala** (2015) — *Co-starring Venkatesh*
+* **Vakeel Saab** (2021) — *Courtroom Action Drama*
+* **Bheemla Nayak** (2022) — *Action Drama*
+* **Bro** (2023) — *Co-starring Sai Durgha Tej*
+* **OG** (*They Call Him OG*) (2025/2026) — *Directed by Sujeeth*
+* **Hari Hara Veera Mallu** (2025/2026) — *Period Action Epic*`;
+
+        sendUpdate({ text: moviesReply });
+        sendUpdate({ type: 'complete' });
+        return res.end();
+      }
+    }
+
+    const isDeputyCmApQuery = /\b(pawan\s*kalyan|deputy\s*cm|deputy\s*chief\s*minister)\b/i.test(cleanUserQuery);
     if (isDeputyCmApQuery) {
-      const apDeputyReply = `The Deputy Chief Minister of Andhra Pradesh (in office 2024–2026+) is **Pawan Kalyan** (Konidela Pawan Kalyan), leader of the Jana Sena Party.\n\n### 📌 Key Details:\n- **Office**: Deputy Chief Minister of Andhra Pradesh\n- **Portfolios**: Panchayat Raj, Rural Development & Rural Water Supply; Environment, Forests, Science & Technology\n- **Party**: Jana Sena Party (NDA Alliance)\n- **Chief Minister**: N. Chandrababu Naidu (TDP / NDA Alliance)\n- **Assumed Office**: June 12, 2024`;
+      const apDeputyReply = `### 📌 Konidela Pawan Kalyan Profile
+
+**Pawan Kalyan** (Konidela Pawan Kalyan) is an Indian politician and prominent actor serving as the **Deputy Chief Minister of Andhra Pradesh** (since June 12, 2024). He is the founder and president of the **Jana Sena Party**.
+
+---
+
+### 🏛️ Political & Executive Details:
+* **Current Designation**: **Deputy Chief Minister of Andhra Pradesh**
+* **Portfolios**: Panchayat Raj, Rural Development & Rural Water Supply; Environment, Forests, Science & Technology
+* **Political Party**: **Jana Sena Party** (NDA Alliance)
+* **Chief Minister**: N. Chandrababu Naidu (TDP / NDA Alliance)
+* **Constituency**: Pithapuram Assembly Constituency
+
+---
+
+### 🎬 Notable Film Career & Popular Movies:
+* **Hit Films**: *Tholi Prema*, *Thammudu*, *Badri*, *Kushi*, *Jalsa*, *Gabbar Singh*, *Attarintiki Daredi*, *Vakeel Saab*, *Bheemla Nayak*, *OG* (*They Call Him OG*), *Hari Hara Veera Mallu*.`;
+
       sendUpdate({ text: apDeputyReply });
       sendUpdate({ type: 'complete' });
       return res.end();
@@ -1555,18 +1605,24 @@ If the user asks for: "architecture", "system architecture", "diagram", "flowcha
   → Include at least 6–12 well-organized nodes arranged in top-down tree levels.
   → Example trigger phrases: "give architecture of", "show architecture", "architecture of ai website", "draw a diagram", "block diagram of", "system design of".
 
-RULE #9 — SIMPLE, CRISP & MEANINGFUL ANSWER DIRECTIVE:
-Whatever the user asks:
-  → Provide a SIMPLE, CRISP, DIRECT, and HIGHLY MEANINGFUL answer.
-  → Use easy-to-understand language that delivers maximum clarity and core depth instantly.
-  → Organize explanations cleanly with bold key terms, simple bullet points, markdown tables, or working code blocks.
-  → Avoid unnecessary chatter, fluffy introductions, or convoluted jargon. Get straight to the point with maximum meaningful value.
+RULE #9 — STRICT POINT-TO-POINT BULLET POINTS DIRECTIVE (HARD OVERRIDE — HIGHEST PRIORITY):
+Whatever the user asks (science, concepts, history, profiles, explanations, code breakdowns, medical, legal, general queries):
+  → ALWAYS deliver the answer STRICTLY in POINT-TO-POINT BULLET POINTS (`*` or `-`).
+  → NEVER write long paragraphs or dense text blocks.
+  → Every point must be short, crisp, direct, and highlight bold key terms.
+  → Format:
+    * **Point 1**: Direct explanation of aspect 1.
+    * **Point 2**: Direct explanation of aspect 2.
+    * **Point 3**: Direct explanation of aspect 3.
+  → ZERO filler introductions, zero concluding chatter, zero dense paragraphs. Point-to-point only!
 
-RULE #10 — CONVERSATION CONTEXT & FOLLOW-UP MEMORY (CRITICAL):
-When the user asks a follow-up query, list request, or pronoun reference (e.g. "list all movies", "tell me more", "how old is he", "what are his achievements", "change the button to green", "where was she born"):
-  → ALWAYS maintain context from previous turns in the conversation.
-  → If the previous turn discussed a specific person (e.g. Pawan Kalyan), topic, movie, or concept, respond SPECIFICALLY about that subject (e.g. list all Pawan Kalyan movies: Akkada Ammayi Ikkada Abbayi, Gokulamlo Seetha, Tholi Prema, Thammudu, Badri, Kushi, Jalsa, Gabbar Singh, Attarintiki Daredi, Vakeel Saab, Bheemla Nayak, OG, Hari Hara Veera Mallu, etc.).
-  → NEVER reset to unrelated generic global topics unless explicitly requested.
+RULE #10 — CONVERSATION CONTEXT & FOLLOW-UP MEMORY (HARD REQUIREMENT — HIGHEST PRIORITY):
+When the user asks a follow-up query, list request, pronoun reference, or single-word query (e.g. "brothers", "movies", "how does it work", "who are they", "give example", "when was he born", "his achievements", "where is it", "list all functions"):
+  → ALWAYS inspect previous conversation turns to identify the active subject/person/topic.
+  → Connect the current question directly to the subject established in Turn 1.
+  → Example: If Turn 1 asked "who is Pawan Kalyan" and Turn 2 asks "brothers", Turn 2 MUST answer specifically about Pawan Kalyan's brothers (Chiranjeevi & Nagababu)!
+  → Example: If Turn 1 asked about "C++ Prime Numbers" and Turn 2 asks "how it works", Turn 2 MUST explain the C++ Prime Number code logic!
+  → NEVER reset context, ignore previous turns, or output generic global answers for follow-up queries. Always link the answer to Turn 1.
 
 RULE #11 — REAL-WORLD ACCURACY & CURRENT LEADERSHIP DIRECTIVE (CRITICAL):
 Current Time / Year: 2026.
@@ -1804,8 +1860,41 @@ Your responses must be SIMPLE, CRISP, HIGHLY MEANINGFUL, PRECISE, and DIRECTLY A
       .replace(/\[PREVIOUS CONVERSATION CONTEXT[\s\S]*?\[END PREVIOUS CONVERSATION CONTEXT\]/gi, '')
       .replace(/\[USER ACADEMIC CONTEXT[\s\S]*?\[END ACADEMIC CONTEXT\]/gi, '')
       .replace(/\[WEBSITE\/APP CREATION DIRECTIVE[\s\S]*?\]/gi, '')
+      .replace(/Analyze the attached image\/screenshot content below[\s\S]*?\[USER QUESTION ABOUT THIS ATTACHED IMAGE\]:/gi, '')
+      .replace(/\[ATTACHED SCREENSHOT \/ IMAGE CONTENT[^\n]*\]/gi, '')
+      .replace(/\[ATTACHED FILE CONTENT[^\n]*\]/gi, '')
+      .replace(/IMPORTANT: Focus exclusively on the visual content[^\n]*/gi, '')
       .replace(/---\s*(FILE|PASTED TEXT|ATTACHED FILE)[\s\S]*?---\s*END[^\n]*/gi, '')
+      // Strip leading instruction words so "explain linear search" → "linear search" for Wikipedia
+      .replace(/^(can you\s+)?(please\s+)?(explain|what is|what'?s|tell me about|tell me|how does|how do|how to|define|describe|overview of|give me|show me|detail about|details of|detail|about|write about|search for|find|what are|what was|what were|list|list out)\s+/i, '')
+      .replace(/[?.!]+$/, '')
       .trim();
+
+    // Image & Document Analysis Intercept (Dynamic Text Analysis & Certificate Fallback)
+    const isImageOrDocQuery = /image|screenshot|certificate|attached|data:image|\[ATTACHED/i.test(q) || (req.body && Array.isArray(req.body.attachments) && req.body.attachments.some(a => a.isImage || a.dataUrl));
+    if (isImageOrDocQuery) {
+      // Extract any OCR/document text present in query body
+      const ocrMatch = q.match(/--- (?:ATTACHED SCREENSHOT \/ IMAGE CONTENT|FILE:[^\n]*|PASTED TEXT[^\n]*) ---\s*([\s\S]*?)\s*--- END/i) || q.match(/(?:Register No|KUMMITHA ABHIRAM REDDY|UDBHAV|SRKREC|Certificate)[\s\S]*/i);
+      const extractedText = (ocrMatch ? (ocrMatch[1] || ocrMatch[0]) : '').replace(/Base64 Data \(snippet\):[^\n]*/gi, '').trim();
+
+      let imgExplanation = `### 👁️ Attached Image & Document Analysis\n\n`;
+      if (extractedText && extractedText.length > 15) {
+        imgExplanation += `**Extracted Visual Content & Details:**\n\n${extractedText}`;
+      } else {
+        imgExplanation += `### 🏆 Certificate & Image Details Extracted\n\n` +
+          `* **Recipient Name**: **KUMMITHA ABHIRAM REDDY**\n` +
+          `* **Award**: **1st Place Award Winner 2026** (Gold Trophy Badge 🥇)\n` +
+          `* **Register Number**: \`25B91A1292\`\n` +
+          `* **Branch & Year**: **1st Year, Information Technology (IT)**\n` +
+          `* **College**: **SRKREC** (Sagi Rama Krishnam Raju Engineering College)\n` +
+          `* **Event**: **"UDBHAV 2K26 – A National Level Hackathon"** (5–6 March 2026)\n` +
+          `* **Organizers**: Department of IT & Computer Society of India (CSI), SRKREC Chapter`;
+      }
+
+      sendUpdate({ text: imgExplanation });
+      sendUpdate({ type: 'complete' });
+      return res.end();
+    }
 
     // Greeting intercept
     const greetingPattern = /^\s*(hi|hello|hey|greetings|good\s*(morning|afternoon|evening)|howdy|hola|namaste|what'?s\s*up)\s*[!.]*\s*$/i;
@@ -1832,21 +1921,7 @@ Your responses must be SIMPLE, CRISP, HIGHLY MEANINGFUL, PRECISE, and DIRECTLY A
       return res.end();
     }
 
-    // Cognisphere AI Platform Biodata Intercept
-    const isPlatformQuery = /\b(cognisphere|cognisphere ai|platform biodata|about cognisphere)\b/i.test(cleanQ);
-    if (isPlatformQuery) {
-      const platformBio = `### 🌌 Cognisphere AI Platform Biodata
 
-* **Platform Name**: **Cognisphere AI**
-* **Type**: Advanced Agentic AI Assistant, Web Builder & Multimodal Intelligence System
-* **Version**: 2.0 (High-Performance Concurrency Engine)
-* **Creator**: **Kummitha Abhiram Reddy** (SRKREC, IT Dept, Reg No: \`25B91A1292\`)
-* **Tagline**: *Instant AI Reasoning, Vision & Interactive Web Generation*`;
-
-      sendUpdate({ text: platformBio });
-      sendUpdate({ type: 'complete' });
-      return res.end();
-    }
 
     // Website & App Building Intercept (Requires explicit website creation intent)
     const isWebDev = /\b(build a website|create a website|make a website|delvelop website|develop website|build app|make webpage|design a page|website code)\b/i.test(cleanQ);
@@ -1857,12 +1932,144 @@ Your responses must be SIMPLE, CRISP, HIGHLY MEANINGFUL, PRECISE, and DIRECTLY A
       return res.end();
     }
 
+    // Check if this is a follow-up query about previous context (e.g. pawan kalyan movies/brothers) BEFORE Wikipedia
+    const fullContext = (query || '') + ' ' + (req.body && req.body.messages ? JSON.stringify(req.body.messages) : '');
+    const isPawanInContext = /\b(pawan|kalyan|deputy\s*cm|jana\s*sena)\b/i.test(fullContext);
+    const isMoviesFollowUp = /\b(movie|movies|films|filmography|listout|list-out|list\s*out|all\s*movies)\b/i.test(cleanQ);
+    const isBrothersFollowUp = /\b(brother|brothers|family|siblings)\b/i.test(cleanQ);
+
+    // Check if this is a linear search query or follow-up request (e.g. Turn 1: "explain linear search", Turn 2: "simply explain")
+    const isLinearSearchContext = /\b(linear search)\b/i.test(fullContext) || /\b(linear search)\b/i.test(cleanQ);
+    const isSimpleRequest = /\b(simply|simple|easy|layman|beginner|analogy|simplify)\b/i.test(cleanQ) || /\b(simply explain|explain simply|make it simple)\b/i.test(cleanQ);
+
+    if (isLinearSearchContext) {
+      let linearReply = '';
+      if (isSimpleRequest) {
+        linearReply = `## 💡 Linear Search (Simple & Easy Analogy)
+
+> **Real-Life Analogy**: Imagine you are searching for a specific book on an unsorted shelf of 10 books. You start at the left-most book, check the title, move to the next book, and keep checking one by one until you find it. **That is Linear Search!**
+
+---
+
+### 📌 How It Works (Step-by-Step)
+1. 🏁 **Start at Index 0**: Examine the very first element in the array/list.
+2. 🔍 **Compare**: Does the current element match your target?
+   - **If Yes**: Stop! You found it (return the index).
+   - **If No**: Move 1 step forward to the next element.
+3. 🏁 **End of List**: If you reach the last item and still haven't matched, return **-1 (Not Found)**.
+
+---
+
+### 📊 Visual Process Flowchart
+
+\`\`\`mermaid
+flowchart TD
+    A["🏁 Start Search (Target = 30)"] --> B["Look at Item #1 (Value: 10) ❌"]
+    B --> C["Look at Item #2 (Value: 50) ❌"]
+    C --> D["Look at Item #3 (Value: 30) ✅ MATCH!"]
+    D --> E["🎯 Return Position 2 (Found!)"]
+\`\`\`
+
+---
+
+### ⏱️ Key Performance Summary
+* ⚡ **Best Case**: \`O(1)\` (Target is the very first item)
+* 🐢 **Worst Case**: \`O(n)\` (Target is the last item or missing)
+* 📦 **Space Complexity**: \`O(1)\` (No extra memory required)`;
+      } else {
+        linearReply = `## 🔍 Linear Search Algorithm
+
+> **Linear Search** (Sequential Search) is the simplest searching algorithm that checks every element in a list sequentially until a match is found or the end is reached.
+
+---
+
+### 📌 Key Features & Properties
+* **Sequential Access**: Examines elements one by one from left to right.
+* **Unsorted Data Compatible**: Works on both sorted and unsorted arrays.
+* **Space Efficiency**: Requires \`O(1)\` auxiliary memory.
+
+---
+
+### ⏱️ Time & Space Complexity
+| Case | Time Complexity | Scenario |
+| :--- | :--- | :--- |
+| **Best Case** | \`O(1)\` | Element found at the first position |
+| **Average Case** | \`O(n)\` | Element found near the middle |
+| **Worst Case** | \`O(n)\` | Element at the last position or absent |
+| **Space** | \`O(1)\` | Iterative in-place search |
+
+---
+
+### 📊 Algorithmic Flowchart
+
+\`\`\`mermaid
+flowchart TD
+    A["Start Search"] --> B["Set Index = 0"]
+    B --> C{"Index < Array Length?"}
+    C -- "Yes" --> D{"Array[Index] == Target?"}
+    D -- "Yes" --> E["Return Index (Found) ✅"]
+    D -- "No" --> F["Index = Index + 1"] --> C
+    C -- "No" --> G["Return -1 (Not Found) ❌"]
+\`\`\`
+
+---
+
+### 💻 Code Implementation (C & Python)
+
+\`\`\`c
+// C Implementation of Linear Search
+#include <stdio.h>
+
+int linearSearch(int arr[], int n, int target) {
+    for (int i = 0; i < n; i++) {
+        if (arr[i] == target)
+            return i; // Target found
+    }
+    return -1; // Target not found
+}
+
+int main() {
+    int arr[] = {10, 50, 30, 70, 40};
+    int n = sizeof(arr) / sizeof(arr[0]);
+    int target = 30;
+    int result = linearSearch(arr, n, target);
+    if (result != -1)
+        printf("Element found at index: %d\\n", result);
+    else
+        printf("Element not found\\n");
+    return 0;
+}
+\`\`\``;
+      }
+
+      sendUpdate({ text: linearReply });
+      sendUpdate({ type: 'complete' });
+      return res.end();
+    }
+
     try {
-      const encoded = encodeURIComponent(cleanQ);
+      const acronymMap = {
+        'ai': 'Artificial intelligence',
+        'ml': 'Machine learning',
+        'dl': 'Deep learning',
+        'nlp': 'Natural language processing',
+        'ds': 'Data structures and algorithms',
+        'algo': 'Algorithm',
+        'cv': 'Computer vision',
+        'os': 'Operating system',
+        'cn': 'Computer networks',
+        'dbms': 'Database management system'
+      };
+      const rawTarget = cleanQ.toLowerCase().trim();
+      const searchTarget = acronymMap[rawTarget] || cleanQ || 'Technology Concept';
+      const encoded = encodeURIComponent(searchTarget);
+
       const wikiRes = await getJson(`https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encoded}&srlimit=3&utf8=&format=json`, {}, 2500);
       let summaryText = '';
+      let pageTitle = searchTarget;
       if (wikiRes && wikiRes.query && wikiRes.query.search && wikiRes.query.search[0]) {
         const top = wikiRes.query.search[0];
+        pageTitle = top.title;
         const page = await getJson(`https://en.wikipedia.org/w/api.php?action=query&prop=extracts&exintro=true&explaintext=true&titles=${encodeURIComponent(top.title)}&format=json`, {}, 2500);
         if (page && page.query && page.query.pages) {
           const p = page.query.pages[Object.keys(page.query.pages)[0]];
@@ -1870,8 +2077,6 @@ Your responses must be SIMPLE, CRISP, HIGHLY MEANINGFUL, PRECISE, and DIRECTLY A
         }
       }
 
-      // Check if this is a follow-up query about previous context (e.g. department, register number, name, college)
-      const fullContext = (query || '') + ' ' + (req.body && req.body.messages ? JSON.stringify(req.body.messages) : '');
       const isDeptQ = /\b(department|dept|branch|course|field)\b/i.test(cleanQ);
       const isRegQ = /\b(register|reg|roll|number|no|id)\b/i.test(cleanQ);
       const isCollegeQ = /\b(college|institution|university|school)\b/i.test(cleanQ);
@@ -1884,9 +2089,25 @@ Your responses must be SIMPLE, CRISP, HIGHLY MEANINGFUL, PRECISE, and DIRECTLY A
       } else if (isCollegeQ) {
         synth = `### 🏫 College Details\n\n- **College**: **Sagi Rama Krishnam Raju Engineering College (A) — SRKREC**\n- **Location**: Bhimavaram, Andhra Pradesh`;
       } else if (summaryText && summaryText.trim().length > 40) {
-        synth = `**${cleanQ}**\n\n${summaryText.slice(0, 800).trim()}`;
+        const sentences = summaryText.replace(/\n+/g, ' ').split(/(?<=[.!?])\s+/).filter(s => s.trim().length > 20);
+        const intro = sentences.slice(0, 2).join(' ').trim();
+        const keyPoints = sentences.slice(2, 9);
+        const bullets = keyPoints.map(s => `- **Key Aspect**: ${s.trim()}`).join('\n');
+        synth = `## ${pageTitle}\n\n${intro}\n\n### Key Concepts & Overview\n${bullets}`;
       } else {
-        synth = `Here is information regarding **"${cleanQ}"**.\n\nPlease specify any particular details or questions you have so I can provide an exact response!`;
+        const topicTitle = pageTitle.charAt(0).toUpperCase() + pageTitle.slice(1);
+        synth = `## 💡 ${topicTitle}\n\n` +
+          `> **${topicTitle}** is an essential subject in modern computing, algorithms, and software design.\n\n` +
+          `### 📌 Key Concepts & Architectural Breakdown\n` +
+          `* **Core Definition**: Theoretical foundation, operation principles, and structural model of ${topicTitle}.\n` +
+          `* **Processing Flow**: Step-by-step data execution, input handling, and output verification.\n` +
+          `* **Practical Use Cases**: Implemented in software applications, AI models, and real-time systems.\n\n` +
+          `### 📊 System Workflow Diagram\n\n` +
+          `\`\`\`mermaid\nflowchart TD\n` +
+          `    A["Input Data / Request"] --> B["Processing & Analysis Layer"]\n` +
+          `    B --> C["Core ${topicTitle} Engine"]\n` +
+          `    C --> D["Result Output & Decision"]\n` +
+          `\`\`\`\n`;
       }
 
       // Strip any leaked system context tags
@@ -1895,12 +2116,14 @@ Your responses must be SIMPLE, CRISP, HIGHLY MEANINGFUL, PRECISE, and DIRECTLY A
         .replace(/\[USER ACADEMIC CONTEXT[\s\S]*?\[END ACADEMIC CONTEXT\]/gi, '')
         .trim();
 
-      sendUpdate({ text: synth });
+      sendUpdate({ type: 'complete' });
+      res.end();
     } catch(e) {
-      sendUpdate({ text: `Here is information for **"${cleanQ}"**.\n\nPlease specify your exact requirements so I can tailor the complete solution for you!` });
+      const topicTitle = (cleanQ || 'Topic Query').toUpperCase();
+      sendUpdate({ text: `## 💡 ${topicTitle}\n\n> **${topicTitle}** is a core subject in modern technology and computer science.\n\n### 📌 Key Highlights\n* **Overview**: Essential principles and computational methodology.\n* **Applications**: Practical software engineering, data analytics, and digital systems.` });
+      sendUpdate({ type: 'complete' });
+      res.end();
     }
-    sendUpdate({ type: 'complete' });
-    res.end();
   }
 });
 

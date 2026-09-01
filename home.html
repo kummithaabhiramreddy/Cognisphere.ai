@@ -1190,6 +1190,65 @@
     word-break: break-word;
     overflow-wrap: break-word;
     min-width: 0;
+    font-size: 0.95rem;
+    line-height: 1.68;
+    color: var(--text-primary, #e2e8f0);
+  }
+  .msg-text h1, .msg-text h2, .msg-text h3, .msg-text h4 {
+    color: #f8fafc;
+    font-weight: 700;
+    margin-top: 1.3em;
+    margin-bottom: 0.5em;
+    line-height: 1.3;
+    letter-spacing: -0.01em;
+  }
+  .msg-text h1 { font-size: 1.45rem; border-bottom: 1px solid rgba(255,255,255,0.12); padding-bottom: 8px; color: #d97757; }
+  .msg-text h2 { font-size: 1.25rem; color: #e08b6c; border-bottom: 1px solid rgba(255,255,255,0.06); padding-bottom: 6px; }
+  .msg-text h3 { font-size: 1.1rem; color: #f1f5f9; }
+  .msg-text h4 { font-size: 0.98rem; color: #cbd5e1; font-weight: 600; }
+  .msg-text p {
+    margin-bottom: 0.95em;
+    line-height: 1.7;
+    color: #e2e8f0;
+  }
+  .msg-text p:last-child { margin-bottom: 0; }
+  .msg-text ul, .msg-text ol {
+    margin: 0.8em 0 1.1em 1.2em;
+    padding-left: 0.8em;
+  }
+  .msg-text li {
+    margin-bottom: 0.45em;
+    line-height: 1.65;
+    color: #e2e8f0;
+  }
+  .msg-text li strong {
+    color: #ffffff;
+    font-weight: 650;
+  }
+  .msg-text blockquote {
+    margin: 1.1em 0;
+    padding: 12px 18px;
+    background: rgba(217, 119, 87, 0.08);
+    border-left: 4px solid #d97757;
+    border-radius: 0 10px 10px 0;
+    color: #f1f5f9;
+    font-style: normal;
+  }
+  .msg-text blockquote p { margin-bottom: 0; }
+  .msg-text code:not(pre code) {
+    background: rgba(217, 119, 87, 0.15);
+    color: #f6ad55;
+    padding: 2px 7px;
+    border-radius: 6px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.84em;
+    border: 1px solid rgba(217, 119, 87, 0.25);
+  }
+  .msg-text hr {
+    border: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
+    margin: 1.6em 0;
   }
   .msg-text pre {
     white-space: pre;
@@ -5836,7 +5895,14 @@
   }
 
   async function fetchLiveWebResults(query, langCode = '') {
+    // Strip leading instruction words so "explain linear search" → "linear search" for Wikipedia/search
+    const cleanWikiQuery = (q) => (q || '')
+      .replace(/^(can you\s+)?(please\s+)?(explain|what is|what'?s|tell me about|tell me|how does|how do|how to|define|describe|overview of|give me|show me|detail about|details of|detail|about|write about|search for|find|what are|what was|what were|list|list out)\s+/i, '')
+      .replace(/[?.!]+$/g, '')
+      .trim() || q;
+    const wikiQuery = cleanWikiQuery(query);
     const encoded = encodeURIComponent(query);
+    const encodedWiki = encodeURIComponent(wikiQuery);
 
     // 1. Try backend proxy first (fast, reliable, CORS-free, view sorted)
     try {
@@ -5858,7 +5924,7 @@
     // 2. Wikipedia Fallback
     try {
       const wikiSearch = await fetch(
-        `https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encoded}&srlimit=4&utf8=&format=json&origin=*`
+        `https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodedWiki}&srlimit=4&utf8=&format=json&origin=*`
       ).then(r => r.json());
       if (wikiSearch.query && wikiSearch.query.search.length > 0) {
         const top = wikiSearch.query.search[0];
@@ -5909,16 +5975,18 @@
   function videoCardHTML(v) {
     const imgSrc = v.thumbnail || `https://i.ytimg.com/vi/${v.videoId}/mqdefault.jpg`;
     const stars = v.rating !== '—' ? '★'.repeat(Math.round(parseFloat(v.rating)/2)) : '★★★';
-    return `<div class="video-card" data-videoid="${v.videoId||''}" data-title="${v.title.replace(/"/g,'&quot;')}" data-channel="${(v.channel||'').replace(/"/g,'&quot;')}">
+    const safeTitle = escapeHtml(v.title || '');
+    const safeChannel = escapeHtml(v.channel || '');
+    return `<div class="video-card" data-videoid="${escapeHtml(v.videoId||'')}" data-title="${safeTitle}" data-channel="${safeChannel}">
         <div class="video-card-thumb">
-          <img src="${imgSrc}" alt="${v.title}" loading="lazy" onerror="this.style.display='none'">
+          <img src="${imgSrc}" alt="${safeTitle}" loading="lazy" onerror="this.style.display='none'">
           <div class="video-card-play"><div class="video-card-play-btn"><svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg></div></div>
-          ${v.duration ? `<div class="video-card-duration">${v.duration}</div>` : ''}
+          ${v.duration ? `<div class="video-card-duration">${escapeHtml(v.duration)}</div>` : ''}
         </div>
         <div class="video-card-info">
-          <div class="video-card-title">${v.title}</div>
+          <div class="video-card-title">${safeTitle}</div>
           <div class="video-card-meta">
-            <span class="video-card-views"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>${v.views}</span>
+            <span class="video-card-views"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>${escapeHtml(v.views||'')}</span>
             <span class="video-card-rating">${stars}</span>
           </div>
           <span class="yt-direct-btn" style="font-size:0.68rem; color:var(--gold-soft); background:rgba(217,119,87,0.15); border:1px solid rgba(217,119,87,0.3); border-radius:10px; padding:3px 8px; margin-top:6px; display:inline-flex; align-items:center; gap:4px; cursor:pointer;">▶ Play Class</span>
@@ -5939,7 +6007,7 @@
           <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" style="vertical-align:middle; margin-right:4px;"><path d="M12 3L1 9l11 6 9-4.91V17h2V9L12 3zM5 13.18v4L12 21l7-3.82v-4L12 17l-7-3.82z"/></svg>
           Top Classes
         </div>
-        <select class="lang-select" id="videoLangSelect" data-query="${query.replace(/"/g,'&quot;')}">
+        <select class="lang-select" id="videoLangSelect" data-query="${escapeHtml(query)}">
           ${langOptionsHTML}
         </select>
       </div>
@@ -5947,16 +6015,73 @@
     </div>`;
   }
 
+  function buildImageGalleryHTML(images, query) {
+    if (!images || !images.length) return '';
+
+    const seen = new Set();
+    const validImages = images.filter(img => {
+      if (!img || !img.src || seen.has(img.src)) return false;
+      seen.add(img.src);
+      return true;
+    }).slice(0, 6);
+
+    if (!validImages.length) return '';
+
+    const cardsHTML = validImages.map((img, idx) => {
+      const safeSrc = (img.src || '').replace(/'/g, "\\'");
+      const safeAlt = escapeHtml(img.alt || query || `Image ${idx + 1}`);
+      const encUrl = encodeURIComponent(img.src);
+      const encLabel = encodeURIComponent(img.alt || query || `Image ${idx + 1}`);
+
+      return `
+        <div class="gallery-card-item" onclick="openMediaModal({url:decodeURIComponent('${encUrl}'), label:decodeURIComponent('${encLabel}'), isImage:true})" style="flex:0 0 280px; max-width:280px; scroll-snap-align:start; background:#0e1117; border:1px solid rgba(255,255,255,0.12); border-radius:14px; overflow:hidden; cursor:pointer; transition:transform 0.2s ease, border-color 0.2s ease; box-shadow:0 8px 24px rgba(0,0,0,0.4);" onmouseover="this.style.transform='translateY(-3px)'; this.style.borderColor='rgba(217,119,87,0.6)';" onmouseout="this.style.transform='none'; this.style.borderColor='rgba(255,255,255,0.12)';">
+          <div style="position:relative; width:100%; height:160px; background:#05070a; overflow:hidden;">
+            <img src="${img.src}" alt="${safeAlt}" loading="lazy" style="width:100%; height:100%; object-fit:cover; display:block;" onerror="this.closest('.gallery-card-item').style.display='none';" />
+            <div style="position:absolute; inset:0; background:linear-gradient(to top, rgba(0,0,0,0.75) 0%, transparent 60%); pointer-events:none;"></div>
+            <div style="position:absolute; bottom:8px; left:10px; right:10px; font-size:0.75rem; font-weight:600; color:#ffffff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; text-shadow:0 2px 4px rgba(0,0,0,0.8);">
+              🖼️ ${safeAlt}
+            </div>
+          </div>
+          <div style="padding:8px 10px; display:flex; gap:6px; justify-content:center; background:#121620; border-top:1px solid rgba(255,255,255,0.06);" onclick="event.stopPropagation();">
+            <button type="button" onclick="convertImageToFormat('${safeSrc}', 'pdf', '${safeAlt.replace(/'/g, "\\'")}')" style="all:unset; box-sizing:border-box; padding:4px 8px; background:rgba(217,119,87,0.2); border:1px solid rgba(217,119,87,0.4); color:#fff; border-radius:6px; font-size:0.68rem; font-weight:600; cursor:pointer; transition:background 0.15s;" onmouseover="this.style.background='rgba(217,119,87,0.4)';" onmouseout="this.style.background='rgba(217,119,87,0.2)';">📄 PDF</button>
+            <button type="button" onclick="convertImageToFormat('${safeSrc}', 'png', '${safeAlt.replace(/'/g, "\\'")}')" style="all:unset; box-sizing:border-box; padding:4px 8px; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.15); color:#fff; border-radius:6px; font-size:0.68rem; font-weight:600; cursor:pointer; transition:background 0.15s;" onmouseover="this.style.background='rgba(255,255,255,0.18)';" onmouseout="this.style.background='rgba(255,255,255,0.08)';">🖼️ PNG</button>
+            <button type="button" onclick="convertImageToFormat('${safeSrc}', 'jpg', '${safeAlt.replace(/'/g, "\\'")}')" style="all:unset; box-sizing:border-box; padding:4px 8px; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.15); color:#fff; border-radius:6px; font-size:0.68rem; font-weight:600; cursor:pointer; transition:background 0.15s;" onmouseover="this.style.background='rgba(255,255,255,0.18)';" onmouseout="this.style.background='rgba(255,255,255,0.08)';">📷 JPG</button>
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    return `
+      <div class="query-image-gallery-section" style="margin-top:16px; margin-bottom:14px; width:100%;">
+        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; padding:0 2px;">
+          <div style="display:flex; align-items:center; gap:6px; font-size:0.85rem; font-weight:700; color:var(--text-primary); font-family:'Inter',sans-serif;">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--gold);"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+            <span>Visual Gallery & Diagrams</span>
+          </div>
+          <span style="font-size:0.72rem; font-weight:600; color:var(--gold-soft); background:rgba(217,119,87,0.15); border:1px solid rgba(217,119,87,0.3); border-radius:12px; padding:2px 8px; display:inline-flex; align-items:center; gap:4px;">
+            🖼️ ${validImages.length} Images
+          </span>
+        </div>
+        <div class="query-image-gallery-scroll" style="display:flex; gap:12px; overflow-x:auto; scroll-snap-type:x mandatory; padding-bottom:8px; scrollbar-width:thin;">
+          ${cardsHTML}
+        </div>
+      </div>
+    `;
+  }
+
   function buildWebResultHTML(data, query, langCode = '') {
     let html = '';
 
-    // Web bullet points summary removed as per user instruction (no random bullet points at end of answers)
+    // Render Query Image Gallery if images are available
+    if (data && data.images && data.images.length) {
+      html += buildImageGalleryHTML(data.images, query);
+    }
 
     // Compact Class Bar Pill (opens dedicated Classes Page on click)
     if (data && data.videos && data.videos.length) {
       const fullVideoCardsMarkup = buildVideoCardsHTML(data.videos, query, langCode);
       html += `<div class="video-pill-wrap" style="margin-top:12px; margin-bottom:4px; display:inline-flex; align-items:center;">
-        <button type="button" class="open-videos-page-btn" data-query="${query.replace(/"/g,'&quot;')}">
+        <button type="button" class="open-videos-page-btn" data-query="${escapeHtml(query)}">
           <svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor" style="pointer-events:none; vertical-align:middle; margin-right:4px;"><path d="M12 3L1 9l11 6 9-4.91V17h2V9L12 3zM5 13.18v4L12 21l7-3.82v-4L12 17l-7-3.82z"/></svg>
           <span style="pointer-events:none;">Watch ${data.videos.length} Classes (Telugu & English) ➔</span>
         </button>
@@ -5977,6 +6102,7 @@
     let fullQuery = query || '';
     const attList = (msgAttachments && msgAttachments.length) ? msgAttachments : (attachments || []);
     const userQuestion = fullQuery.trim();
+    const decodedSentences = [];
 
     // ── GREETING INTERCEPT (IMMEDIATE) ──
     const isSimpleGreeting = /^\s*(hi|hello|hey|greetings|good\s*(morning|afternoon|evening)|howdy|hola|namaste|what'?s\s*up)\s*[!.]*\s*$/i.test(userQuestion);
@@ -5993,19 +6119,19 @@
       return { text: greetingReply, sources: [], isHtml: false };
     }
 
-    // ── IDENTITY INTERCEPT (NAME & CREATOR) ──
-    const isIdentityQuery = /^\s*(what('?s| is) your name|who are you|who made you|who created you|tell me about yourself|your name|creator of cognisphere)\s*[!.]*\s*$/i.test(userQuestion);
-    if (isIdentityQuery && (!attList || attList.length === 0)) {
-      const identityReply = `I am **Cognisphere AI**, an autonomous AI knowledge and research engine created by **KUMMITHA ABHIRAM REDDY**.\n\n### 🚀 What I Can Do For You:\n- 💡 **Instant Concept Explanations**: Deep, crystal-clear answers across science, technology, mathematics, and research.\n- 💻 **Code Generation & Debugging**: Complete working implementations with syntax highlighting.\n- 📊 **Architecture & Flowcharts**: Interactive top-down Mermaid diagrams and system architectures.\n- 🛡️ **Live Web Verification**: Real-time factual search powered by multi-server AI intelligence.\n\nHow can I help you today?`;
+    // ── NAME ONLY INTERCEPT (IMMEDIATE) ──
+    const isNameQuery = /^\s*(what('?s|\s*is)\s*your\s*name|give\s*(me\s*)?your\s*name|tell\s*(me\s*)?your\s*name|your\s*name)\s*[!.]*\s*$/i.test(userQuestion);
+    if (isNameQuery && (!attList || attList.length === 0)) {
+      const nameReply = `I am **Cognisphere AI**.`;
       if (msgToUpdate) {
-        msgToUpdate.text = identityReply;
+        msgToUpdate.text = nameReply;
         msgToUpdate.pending = false;
         msgToUpdate.status = null;
         if (typeof stopPendingAnimations === 'function') stopPendingAnimations(msgToUpdate);
         if (typeof renderThread === 'function') renderThread(convToUpdate);
         if (typeof setGeneratingState === 'function') setGeneratingState(false);
       }
-      return { text: identityReply, sources: [], isHtml: false };
+      return { text: nameReply, sources: [], isHtml: false };
     }
 
     // ── WEBSITE BUILDING MODE RESTRICTION INTERCEPT ──
@@ -6206,7 +6332,6 @@ Building interactive websites, HTML applications, and frontend UI dashboards is 
       }
 
       // ── DOCUMENT READING: decode file text for AI context
-      const decodedSentences = [];
       attList.forEach((a, idx) => {
         if (a.kind === 'text' && a.content) {
           decodedSentences.push(`--- PASTED TEXT ${idx + 1} ---\n${a.content}\n--- END ---`);
@@ -6292,13 +6417,15 @@ Building interactive websites, HTML applications, and frontend UI dashboards is 
     const searchQuery = query.trim() || (attList.length ? (attList[0].label || 'attached file') : 'general learning');
 
     // Contextualize follow-up web searches if previous subject is clear
+    // Contextualize follow-up web searches by linking Turn 2 to Turn 1 subject
     let liveWebQuery = searchQuery;
     if (structuredTurns.length > 0) {
       const lastUserTurn = [...structuredTurns].reverse().find(t => t.role === 'user');
-      const isFollowUpPattern = /^(list|show|give|tell|what|how|why|when|where|which|who|all|more|his|her|its|their|the)\b/i.test(searchQuery);
-      if (lastUserTurn && isFollowUpPattern && searchQuery.length < 60 && !searchQuery.toLowerCase().includes(lastUserTurn.content.toLowerCase().slice(0, 10))) {
-        const subjectExtract = lastUserTurn.content.replace(/^(who is|what is|tell me about|explain|describe)\s*/i, '').trim();
-        if (subjectExtract && subjectExtract.length < 40) {
+      if (lastUserTurn && lastUserTurn.content) {
+        const cleanLastContent = lastUserTurn.content.replace(/\[(?:PREVIOUS|USER|WEBSITE)[^\]]*\]/gi, '').trim();
+        const subjectExtract = cleanLastContent.replace(/^(who is|what is|tell me about|explain|describe|give|show|list|how to)\s*/i, '').trim();
+        const isFollowUp = searchQuery.length < 80 && !searchQuery.toLowerCase().includes(subjectExtract.toLowerCase().slice(0, 8));
+        if (subjectExtract && isFollowUp) {
           liveWebQuery = `${subjectExtract} ${searchQuery}`;
         }
       }
@@ -6320,6 +6447,8 @@ Building interactive websites, HTML applications, and frontend UI dashboards is 
       text = text.replace(/\[(?:IMAGE|PDF|VIDEO|FILE)[^\]]{0,200}\][\s\S]{0,300}Base64[^\n]*/gi, '');
       // Remove "Base64 (first N chars):" lines
       text = text.replace(/Base64\s*\([^)]+\)\s*:[^\n]*/gi, '');
+      // Remove inline or blockquote source citations from output text
+      text = text.replace(/^(?:>\s*)?(?:📖\s*)?\*?\*?Source\*?\*?\s*:[^\n]*/gmi, '');
       return text.trim();
     }
 
@@ -6330,7 +6459,7 @@ Building interactive websites, HTML applications, and frontend UI dashboards is 
       let webHtml = '';
 
       // Check if this is an identity / creator / biodata query
-      const isIdentityQuery = /\b(explain\s*(about\s*)?your\s*self|what('?s|\s*is)\s*your\s*(name|self)|your name|give me your name|tell me your name|who are you|who made|who created|who owns|who is the owner|who invented|creator|inventor|owner|cognisphere|kummitha|abhiram|biodata)\b/i.test(searchQuery);
+      const isIdentityQuery = /\b(cognisphere\s*biodata|platform\s*biodata|project\s*biodata|creator\s*biodata)\b/i.test(searchQuery) || /^\s*(who\s*are\s*you|what\s*is\s*your\s*name|who\s*created\s*you)\s*[?.]*\s*$/i.test(searchQuery);
 
       const webResultsPromise = isIdentityQuery ? Promise.resolve() : fetchLiveWebResults(liveWebQuery, '').then(data => {
         webHtml = buildWebResultHTML(data, liveWebQuery, '');
@@ -6475,7 +6604,8 @@ Building interactive websites, HTML applications, and frontend UI dashboards is 
                 llmText = `### Attached File Analysis\n\nI have received your attached document/image.\n\n${decodedSentences.join('\n\n')}\n\n*Please specify any targeted questions you have about this content!*`;
               } else {
                 try {
-                  const wikiRes = await fetch(`https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(searchQuery)}&srlimit=1&utf8=&format=json&origin=*`)
+                  const cleanFallbackQ = (searchQuery || '').replace(/^(can you\s+)?(please\s+)?(explain|what is|what'?s|tell me about|tell me|how does|how do|how to|define|describe|overview of|give me|show me|detail about|details of|detail|about|write about|search for|find|what are|what was|what were|list|list out)\s+/i, '').replace(/[?.!]+$/g, '').trim() || searchQuery;
+                  const wikiRes = await fetch(`https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(cleanFallbackQ)}&srlimit=1&utf8=&format=json&origin=*`)
                     .then(r => r.json()).catch(() => null);
                   if (wikiRes && wikiRes.query && wikiRes.query.search && wikiRes.query.search[0]) {
                     const top = wikiRes.query.search[0];
@@ -6484,7 +6614,10 @@ Building interactive websites, HTML applications, and frontend UI dashboards is 
                     if (pageRes && pageRes.query && pageRes.query.pages) {
                       const page = pageRes.query.pages[Object.keys(pageRes.query.pages)[0]];
                       if (page.extract) {
-                        llmText = `### Overview: ${searchQuery}\n\n${page.extract.slice(0, 1000)}\n\n### Key Concepts & Details\n- **Topic**: ${top.title}\n- **Source**: Wikipedia Knowledge Base\n- **Status**: Live Web Verified`;
+                        const sentences = page.extract.split(/(?<=[.!?])\s+/).filter(s => s.length > 20);
+                        const intro = sentences.slice(0, 2).join(' ');
+                        const bullets = sentences.slice(2, 8).map(s => `- ${s}`).join('\n');
+                        llmText = `## ${top.title}\n\n${intro}\n\n### Key Points\n${bullets}`;
                       }
                     }
                   }
@@ -6521,7 +6654,7 @@ Building interactive websites, HTML applications, and frontend UI dashboards is 
       const response = await fetch(`${API_BASE}/api/search-stream`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ query: payloadQuery }),
+        body: JSON.stringify({ query: payloadQuery, messages: structuredTurns }),
         signal: AbortSignal.timeout(60000)
       });
       if (!response.ok) throw new Error('Network error');
@@ -6888,13 +7021,17 @@ Building interactive websites, HTML applications, and frontend UI dashboards is 
 
     const msgAttachments = attachments.map(a => ({
       kind: a.kind,
-      label: a.kind === 'tool' ? a.label : (a.kind === 'text' ? 'Pasted text' : (a.file ? a.file.name : 'Attachment')),
+      label: a.kind === 'tool' ? a.label : (a.kind === 'text' ? 'Pasted text' : (a.file ? a.file.name : (a.label || a.name || 'Attachment'))),
+      name: a.file ? a.file.name : (a.name || a.label || 'Attachment'),
       content: a.kind === 'text' ? a.content : undefined,
       lineCount: a.kind === 'text' ? a.lineCount : undefined,
       url: a.url || (a.file ? URL.createObjectURL(a.file) : null),
-      isImage: a.isImage || false,
-      isVideo: a.isVideo || false,
-      // textContent is kept internally for AI context ONLY — never rendered on screen
+      dataUrl: a.dataUrl || (a.url && a.url.startsWith('data:') ? a.url : null),
+      thumbnail: a.thumbnail || a.url || (a.dataUrl || null),
+      isImage: Boolean(a.isImage || (a.file && a.file.type && a.file.type.startsWith('image/')) || (a.mimeType && a.mimeType.startsWith('image/')) || /\.(png|jpe?g|gif|webp|bmp|svg)$/i.test(a.name || a.label || '')),
+      isVideo: Boolean(a.isVideo),
+      isPdf: Boolean(a.isPdf || (a.mimeType && a.mimeType.includes('pdf')) || /\.(pdf)$/i.test(a.name || a.label || '')),
+      mimeType: a.mimeType || (a.file ? a.file.type : undefined),
       textContent: a.textContent || ''
     }));
     const fileAttachments = msgAttachments.filter(a => a.kind === 'file');
@@ -7128,7 +7265,7 @@ Building interactive websites, HTML applications, and frontend UI dashboards is 
           const thumb = document.createElement('div');
           thumb.className = 'msg-small-card-thumb';
 
-          const isImg = Boolean(a.isImage || a.kind === 'image' || (a.mimeType && a.mimeType.startsWith('image/')) || /\.(png|jpe?g|gif|webp|bmp|svg)$/i.test(a.name || a.label || ''));
+          const isImg = Boolean(a.isImage || a.kind === 'image' || (a.mimeType && a.mimeType.startsWith('image/')) || /\.(png|jpe?g|gif|webp|bmp|svg)$/i.test(a.name || a.label || '') || (a.dataUrl && typeof a.dataUrl === 'string' && a.dataUrl.startsWith('data:image')) || (a.url && typeof a.url === 'string' && (a.url.startsWith('data:image') || a.url.startsWith('blob:'))));
           const imgSrc = a.dataUrl || a.url || a.thumbnail;
           const isPdfFile = Boolean(a.isPdf || (a.mimeType && a.mimeType.includes('pdf')) || /\.(pdf)$/i.test(a.name || a.label || ''));
 
@@ -7224,10 +7361,18 @@ Building interactive websites, HTML applications, and frontend UI dashboards is 
       const textEl = document.createElement('div');
       textEl.className = 'msg-text';
       
-      if (m.isHtml || (m.text && /^[\s\n]*<(div|table|ul|ol|p|section|article|pre|figure|header|main)\b/i.test(m.text.trim()))) {
-        textEl.innerHTML = m.text;
+      let rawText = m.text || '';
+      if (rawText) {
+        // Sanitize any unescaped tags inside HTML data-query or data-title attributes from previously saved messages
+        rawText = rawText.replace(/(data-(?:query|title|channel)=")([^"]*)(")/gi, (match, prefix, val, suffix) => {
+          return prefix + escapeHtml(val.replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"')) + suffix;
+        });
+      }
+
+      if (m.isHtml || (rawText && /^[\s\n]*<(div|table|ul|ol|p|section|article|pre|figure|header|main)\b/i.test(rawText.trim()))) {
+        textEl.innerHTML = rawText;
       } else {
-        textEl.innerHTML = parseMarkdown(m.text || '');
+        textEl.innerHTML = parseMarkdown(rawText);
       }
 
       bubble.appendChild(textEl);
@@ -8419,7 +8564,13 @@ Building interactive websites, HTML applications, and frontend UI dashboards is 
   }
 
   function escapeHtml(s){
-    return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    if (!s) return '';
+    return String(s)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
   }
   function highlightPreviewLine(line){
     let html = escapeHtml(line);
@@ -9050,7 +9201,7 @@ Building interactive websites, HTML applications, and frontend UI dashboards is 
     mediaModalTitle.textContent = fileName;
     mediaModalBody.innerHTML = '';
 
-    const isImageFile = Boolean(att.isImage || att.kind === 'image' || (att.mimeType && att.mimeType.startsWith('image/')) || /\.(png|jpe?g|gif|webp|bmp|svg)$/i.test(fileName));
+    const isImageFile = Boolean(att.isImage || att.kind === 'image' || (att.mimeType && att.mimeType.startsWith('image/')) || /\.(png|jpe?g|gif|webp|bmp|svg)$/i.test(fileName) || (att.dataUrl && typeof att.dataUrl === 'string' && att.dataUrl.startsWith('data:image')) || (att.url && typeof att.url === 'string' && (att.url.startsWith('data:image') || att.url.startsWith('blob:'))));
     const mediaUrl = att.dataUrl || att.url || att.thumbnail;
 
     if (isImageFile && mediaUrl) {
