@@ -1922,8 +1922,8 @@ Your responses must be SIMPLE, CRISP, HIGHLY MEANINGFUL, PRECISE, and DIRECTLY A
       }
     }
 
-    const isImageOrDocQuery = /image|screenshot|certificate|attached|data:image|\[ATTACHED/i.test(q) || (req.body && Array.isArray(req.body.attachments) && req.body.attachments.some(a => a.isImage || a.dataUrl));
-    if (isImageOrDocQuery) {
+    const hasActualImageAttachment = (req.body && Array.isArray(req.body.attachments) && req.body.attachments.some(a => (a.isImage || (a.dataUrl && typeof a.dataUrl === 'string' && a.dataUrl.startsWith('data:image'))))) || /--- ATTACHED SCREENSHOT \/ IMAGE CONTENT ---/i.test(q);
+    if (hasActualImageAttachment) {
       const userPrompt = cleanUserQuery || 'your attached file/image';
       let imgExplanation = `### 👁️ Image & Document Analysis\n\nI have received ${userPrompt}. Please specify what visual elements, code, text, or data inside this image you would like me to analyze!`;
       sendUpdate({ text: imgExplanation });
