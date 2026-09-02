@@ -1,0 +1,52 @@
+{
+  "domain_id": 5,
+  "domain": "Business",
+  "description": "The organization, management, and operation of commercial enterprises to produce goods, services, and value.",
+  "subdomain_count": 11,
+  "subdomains": [
+    {
+      "name": "Finance",
+      "description": "Management of money, investments, capital, and financial risk."
+    },
+    {
+      "name": "Accounting",
+      "description": "Recording, summarizing, and reporting financial transactions of an organization."
+    },
+    {
+      "name": "Marketing",
+      "description": "Strategies to promote, price, and distribute products or services to customers."
+    },
+    {
+      "name": "Sales",
+      "description": "The process of engaging prospects and converting them into paying customers."
+    },
+    {
+      "name": "Entrepreneurship",
+      "description": "Creating and scaling new business ventures, often under uncertainty and risk."
+    },
+    {
+      "name": "Management",
+      "description": "Planning, organizing, and leading resources to achieve organizational goals."
+    },
+    {
+      "name": "HR",
+      "description": "Human Resources handles recruitment, training, compensation, and employee relations."
+    },
+    {
+      "name": "Supply Chain",
+      "description": "Coordinates the flow of goods, information, and finances from raw materials to end customer."
+    },
+    {
+      "name": "Economics",
+      "description": "Studies production, distribution, and consumption of goods and services."
+    },
+    {
+      "name": "Banking",
+      "description": "Financial institutions that manage deposits, loans, and payment systems."
+    },
+    {
+      "name": "Investment",
+      "description": "Allocating capital into assets with the expectation of generating returns."
+    }
+  ]
+}

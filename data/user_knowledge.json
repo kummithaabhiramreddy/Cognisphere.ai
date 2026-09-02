@@ -1,0 +1,50 @@
+{
+  "id": "user_knowledge",
+  "domain": "User Knowledge",
+  "description": "Knowledge contributed, curated, and verified by individual users and communities.",
+  "subdomains": [
+    {
+      "name": "Personal Notes",
+      "description": "Private user-generated notes and records stored within the system.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "Community Contributions",
+      "description": "Knowledge submitted collaboratively by a community of users.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "Local Knowledge",
+      "description": "Information specific to a particular locality, culture, or region.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "Project Documents",
+      "description": "Documents and records associated with specific user projects.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "Expert Knowledge",
+      "description": "Specialized knowledge contributed or validated by domain experts.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "Verified User Contributions",
+      "description": "User-submitted content that has passed a verification or fact-check process.",
+      "status": "overview",
+      "expandable": true
+    }
+  ],
+  "meta": {
+    "version": 1,
+    "last_updated": "2026-07-11",
+    "detail_level": "brief_overview",
+    "extensible": true,
+    "notes": "This file is a seed/overview record. Each subdomain entry is designed to be expanded with deeper structured knowledge (facts, definitions, key figures, sub-subtopics, sources) over time."
+  }
+}

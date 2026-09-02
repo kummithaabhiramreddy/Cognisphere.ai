@@ -1,0 +1,56 @@
+{
+  "domain_id": 4,
+  "domain": "Medicine & Healthcare",
+  "description": "The science and practice of diagnosing, treating, and preventing disease, and maintaining human health.",
+  "subdomain_count": 12,
+  "subdomains": [
+    {
+      "name": "General Medicine",
+      "description": "Diagnosis and non-surgical treatment of a broad range of adult illnesses."
+    },
+    {
+      "name": "Surgery",
+      "description": "Operative procedures to treat injuries, diseases, and deformities of the body."
+    },
+    {
+      "name": "Cardiology",
+      "description": "Specializes in diagnosis and treatment of diseases of the heart and blood vessels."
+    },
+    {
+      "name": "Neurology",
+      "description": "Focuses on disorders of the brain, spinal cord, and nervous system."
+    },
+    {
+      "name": "Pediatrics",
+      "description": "Medical care for infants, children, and adolescents."
+    },
+    {
+      "name": "Oncology",
+      "description": "Diagnosis and treatment of cancer, including chemotherapy, radiation, and surgery."
+    },
+    {
+      "name": "Dentistry",
+      "description": "Diagnosis, treatment, and prevention of diseases and conditions of the oral cavity."
+    },
+    {
+      "name": "Nursing",
+      "description": "Patient care, health promotion, and support across clinical settings."
+    },
+    {
+      "name": "Pharmacy",
+      "description": "The science of preparing, dispensing, and understanding the effects of medications."
+    },
+    {
+      "name": "Mental Health",
+      "description": "Diagnosis and treatment of psychological and psychiatric conditions."
+    },
+    {
+      "name": "Nutrition",
+      "description": "The study of how food and diet affect health and bodily function."
+    },
+    {
+      "name": "Public Health",
+      "description": "Protects and improves health at the population level through policy and prevention."
+    }
+  ]
+}

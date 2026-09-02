@@ -1,0 +1,48 @@
+{
+  "domain_id": 17,
+  "domain": "Industry",
+  "description": "Sectors involved in the large-scale production of goods and services.",
+  "subdomain_count": 10,
+  "subdomains": [
+    {
+      "name": "Manufacturing",
+      "description": "The production of goods through machinery, labor, and industrial processes."
+    },
+    {
+      "name": "Construction",
+      "description": "The process of building infrastructure, homes, and commercial structures."
+    },
+    {
+      "name": "Automotive",
+      "description": "Design, manufacturing, and sale of vehicles and related technology."
+    },
+    {
+      "name": "Aviation",
+      "description": "The design, operation, and regulation of aircraft and air travel."
+    },
+    {
+      "name": "Shipping",
+      "description": "Transport of goods via sea and the logistics of maritime trade."
+    },
+    {
+      "name": "Textile",
+      "description": "Production of fabric and clothing materials from natural or synthetic fibers."
+    },
+    {
+      "name": "Pharma",
+      "description": "Research, development, and manufacturing of pharmaceutical drugs."
+    },
+    {
+      "name": "Energy",
+      "description": "Production and distribution of power from fossil fuels, nuclear, and renewables."
+    },
+    {
+      "name": "Mining",
+      "description": "Extraction of valuable minerals and materials from the earth."
+    },
+    {
+      "name": "Telecom",
+      "description": "Infrastructure and services enabling voice, data, and internet communication."
+    }
+  ]
+}

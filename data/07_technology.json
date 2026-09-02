@@ -1,0 +1,52 @@
+{
+  "domain_id": 7,
+  "domain": "Technology",
+  "description": "The application of scientific knowledge for practical purposes, especially in computing, communication, and digital systems.",
+  "subdomain_count": 11,
+  "subdomains": [
+    {
+      "name": "Software",
+      "description": "Programs and applications that run on computing devices to perform tasks."
+    },
+    {
+      "name": "Hardware",
+      "description": "Physical components of computing devices such as processors, memory, and peripherals."
+    },
+    {
+      "name": "Cloud Computing",
+      "description": "On-demand delivery of computing resources like storage and processing over the internet."
+    },
+    {
+      "name": "Cybersecurity",
+      "description": "Protecting systems, networks, and data from digital attacks and unauthorized access."
+    },
+    {
+      "name": "Networking",
+      "description": "Connecting computers and devices to share resources and communicate."
+    },
+    {
+      "name": "IoT",
+      "description": "Internet of Things connects physical devices to the internet for data exchange and automation."
+    },
+    {
+      "name": "Blockchain",
+      "description": "A distributed, tamper-resistant ledger technology underlying cryptocurrencies and smart contracts."
+    },
+    {
+      "name": "Quantum Computing",
+      "description": "Computing that uses quantum mechanical phenomena to process information beyond classical limits."
+    },
+    {
+      "name": "Data Science",
+      "description": "Extracting insights and knowledge from structured and unstructured data."
+    },
+    {
+      "name": "Web Development",
+      "description": "Building and maintaining websites and web applications."
+    },
+    {
+      "name": "Mobile Development",
+      "description": "Creating applications for smartphones and tablets across platforms."
+    }
+  ]
+}

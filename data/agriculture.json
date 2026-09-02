@@ -1,0 +1,62 @@
+{
+  "id": "agriculture",
+  "domain": "Agriculture",
+  "description": "The practice of cultivating land, raising crops, and rearing animals for food and other products.",
+  "subdomains": [
+    {
+      "name": "Crops",
+      "description": "Cultivation of plants grown for food, fiber, or other agricultural products.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "Irrigation",
+      "description": "Artificial application of water to land to assist crop production.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "Fertilizers",
+      "description": "Substances applied to soil to supply nutrients essential for plant growth.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "Organic Farming",
+      "description": "Agricultural production without synthetic pesticides or fertilizers.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "Livestock",
+      "description": "Raising of domesticated animals for food, labor, or other products.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "Fisheries",
+      "description": "Management and harvesting of fish and other aquatic resources.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "Dairy",
+      "description": "Production and processing of milk and milk-based products.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "Food Processing",
+      "description": "Transformation of raw agricultural products into consumable food products.",
+      "status": "overview",
+      "expandable": true
+    }
+  ],
+  "meta": {
+    "version": 1,
+    "last_updated": "2026-07-11",
+    "detail_level": "brief_overview",
+    "extensible": true,
+    "notes": "This file is a seed/overview record. Each subdomain entry is designed to be expanded with deeper structured knowledge (facts, definitions, key figures, sub-subtopics, sources) over time."
+  }
+}

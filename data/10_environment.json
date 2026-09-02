@@ -1,0 +1,36 @@
+{
+  "domain_id": 10,
+  "domain": "Environment",
+  "description": "The study and protection of the natural world, ecosystems, and the sustainable use of resources.",
+  "subdomain_count": 7,
+  "subdomains": [
+    {
+      "name": "Climate Change",
+      "description": "Long-term shifts in global temperature and weather patterns driven largely by human activity."
+    },
+    {
+      "name": "Renewable Energy",
+      "description": "Energy from naturally replenishing sources like solar, wind, and hydro power."
+    },
+    {
+      "name": "Pollution",
+      "description": "Contamination of air, water, or land that causes harm to health and ecosystems."
+    },
+    {
+      "name": "Wildlife",
+      "description": "Conservation and study of wild animal species and their habitats."
+    },
+    {
+      "name": "Forestry",
+      "description": "Management and conservation of forests and woodland resources."
+    },
+    {
+      "name": "Sustainability",
+      "description": "Practices that meet present needs without compromising future generations' resources."
+    },
+    {
+      "name": "Disaster Management",
+      "description": "Planning and response strategies for natural and man-made disasters."
+    }
+  ]
+}

@@ -1,0 +1,56 @@
+{
+  "id": "education",
+  "domain": "Education",
+  "description": "The process and institutions involved in facilitating learning, knowledge, and skill acquisition.",
+  "subdomains": [
+    {
+      "name": "School Education",
+      "description": "Formal education provided at the primary and secondary school level.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "Higher Education",
+      "description": "Post-secondary education provided by colleges, universities, and institutes.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "Online Learning",
+      "description": "Education delivered through digital platforms and remote instruction.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "Skill Development",
+      "description": "Training programs aimed at building practical, job-relevant competencies.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "Research",
+      "description": "Systematic investigation to establish facts and reach new conclusions.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "Competitive Exams",
+      "description": "Standardized tests used for selection into jobs, courses, or institutions.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "Certifications",
+      "description": "Formal credentials verifying proficiency in a specific skill or subject.",
+      "status": "overview",
+      "expandable": true
+    }
+  ],
+  "meta": {
+    "version": 1,
+    "last_updated": "2026-07-11",
+    "detail_level": "brief_overview",
+    "extensible": true,
+    "notes": "This file is a seed/overview record. Each subdomain entry is designed to be expanded with deeper structured knowledge (facts, definitions, key figures, sub-subtopics, sources) over time."
+  }
+}

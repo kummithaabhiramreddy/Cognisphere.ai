@@ -1,0 +1,28 @@
+{
+  "domain_id": 19,
+  "domain": "Religion & Culture",
+  "description": "Belief systems, traditions, and cultural practices that shape communities and identities.",
+  "subdomain_count": 5,
+  "subdomains": [
+    {
+      "name": "Religions",
+      "description": "Organized systems of belief, worship, and moral guidance practiced worldwide."
+    },
+    {
+      "name": "Festivals",
+      "description": "Celebratory events rooted in cultural, religious, or seasonal traditions."
+    },
+    {
+      "name": "Traditions",
+      "description": "Customs and practices passed down through generations within a community."
+    },
+    {
+      "name": "Cultural Heritage",
+      "description": "Tangible and intangible legacies of a society, including monuments and customs."
+    },
+    {
+      "name": "Archaeology",
+      "description": "The study of human history through excavation and analysis of artifacts."
+    }
+  ]
+}

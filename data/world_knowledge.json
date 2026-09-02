@@ -1,0 +1,62 @@
+{
+  "id": "world_knowledge",
+  "domain": "World Knowledge",
+  "description": "General reference knowledge about the world's countries, systems, and current state.",
+  "subdomains": [
+    {
+      "name": "Countries",
+      "description": "Sovereign nations and their political, geographic, and demographic profiles.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "Cities",
+      "description": "Major urban centers and their characteristics, history, and significance.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "Population",
+      "description": "Demographic data describing the size and composition of human populations.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "Economy",
+      "description": "The state and structure of production, trade, and wealth within a region.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "Geography",
+      "description": "Physical and human features of Earth's surface and regions.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "Organizations",
+      "description": "Governmental, non-governmental, and international bodies and institutions.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "Global Events",
+      "description": "Significant occurrences with international impact or attention.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "International Statistics",
+      "description": "Quantitative data used to compare and analyze countries and regions.",
+      "status": "overview",
+      "expandable": true
+    }
+  ],
+  "meta": {
+    "version": 1,
+    "last_updated": "2026-07-11",
+    "detail_level": "brief_overview",
+    "extensible": true,
+    "notes": "This file is a seed/overview record. Each subdomain entry is designed to be expanded with deeper structured knowledge (facts, definitions, key figures, sub-subtopics, sources) over time."
+  }
+}

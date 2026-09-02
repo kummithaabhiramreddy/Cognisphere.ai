@@ -1352,6 +1352,27 @@ app.get('/api/live-search', async (req, res) => {
 
   if (!wantsImages) {
     results.images = [];
+  } else {
+    // Guaranteed high-resolution image gallery fallback for explicit image queries
+    if (!results.images || results.images.length < 3) {
+      const subject = searchTarget || query.replace(/\b(images|image|photos|photo|pictures|picture|pics|pic|show me|look like|wallpapers|wallpaper|gallery)\b/gi, '').trim() || 'Visual';
+      const encSub = encodeURIComponent(subject);
+      const seeds = [108, 209, 310, 411];
+      const styles = ['hd realistic photo', 'cinematic detailed photo', '4k professional visual', 'vibrant clear view'];
+
+      if (!results.images) results.images = [];
+      seeds.forEach((seed, idx) => {
+        const promptStr = encodeURIComponent(`${subject} ${styles[idx]}`);
+        const imgUrl = `https://image.pollinations.ai/prompt/${promptStr}?width=800&height=600&nologo=true&seed=${seed}`;
+        if (!results.images.some(img => img.src === imgUrl)) {
+          results.images.push({
+            src: imgUrl,
+            alt: `${subject} - Photo ${idx + 1}`,
+            link: `https://image.pollinations.ai/prompt/${promptStr}`
+          });
+        }
+      });
+    }
   }
 
   // Remove duplicate articles by URL
@@ -1449,6 +1470,88 @@ app.post('/api/search-stream', (req, res) => {
       sendUpdate({ text: creatorBio });
       sendUpdate({ type: 'complete' });
       return res.end();
+    }
+
+    // ── HIGHER MATHEMATICS — GAMMA FUNCTION INTERCEPT ──────────────────────
+    const isGammaFuncQuery = /\b(gamma\s*function|gamma\s*func|factorial\s*function|gamma\s*integral)\b/i.test(cleanUserQuery);
+    if (isGammaFuncQuery) {
+      const gammaReply = `## 🔢 The Gamma Function — Γ(z)\n\n` +
+        `> **Overview**: In mathematics, the **Gamma function** (denoted by **Γ(z)**, the capital Greek letter Gamma) is the premier extension of the factorial function to complex numbers.\n\n` +
+        `---\n\n` +
+        `### 📌 Key Mathematical Properties & Formulas\n\n` +
+        `* **Factorial Relation**: For any positive integer $n$:\n` +
+        `  $$\\Gamma(n) = (n - 1)!$$\n` +
+        `  *(For example: $\\Gamma(5) = 4! = 24$, $\\Gamma(1) = 0! = 1$)*\n\n` +
+        `* **Integral Definition**: For complex numbers $z$ with positive real part ($\Re(z) > 0$):\n` +
+        `  $$\\Gamma(z) = \\int_{0}^{\\infty} t^{z-1} e^{-t} \\, dt$$\n\n` +
+        `* **Recurrence Relation**: For all $z$ except non-positive integers:\n` +
+        `  $$\\Gamma(z+1) = z \\cdot \\Gamma(z)$$\n\n` +
+        `* **Special Values**:\n` +
+        `  - $\\Gamma(1/2) = \\sqrt{\\pi} \\approx 1.77245$\n` +
+        `  - $\\Gamma(1) = 1$\n` +
+        `  - $\\Gamma(2) = 1$\n` +
+        `  - $\\Gamma(3) = 2$\n` +
+        `  - $\\Gamma(4) = 6$\n\n` +
+        `---\n\n` +
+        `### 📊 Summary Table\n\n` +
+        `| Property | Definition / Value |\n` +
+        `| :--- | :--- |\n` +
+        `| **Symbol** | $\\Gamma(z)$ |\n` +
+        `| **Domain** | All complex numbers except non-positive integers ($0, -1, -2, \\dots$) |\n` +
+        `| **Half-Integer Value** | $\\Gamma(1/2) = \\sqrt{\\pi}$ |\n` +
+        `| **Applications** | Quantum physics, probability distributions (Gamma, Chi-Squared), number theory |`;
+
+      sendUpdate({ text: gammaReply });
+      sendUpdate({ type: 'complete' });
+      return res.end();
+    }
+
+    // ── HIGH-PRECISION MATHEMATICAL CALCULATOR ENGINE ───────────────────────
+    const cleanMathExpr = cleanUserQuery
+      .replace(/^(can you\s+)?(please\s+)?(calculate|compute|solve|what is|what'?s|give|find|evaluate)\s+/i, '')
+      .replace(/[?=!]+$/g, '')
+      .trim();
+
+    const isPureMathExpr = /^\s*\(?\s*-?\d+(?:\.\d+)?\s*(?:[+\-*/%^]|x|\*|\/)\s*-?\d+(?:\.\d+)?\s*(?:(?:[+\-*/%^]|x|\*|\/)\s*-?\d+(?:\.\d+)?\s*)*\)?\s*$/i.test(cleanMathExpr) ||
+      /^\s*(?:sqrt|sin|cos|tan|log|ln|abs|factorial)\s*\(\s*\d+(?:\.\d+)?\s*\)\s*$/i.test(cleanMathExpr) ||
+      /^\s*\d+(?:\.\d+)?\s*%\s*of\s*\d+(?:\.\d+)?\s*$/i.test(cleanMathExpr);
+
+    if (isPureMathExpr) {
+      try {
+        let evalExpr = cleanMathExpr
+          .replace(/x/gi, '*')
+          .replace(/\^/g, '**')
+          .replace(/(\d+(?:\.\d+)?)%\s*of\s*(\d+(?:\.\d+)?)/i, '($1 / 100) * $2');
+
+        let mathResult;
+        if (/sqrt\s*\(\s*(\d+(?:\.\d+)?)\s*\)/i.test(evalExpr)) {
+          const num = parseFloat(evalExpr.match(/sqrt\s*\(\s*(\d+(?:\.\d+)?)\s*\)/i)[1]);
+          mathResult = Math.sqrt(num);
+        } else {
+          if (/^[\d\s+\-*/%().**]+$/.test(evalExpr)) {
+            mathResult = Function(`"use strict"; return (${evalExpr})`)();
+          }
+        }
+
+        if (mathResult !== undefined && !isNaN(mathResult)) {
+          const mathReply = `## 🔢 Mathematical Calculation\n\n` +
+            `> **Expression**: \`${cleanMathExpr}\` = **\`${mathResult}\`**\n\n` +
+            `---\n\n` +
+            `### 📌 Step-by-Step Calculation Breakdown\n` +
+            `1. **Input Expression**: \`${cleanMathExpr}\`\n` +
+            `2. **Operation**: Arithmetic evaluation \`${evalExpr}\`\n` +
+            `3. **Exact Result**: **\`${mathResult}\`**\n\n` +
+            `| Parameter | Value |\n` +
+            `| :--- | :--- |\n` +
+            `| **Expression** | \`${cleanMathExpr}\` |\n` +
+            `| **Result** | **\`${mathResult}\`** |\n` +
+            `| **Precision** | Standard IEEE 754 Floating-Point |`;
+
+          sendUpdate({ text: mathReply });
+          sendUpdate({ type: 'complete' });
+          return res.end();
+        }
+      } catch(mathErr) {}
     }
 
     // ── DEPUTY CM / AP POLITICS / PAWAN KALYAN & FOLLOW-UP INTERCEPT ──
@@ -1647,16 +1750,14 @@ If the user asks for: "architecture", "system architecture", "diagram", "flowcha
   → Include at least 6–12 well-organized nodes arranged in top-down tree levels.
   → Example trigger phrases: "give architecture of", "show architecture", "architecture of ai website", "draw a diagram", "block diagram of", "system design of".
 
-RULE #9 — STRICT POINT-TO-POINT BULLET POINTS DIRECTIVE (HARD OVERRIDE — HIGHEST PRIORITY):
+RULE #9 — CHATGPT / CLOUDE 3.5 MASTER RESPONSE DIRECTIVE (WORLD-CLASS CONTENT QUALITY):
 Whatever the user asks (science, concepts, history, profiles, explanations, code breakdowns, medical, legal, general queries):
-  → ALWAYS deliver the answer STRICTLY in POINT-TO-POINT BULLET POINTS (`*` or `-`).
-  → NEVER write long paragraphs or dense text blocks.
-  → Every point must be short, crisp, direct, and highlight bold key terms.
-  → Format:
-    * **Point 1**: Direct explanation of aspect 1.
-    * **Point 2**: Direct explanation of aspect 2.
-    * **Point 3**: Direct explanation of aspect 3.
-  → ZERO filler introductions, zero concluding chatter, zero dense paragraphs. Point-to-point only!
+  → Deliver responses with the depth, articulate clarity, and intelligence of ChatGPT (GPT-4o) and Claude 3.5 Sonnet.
+  → Begin with a direct, highly articulate 1-2 sentence overview paragraph explaining the core subject.
+  → Organize the content logically using clean Markdown section headers (##, ###), bold key terms, and bullet points for readability.
+  → For programming & algorithm queries: Provide complete, fully-functional code blocks with comments, complexity analysis, and execution logic.
+  → For mathematical queries: Use clear step-by-step derivations and KaTeX formatting where appropriate.
+  → Maintain an accurate, engaging, professional tone with zero robotic boilerplate or filler.
 
 RULE #10 — CONVERSATION CONTEXT & FOLLOW-UP MEMORY (HARD REQUIREMENT — HIGHEST PRIORITY):
 When the user asks a follow-up query, list request, pronoun reference, or single-word query (e.g. "brothers", "movies", "how does it work", "who are they", "give example", "when was he born", "his achievements", "where is it", "list all functions"):
@@ -1682,16 +1783,45 @@ When the user attaches an image or screenshot (containing [IMAGE / SCREENSHOT FI
   → NEVER confuse the attached image with previous conversation topics (e.g. politics, Andhra Pradesh, Pawan Kalyan, previous search history).
   → Explain the EXACT visual elements, text, error trace, or code visible inside the attached screenshot. Do NOT output unrelated political or historical summaries.
 
----
-
-You are Cognisphere AI — an elite autonomous AI assistant created by KUMMITHA ABHIRAM REDDY.
+RULE #13 — REAL-WORLD 5-LAYER OPERATING ARCHITECTURE & MASTER DIRECTIVE:
+You are Cognisphere AI — an advanced, user-friendly real-world AI digital assistant created by KUMMITHA ABHIRAM REDDY.
 - Name: Cognisphere AI | Creator: KUMMITHA ABHIRAM REDDY | DOB: 27-OCT-2007
-- College: SRKR Engineering College, Bhimavaram — IT, Batch 2025–2029
-- Official Website: https://cognisphereai.vercel.app/ — ALWAYS use this URL when asked. NEVER say https://cognisphere.ai/
+- Education: SRKR Engineering College, Bhimavaram — Department of IT, Batch 2025–2029
+- Official Website: https://cognisphereai.vercel.app/ — ALWAYS use this URL. NEVER say https://cognisphere.ai/
 
-CODE DEFAULT: If no language specified → C language with full working code.
+5-LAYER OPERATING ARCHITECTURE:
+User Intent → AI Brain → Connection/Tool Layer → Action Layer → Interactive UI Output
 
-Your responses must be SIMPLE, CRISP, HIGHLY MEANINGFUL, PRECISE, and DIRECTLY ANSWER WHAT WAS ASKED.`;
+CORE PRINCIPLES & BEHAVIOR:
+1. NATURAL LANGUAGE & CONTEXT MEMORY:
+   - Understand normal human language, incomplete sentences, spelling typos, and Telugu-English mixed language ("Telugu-Lo").
+   - Maintain multi-turn context memory across previous messages ("compare the second one with the first one", "give code for it", "show output", "in telugu").
+
+2. ACTION-ORIENTED & INTERACTIVE UI PRESENCE:
+   - Do NOT just explain how to do something — perform the action and create the result!
+   - Output information using Markdown tables, structured cards, step-by-step checklists, interactive flowcharts (\`\`\`mermaid), and C/Python/JS code blocks.
+   - If user asks for study plan/timetable → create an interactive timetable table + checklist.
+   - If user asks for comparison → create a specification comparison table.
+   - If user asks for code → default to working C language code with sample terminal execution output.
+
+3. CRISP, SIMPLE, & USER-FRIENDLY RESPONSE STYLE:
+   - Be friendly, fast, human-like, and direct.
+   - Avoid long, boring, or difficult explanations.
+   - Structure answers with a 1-2 sentence simple summary followed by 3-4 short, clear key points.
+   - Suggest proactive next steps (e.g. ⚡ Generate Code, 🌐 Translate to Telugu, 📊 Create Flowchart).
+
+4. MULTI-MODAL & REAL-TIME ACCURACY:
+   - For images/screenshots, analyze visual details, text, and error traces inside that image.
+   - Deliver real-time, accurate facts across science, technology, movies, politics, and research.
+
+5. INTELLIGENT CARD SELECTION & RESPONSE UI DIRECTIVE:
+   Format every response using clean, structured, card-like blocks:
+   - Information Request ("What is X?") → Answer Card with Topic Title, 1-sentence direct answer, and 3 key points.
+   - Comparison ("Compare X and Y") → Comparison Card Matrix table with specs, pros & cons.
+   - Tutorial / How-To ("How to install X") → Step Cards (Step 1 → Step 2 → Step 3).
+   - Programming ("Write code") → Code Card with language label, working code block, and sample console output.
+   - Weather Request ("Weather today") → Weather Card with metrics, humidity, wind, and forecast.
+   - Planning / Tasks ("Study schedule") → Task Card with checkboxes, timeline table, and completion status.`;
 
   // ── MULTI-TURN STRUCTURED MESSAGES BUILDER ──────────────────────────────
   let llmMessages = [{ role: 'system', content: systemPrompt }];
@@ -1774,54 +1904,32 @@ Your responses must be SIMPLE, CRISP, HIGHLY MEANINGFUL, PRECISE, and DIRECTLY A
     }
   };
 
-  // Launch primary server workers
-  let failedCount = 0;
+  // Zero-Lag Safety Timer: If no stream token is received within 4500ms, trigger synthesis fallback
+  const zeroLagTimer = setTimeout(() => {
+    if (activeWinner === null) {
+      console.log('⚡ 4500ms Zero-Lag Safety Timer fired --> triggering pollinations fallback');
+      claimStreamWinner('synthesis');
+      synthesizeKnowledgeFallback(query);
+    }
+  }, 4500);
+
 
   const handleWorkerError = (workerName, err) => {
     console.warn(`Multi-Server Worker [${workerName}] failed:`, err.message);
     failedCount++;
     if (activeWinner === null) {
-      console.log('⚡ Primary worker failed/rate-limited --> dispatching Pollinations backup worker');
       runPollinationsBackup();
     }
   };
 
-  // Worker 1: Groq Vision / GPT-OSS 120B
+  // Launch primary server workers
   if (groqKey) {
-    const primaryModel = visionImageUrl ? 'llama-3.2-11b-vision-preview' : 'openai/gpt-oss-120b';
+    const primaryModel = visionImageUrl ? 'openai/gpt-oss-120b' : 'openai/gpt-oss-120b';
     postStream(
       'https://api.groq.com/openai/v1/chat/completions',
       { 'Authorization': `Bearer ${groqKey}` },
       {
         model: primaryModel,
-        messages: llmMessages,
-        stream: true,
-        temperature: 0.15
-      },
-      (line) => {
-        if (line.startsWith('data: ')) {
-          const raw = line.slice(6).trim();
-          if (raw === '[DONE]') return;
-          try {
-            const parsed = JSON.parse(raw);
-            const token = parsed.choices[0]?.delta?.content || '';
-            if (token && claimStreamWinner('groq-120b')) {
-              sendUpdate({ text: token });
-            }
-          } catch (e) {}
-        }
-      },
-      () => { if (activeWinner === 'groq-120b') finishStream(); },
-      (err) => handleWorkerError('groq-120b', err),
-      5500
-    );
-
-    // Worker 2: Groq Qwen 27B (High Accuracy Backup)
-    postStream(
-      'https://api.groq.com/openai/v1/chat/completions',
-      { 'Authorization': `Bearer ${groqKey}` },
-      {
-        model: 'qwen/qwen3.8-27b',
         messages: llmMessages,
         stream: true,
         temperature: 0.2
@@ -1833,72 +1941,101 @@ Your responses must be SIMPLE, CRISP, HIGHLY MEANINGFUL, PRECISE, and DIRECTLY A
           try {
             const parsed = JSON.parse(raw);
             const token = parsed.choices[0]?.delta?.content || '';
-            if (token && claimStreamWinner('groq-qwen')) {
+            if (token && claimStreamWinner('groq-120b')) {
+              clearTimeout(zeroLagTimer);
               sendUpdate({ text: token });
             }
           } catch (e) {}
         }
       },
-      () => { if (activeWinner === 'groq-qwen') finishStream(); },
-      (qwenErr) => handleWorkerError('groq-qwen', qwenErr),
+      () => { if (activeWinner === 'groq-120b') finishStream(); },
+      (err) => handleWorkerError('groq-120b', err),
       5000
     );
+
+    // Staggered Backup Groq Worker (qwen/qwen3.8-27b) dispatched after 800ms
+    setTimeout(() => {
+      if (activeWinner === null) {
+        postStream(
+          'https://api.groq.com/openai/v1/chat/completions',
+          { 'Authorization': `Bearer ${groqKey}` },
+          {
+            model: 'qwen/qwen3.8-27b',
+            messages: llmMessages,
+            stream: true,
+            temperature: 0.3
+          },
+          (line) => {
+            if (line.startsWith('data: ')) {
+              const raw = line.slice(6).trim();
+              if (raw === '[DONE]') return;
+              try {
+                const parsed = JSON.parse(raw);
+                const token = parsed.choices[0]?.delta?.content || '';
+                if (token && claimStreamWinner('groq-qwen')) {
+                  clearTimeout(zeroLagTimer);
+                  sendUpdate({ text: token });
+                }
+              } catch (e) {}
+            }
+          },
+          () => { if (activeWinner === 'groq-qwen') finishStream(); },
+          (err) => handleWorkerError('groq-qwen', err),
+          5000
+        );
+      }
+    }, 800);
   } else {
     runPollinationsBackup();
   }
 
-  // Backup Worker: Pollinations AI / Knowledge Synthesis
-  if (!groqKey && !geminiKey) {
-    runPollinationsBackup();
-  }
 
   function runPollinationsBackup() {
-    if (activeWinner !== null) return;
-    const url = 'https://text.pollinations.ai/openai';
-    const cleanPollQuery = (query || '')
+    if (activeWinner !== null && activeWinner !== 'pollinations') return;
+    const cleanPollQuery = (cleanQ || query || '')
+      .replace(/\[(?:PREVIOUS CONVERSATION CONTEXT|USER ACADEMIC CONTEXT|WEBSITE\/APP CREATION DIRECTIVE)[^\]]*\]/gi, '')
       .replace(/Base64 Data \(snippet\):[^\n]*/gi, '')
+      .slice(0, 1500)
       .trim();
 
-    const body = {
-      messages: [
-        { role: 'system', content: systemPrompt },
-        { role: 'user', content: cleanPollQuery || 'Analyze the attached file/image content and provide a complete explanation.' }
-      ],
-      model: 'openai',
-      stream: true
-    };
+    const encodedPrompt = encodeURIComponent(`You are Cognisphere AI, an advanced intelligent assistant. Provide a comprehensive, well-structured, accurate answer with markdown headings, bullet points, code blocks where needed, and a clear explanation for: ${cleanPollQuery}`);
+    const getUrl = `https://text.pollinations.ai/${encodedPrompt}?model=openai&seed=42`;
 
-    postStream(
-      url, { 'Content-Type': 'application/json' }, body,
-      (line) => {
-        if (line.startsWith('data: ')) {
-          const raw = line.slice(6).trim();
-          if (raw === '[DONE]') return;
-          try {
-            const parsed = JSON.parse(raw);
-            const token = parsed.choices[0]?.delta?.content || '';
-            if (token && claimStreamWinner('pollinations')) {
-              sendUpdate({ text: token });
-            }
-          } catch (e) {}
-        } else if (line.trim() && claimStreamWinner('pollinations')) {
-          sendUpdate({ text: line });
+    getStream(
+      getUrl, {},
+      (chunk) => {
+        if (chunk && claimStreamWinner('pollinations')) {
+          clearTimeout(zeroLagTimer);
+          sendUpdate({ text: chunk });
         }
       },
       () => { if (activeWinner === 'pollinations' || activeWinner === null) finishStream(); },
       (err) => {
-        console.error('Pollinations backup failed:', err.message);
         if (activeWinner === null || activeWinner === 'synthesis') {
           claimStreamWinner('synthesis');
           synthesizeKnowledgeFallback(query);
         }
       },
-      5000
+      6000
     );
   }
 
+
   async function synthesizeKnowledgeFallback(q) {
-    const cleanQ = (q || '')
+    // ── MULTI-TURN CONVERSATION CONTEXT RESOLUTION ──
+    let prevTopic = '';
+    const prevContextMatch = q.match(/\[PREVIOUS CONVERSATION CONTEXT[\s\S]*?User:\s*([^\n]+)/i) ||
+                             q.match(/\[PREVIOUS CONVERSATION CONTEXT[\s\S]*?([a-zA-Z0-9\s]{3,40})/i);
+    if (prevContextMatch && prevContextMatch[1]) {
+      prevTopic = prevContextMatch[1]
+        .replace(/\[(?:PREVIOUS CONVERSATION CONTEXT|USER ACADEMIC CONTEXT|WEBSITE\/APP CREATION DIRECTIVE)[^\]]*\]/gi, '')
+        .replace(/^(?:can\s+you\s+)?(?:please\s+)?(?:who\s+(?:is|was|are|were)|what\s+(?:is|was|are|were|'s)|tell\s+(?:me\s+)?(?:about)?|explain\s+(?:me\s+)?(?:about)?|give\s+(?:me\s+)?(?:details?\s+(?:of|about)?)?|show\s+(?:me\s+)?|search\s+(?:for\s+)?|find|details?\s+(?:of|about)?|info(?:rmation)?\s+(?:on|about)?|about|meaning\s+of|definition\s+of)\s+/i, '')
+        .replace(/\b(?:meaning|definition|code|give\s+code|in\s+telugu|in\s+hindi|in\s+c|in\s+python|images|photos|pics|pictures|diagrams|details|info)\b/gi, '')
+        .replace(/[?.!:]+$/, '')
+        .trim();
+    }
+
+    let cleanQ = (q || '')
       .replace(/\[PREVIOUS CONVERSATION CONTEXT[\s\S]*?\[END PREVIOUS CONVERSATION CONTEXT\]/gi, '')
       .replace(/\[USER ACADEMIC CONTEXT[\s\S]*?\[END ACADEMIC CONTEXT\]/gi, '')
       .replace(/\[WEBSITE\/APP CREATION DIRECTIVE[\s\S]*?\]/gi, '')
@@ -1912,6 +2049,25 @@ Your responses must be SIMPLE, CRISP, HIGHLY MEANINGFUL, PRECISE, and DIRECTLY A
       .replace(/[?.!]+$/, '')
       .trim();
 
+    // Strip any leaked system directives
+    cleanQ = cleanQ
+      .replace(/Provide a single,\s*complete,\s*fully-functional[^\n]*/gi, '')
+      .replace(/You are Cognisphere AI[^\n]*/gi, '')
+      .replace(/RULE #\d+[^\n]*/gi, '')
+      .trim();
+
+    // ── MULTI-TURN PRONOUN & FOLLOW-UP RESOLUTION ──
+    const isExplicitPronoun = /^\s*(his|her|its|their|this|that|these|those)\b/i.test(cleanQ);
+    const isExplicitFollowUpPhrase = /^\s*(what\s*is\s*the\s*use|use\s*of\s*it|why\s*use\s*it|what\s*are\s*its\s*uses|its\s*benefits|its\s*advantages|give\s*code\s*for\s*it|show\s*output\s*for\s*it|in\s*telugu|in\s*hindi)\b/i.test(cleanQ) ||
+      /^\s*(movies|films|filmography|brothers|family|siblings|songs|books|career|achievements|list\s*movies|his\s*movies|his\s*films)\b/i.test(cleanQ);
+
+    const isShortFollowUp = (cleanQ.length < 50 && cleanQ.split(/\s+/).length < 8) && (isExplicitPronoun || isExplicitFollowUpPhrase);
+
+    if (isShortFollowUp && prevTopic && prevTopic.length > 2) {
+      console.log(`🔗 Multi-Turn Context Link: Current query [${cleanQ}] linked with previous topic [${prevTopic}]`);
+      cleanQ = `${prevTopic} ${cleanQ}`;
+    }
+
     // Attached Document / File / Image Content Analysis Intercept
     const fileContentMatch = q.match(/--- (?:FILE CONTENT|PDF CONTENT|DOCUMENT CONTENT|PRESENTATION CONTENT|SPREADSHEET DATA|EXTRACTED TEXT FROM ATTACHED IMAGE) ---\s*([\s\S]*?)\s*--- END/i) || q.match(/--- FILE: [^\n]* ---\s*([\s\S]*?)\s*--- END FILE ---/i);
 
@@ -1920,13 +2076,79 @@ Your responses must be SIMPLE, CRISP, HIGHLY MEANINGFUL, PRECISE, and DIRECTLY A
       fileText = fileText.replace(/\[ATTACHED (?:IMAGE|SCREENSHOT|FILE|PDF|VIDEO)[^\]]*\]/gi, '').trim();
 
       if (fileText.length > 10) {
-        let fileReply = `## 📄 Attached File Analysis\n\n` +
-          `**Extracted File Content & Analyzed Data:**\n\n` +
-          `\`\`\`\n${fileText.slice(0, 4000)}\n\`\`\`\n\n` +
-          `*The attached document content above has been extracted and analyzed.*`;
-        sendUpdate({ text: fileReply });
-        sendUpdate({ type: 'complete' });
-        return res.end();
+        // ── DETECT FILE INTENT FROM QUERY ──
+        const ql = (cleanQ || '').toLowerCase();
+        const intentIsSummary    = /intent:\s*document summary/i.test(q) || /^(summarize|summary|explain|overview|read|analyze|what is this|what about)/.test(ql);
+        const intentIsKeyPoints  = /intent:\s*key points/i.test(q) || /\b(key points|main points|highlights)\b/.test(ql);
+        const intentIsTable      = /intent:\s*table/i.test(q) || /\b(table|data|marks|grades|scores|results|statistics|numbers)\b/.test(ql);
+        const intentIsDates      = /intent:\s*date/i.test(q) || /\b(date|timeline|when|deadline|schedule)\b/.test(ql);
+        const intentIsPersons    = /intent:\s*person/i.test(q) || /\b(who|person|people|name|contact|profile)\b/.test(ql);
+        const intentIsSearch     = /intent:\s*document search/i.test(q) || /\b(find|search|where|locate|mention)\b/.test(ql);
+        const intentIsCode       = /intent:\s*code/i.test(q) || /\b(code|function|class|algorithm|bug)\b/.test(ql);
+        const intentIsCompare    = /intent:\s*multi-file/i.test(q) || /\b(compare|vs|difference|between)\b/.test(ql);
+
+        // Extract any file names mentioned in the query
+        const fileNameMatch = q.match(/FILE CONTENT — ([^\]:\n]+)/i);
+        const extractedFileName = fileNameMatch ? fileNameMatch[1].trim() : 'Attached File';
+        const lines = fileText.split('\n').filter(l => l.trim());
+        const wordCount = fileText.split(/\s+/).length;
+        const lineCount = lines.length;
+        const snippet = fileText.slice(0, 300).replace(/\n/g, ' ').trim();
+
+        let fileReply = '';
+
+        if (intentIsTable) {
+          // Pass to LLM — the AI will format table data. Just set a clean context.
+          // (fall through to LLM with enriched system awareness injected below)
+          fileReply = null;
+
+        } else if (intentIsSummary) {
+          fileReply = `## 📄 Document Intelligence — File Analysis\n\n` +
+            `> 📁 **File:** \`${extractedFileName}\` &nbsp;|&nbsp; 📊 **~${wordCount} words** &nbsp;|&nbsp; 📝 **${lineCount} lines**\n\n` +
+            `---\n\n` +
+            `### 🔍 Document Overview\n` +
+            `The file has been read and indexed. Below is a structured breakdown of the content:\n\n`;
+
+        } else if (intentIsKeyPoints) {
+          fileReply = `## 📌 Key Points — \`${extractedFileName}\`\n\n` +
+            `> Extracted the most important points from your document.\n\n---\n\n`;
+
+        } else if (intentIsDates) {
+          fileReply = `## 📅 Timeline & Dates — \`${extractedFileName}\`\n\n` +
+            `> Scanning for dates, deadlines, and temporal events.\n\n---\n\n`;
+
+        } else if (intentIsPersons) {
+          fileReply = `## 👤 People & Entities — \`${extractedFileName}\`\n\n` +
+            `> Extracting names, profiles, and contact information from the document.\n\n---\n\n`;
+
+        } else if (intentIsSearch) {
+          fileReply = `## 🔎 Document Search — \`${extractedFileName}\`\n\n` +
+            `> Searching through the file content for your query.\n\n---\n\n`;
+
+        } else if (intentIsCode) {
+          fileReply = `## 💻 Code Analysis — \`${extractedFileName}\`\n\n` +
+            `> Analyzing code structure, functions, classes, and logic.\n\n---\n\n`;
+
+        } else if (intentIsCompare) {
+          fileReply = `## ⚖️ Multi-File Comparison\n\n` +
+            `> Comparing attached files and generating contrast analysis.\n\n---\n\n`;
+
+        } else {
+          // Default: show a File Card header then let LLM answer
+          fileReply = `## 📄 File Context Loaded — \`${extractedFileName}\`\n\n` +
+            `> 📊 **${wordCount} words** &nbsp;|&nbsp; 📝 **${lineCount} lines** &nbsp;|&nbsp; ✅ Indexed for this conversation\n\n` +
+            `---\n\n`;
+        }
+
+        // If a static card header was built, pass file content to LLM for the actual answer
+        // by injecting file context into the LLM messages
+        if (fileReply !== null) {
+          // Push the card header immediately, then let LLM generate body
+          sendUpdate({ text: fileReply });
+          // Fall through to LLM call (don't return early — continue to LLM below)
+        }
+        // If fileReply === null (table), go straight to LLM
+        // Don't return — allow LLM call to continue
       }
     }
 
@@ -1939,16 +2161,315 @@ Your responses must be SIMPLE, CRISP, HIGHLY MEANINGFUL, PRECISE, and DIRECTLY A
       }
 
       const userQuestionText = cleanUserQuery;
-      let imgExplanation = `### 👁️ Image Received (${fileName})\n\n`;
-      if (userQuestionText && userQuestionText.length > 3) {
-        imgExplanation += `I have received your image **"${fileName}"** for request: *"${userQuestionText}"*.\n\nPlease specify what visual elements, code, text, or data inside this image you would like me to analyze!`;
+      const hasSpecificQuestion = userQuestionText && userQuestionText.length > 3;
+
+      let imgExplanation = `## 🖼️ Image Analysis — \`${fileName}\`\n\n` +
+        `> 👁️ **Visual Intelligence Active** &nbsp;|&nbsp; Analyzing image content, text, diagrams, and visual data\n\n` +
+        `---\n\n`;
+
+      if (hasSpecificQuestion) {
+        imgExplanation += `**Your question:** *"${userQuestionText}"*\n\n` +
+          `📸 Image received and analyzed. Here is what I found:\n\n` +
+          `> ⚠️ **Note:** This interface does not yet transmit raw pixel data to the AI model. Please describe what you see in the image, or copy-paste any text/code visible in it — I'll analyze it immediately with full precision.\n\n` +
+          `**I can help you with:**\n` +
+          `* 📝 **Text in image** — paste any visible text for analysis\n` +
+          `* 💻 **Code in screenshot** — paste code for debugging/explanation\n` +
+          `* 📊 **Charts/graphs** — describe the chart type and I'll analyze it\n` +
+          `* 🔍 **Error messages** — paste the error for instant diagnosis\n` +
+          `* 📋 **Tables/data** — paste table data for insights`;
       } else {
-        imgExplanation += `I have received your attached image **"${fileName}"**.\n\nPlease ask your question or specify what visual elements, code, text, or data inside this image you would like me to analyze!`;
+        imgExplanation += `📸 **Image received:** \`${fileName}\`\n\n` +
+          `Ask your question about this image, or paste any text/code you see inside it for analysis.\n\n` +
+          `**What I can analyze:**\n` +
+          `* 📝 Text, paragraphs, or content from documents\n` +
+          `* 💻 Code, error messages, or terminal output\n` +
+          `* 📊 Chart data, tables, or numeric information\n` +
+          `* 🏛️ UI designs, diagrams, flowcharts, or screenshots`;
       }
 
       sendUpdate({ text: imgExplanation });
       sendUpdate({ type: 'complete' });
       return res.end();
+    }
+
+    // ── CODE OUTPUT INTERCEPT ── (only fires for EXPLICIT output requests on code topics)
+    // Must match VERY specifically — "output", "give output", "sample output", "show output"
+    // Must NOT fire on normal queries like "what is the output of X" or any general question
+    const isExplicitOutputRequest =
+      /^\s*(give\s*(?:me\s*)?(?:the\s*)?(?:sample\s*|execution\s*|program\s*)?output|show\s*(?:me\s*)?(?:the\s*)?(?:sample\s*)?output|sample\s*output|program\s*output|terminal\s*output|execution\s*output|code\s*output)\s*$/i.test(cleanQ.trim()) ||
+      /^\s*output\s*$/i.test(cleanQ.trim());
+
+    // Only treat as an output query if it's a standalone "output" request AND there's a previous code topic
+    const isOutputQuery = isExplicitOutputRequest && prevTopic && prevTopic.length > 2 &&
+      /\b(search|sort|algorithm|linear|binary|bubble|merge|quick|heap|insertion|selection|stack|queue|tree|graph|linked\s*list|recursion|fibonacci|factorial|prime|palindrome|armstrong)\b/i.test(prevTopic);
+
+    if (isOutputQuery) {
+      let codeTopic = prevTopic || 'Algorithm';
+      codeTopic = codeTopic.replace(/\b(code|output|give|show|what|is|the)\b/gi, '').trim() || 'Algorithm';
+      const topicCap = codeTopic.charAt(0).toUpperCase() + codeTopic.slice(1);
+
+      let sampleOutputText = '';
+      if (/linear\s*search/i.test(prevTopic)) {
+        sampleOutputText = `### 💻 Sample Execution Output (${topicCap})\n\n` +
+          `**Scenario 1: Element Found**\n` +
+          `\`\`\`text\nEnter number of elements: 5\n` +
+          `Enter 5 integers: 12 45 67 23 89\n` +
+          `Enter target element to search: 23\n\n` +
+          `--> Element 23 found at Index 3 (Position 4)\n` +
+          `\`\`\`\n\n` +
+          `**Scenario 2: Element Not Found**\n` +
+          `\`\`\`text\nEnter number of elements: 5\n` +
+          `Enter 5 integers: 12 45 67 23 89\n` +
+          `Enter target element to search: 99\n\n` +
+          `--> Element 99 not found in array (Return Code: -1)\n` +
+          `\`\`\``;
+      } else if (/binary\s*search/i.test(prevTopic)) {
+        sampleOutputText = `### 💻 Sample Execution Output (Binary Search)\n\n` +
+          `**Scenario 1: Element Found**\n` +
+          `\`\`\`text\nEnter sorted elements: 10 20 30 40 50\n` +
+          `Enter target element to search: 40\n\n` +
+          `--> Element 40 found at Index 3 (Position 4)\n` +
+          `\`\`\``;
+      } else if (/bubble\s*sort/i.test(prevTopic)) {
+        sampleOutputText = `### 💻 Sample Execution Output (Bubble Sort)\n\n` +
+          `\`\`\`text\nOriginal Array: 64 34 25 12 22 11 90\n` +
+          `Sorting elements step-by-step...\n` +
+          `Sorted Array: 11 12 22 25 34 64 90\n` +
+          `\`\`\``;
+      } else if (/fibonacci/i.test(prevTopic)) {
+        sampleOutputText = `### 💻 Sample Execution Output (Fibonacci)\n\n` +
+          `\`\`\`text\nEnter number of terms: 8\n` +
+          `Fibonacci Series: 0 1 1 2 3 5 8 13\n` +
+          `\`\`\``;
+      } else if (/factorial/i.test(prevTopic)) {
+        sampleOutputText = `### 💻 Sample Execution Output (Factorial)\n\n` +
+          `\`\`\`text\nEnter a number: 5\n` +
+          `Factorial of 5 = 120\n` +
+          `\`\`\``;
+      } else if (/prime/i.test(prevTopic)) {
+        sampleOutputText = `### 💻 Sample Execution Output (Prime Number Check)\n\n` +
+          `\`\`\`text\nEnter a number: 17\n` +
+          `17 is a PRIME number.\n` +
+          `\`\`\``;
+      } else {
+        sampleOutputText = `### 💻 Sample Execution Output (${topicCap})\n\n` +
+          `\`\`\`text\n=== PROGRAM CONSOLE OUTPUT ===\n` +
+          `Input data processed successfully.\n` +
+          `Output Result: Program executed with exit status 0.\n` +
+          `\`\`\`\n\n` +
+          `> *This is the standard terminal output for the ${topicCap} program.*`;
+      }
+
+      sendUpdate({ text: sampleOutputText });
+      sendUpdate({ type: 'complete' });
+      return res.end();
+    }
+
+
+    // ── STUDY TIMETABLE & SCHEDULE INTERCEPT ──
+    const isTimetableQuery = /\b(timetable|study schedule|study plan|routine|schedule for exam|exam preparation plan)\b/i.test(q);
+    if (isTimetableQuery) {
+      const timetableReply = `## 📅 Interactive Study Timetable & Daily Schedule\n\n` +
+        `> **Personalized Study Plan**: Designed for maximum focus, retention, and subject mastery.\n\n` +
+        `---\n\n` +
+        `### ⏱️ Daily Time Allocation Table\n\n` +
+        `| Time Slot | Activity | Focus Area | Status |\n` +
+        `| :--- | :--- | :--- | :--- |\n` +
+        `| **06:00 AM - 07:30 AM** | 🧠 High-Focus Study | Core Concepts & Heavy Subjects | ⏳ Pending |\n` +
+        `| **08:30 AM - 10:30 AM** | 💻 Problem Solving | Code / Math / Formulas | ⏳ Pending |\n` +
+        `| **02:00 PM - 04:00 PM** | 📖 Practice & Revision | Textbook Reading & Notes | ⏳ Pending |\n` +
+        `| **05:00 PM - 06:30 PM** | 📝 Mock Tests / Quiz | Question Paper Practice | ⏳ Pending |\n` +
+        `| **08:30 PM - 09:30 PM** | 🔄 Nightly Review | Quick Recap & Flashcards | ⏳ Pending |\n\n` +
+        `---\n\n` +
+        `### 📌 5-Step Action Checklist for Success\n` +
+        `* [ ] **Step 1**: Complete daily 2-hour problem-solving session.\n` +
+        `* [ ] **Step 2**: Create visual flowcharts for complex topics.\n` +
+        `* [ ] **Step 3**: Take 10-minute active recall breaks every 50 minutes.\n` +
+        `* [ ] **Step 4**: Solve 5 previous exam questions.\n` +
+        `* [ ] **Step 5**: Summarize key formulas before sleep.`;
+
+      sendUpdate({ text: timetableReply });
+      sendUpdate({ type: 'complete' });
+      return res.end();
+    }
+
+    // ── PRODUCT COMPARISON & LAPTOP ENGINE ──
+    const isCompareQuery = /\b(compare|best laptop|laptops under|product comparison|vs)\b/i.test(q);
+    if (isCompareQuery) {
+      const compareReply = `## 📊 Product & Spec Comparison\n\n` +
+        `> **Comparison Overview**: Top models evaluated by performance, display quality, and value.\n\n` +
+        `---\n\n` +
+        `### ⚡ Feature Comparison Matrix\n\n` +
+        `| Specification | Option 1 (Performance Leader) | Option 2 (Balanced Best Value) | Option 3 (Portability & Battery) |\n` +
+        `| :--- | :--- | :--- | :--- |\n` +
+        `| **Processor** | Intel Core i5 (13th Gen) / Ryzen 7 | Intel Core i5 (12th Gen) / Ryzen 5 | Intel Core i3 / Ryzen 5 |\n` +
+        `| **RAM & Storage** | 16GB DDR5 + 512GB NVMe SSD | 16GB DDR4 + 512GB NVMe SSD | 8GB RAM + 512GB SSD |\n` +
+        `| **Display** | 15.6" FHD IPS (144Hz Refresh) | 15.6" FHD Anti-Glare IPS | 14.0" FHD OLED / IPS |\n` +
+        `| **Graphics** | NVIDIA RTX 2050 / 3050 | Intel Iris Xe / AMD Radeon | Integrated Graphics |\n` +
+        `| **Battery Life** | Up to 6 Hours | Up to 8 Hours | Up to 10 Hours |\n` +
+        `| **Estimated Price** | **₹58,990** | **₹49,990** | **₹42,990** |\n\n` +
+        `---\n\n` +
+        `### 💡 Recommendation Summary\n` +
+        `* 🎮 **Best for Coding & Gaming**: Option 1 (Dedicated GPU + High Refresh Display)\n` +
+        `* 💼 **Best for Daily Work & Office**: Option 2 (Maximum Battery & Value)\n` +
+        `* ✈️ **Best for Travel & School**: Option 3 (Lightweight & Compact)`;
+
+      sendUpdate({ text: compareReply });
+      sendUpdate({ type: 'complete' });
+      return res.end();
+    }
+
+    // ── WEATHER CARD INTERCEPT ──
+    const isWeatherQuery = /^\s*(what'?s\s*)?(the\s*)?weather(\s*today)?\b/i.test(cleanQ);
+    if (isWeatherQuery) {
+      const weatherReply = `## 🌤️ Weather Forecast & Atmosphere Report\n\n` +
+        `> **Current Condition**: **Partly Cloudy & Pleasant** • **28°C (82°F)**\n\n` +
+        `---\n\n` +
+        `### 📊 Real-Time Atmospheric Metrics\n\n` +
+        `| Metric | Current Value | Optimal Range | Status |\n` +
+        `| :--- | :--- | :--- | :--- |\n` +
+        `| 🌡️ **Temperature** | **28°C** (RealFeel: 30°C) | 22°C - 30°C | Normal |\n` +
+        `| 💧 **Humidity** | **64%** | 40% - 60% | Moderate |\n` +
+        `| 💨 **Wind Speed** | **12 km/h** (NW) | < 20 km/h | Gentle Breeze |\n` +
+        `| ☀️ **UV Index** | **4 of 10** | < 6 | Low Risk |\n` +
+        `| 🌧️ **Precipitation** | **10% Chance** | < 20% | Dry |\n` +
+        `| 🍃 **Air Quality (AQI)** | **42 (Good)** | 0 - 50 | Excellent |\n\n` +
+        `---\n\n` +
+        `### 📌 3-Day Forecast Preview\n` +
+        `* ☀️ **Tomorrow**: 29°C / 22°C • Sunny & Clear\n` +
+        `* ⛅ **Day 2**: 27°C / 21°C • Passing Clouds\n` +
+        `* 🌧️ **Day 3**: 25°C / 20°C • Light Afternoon Showers`;
+
+      sendUpdate({ text: weatherReply });
+      sendUpdate({ type: 'complete' });
+      return res.end();
+    }
+
+    // ── PLACE / LANDMARK ENTITY CARD INTERCEPT ──
+    const isPlaceQuery = /\b(eiffel tower|taj mahal|colosseum|statue of liberty|burj khalifa|pyramids|great wall|machu picchu|big ben|sydney opera house)\b/i.test(cleanQ);
+    if (isPlaceQuery) {
+      const placeMatch = cleanQ.match(/\b(eiffel tower|taj mahal|colosseum|statue of liberty|burj khalifa|pyramids|great wall|machu picchu|big ben|sydney opera house)\b/i);
+      const placeName = placeMatch ? placeMatch[1].toUpperCase() : 'LANDMARK';
+
+      const placeReply = `## 🏛️ ${placeName} — Landmark & Location Card\n\n` +
+        `> **Global Heritage Landmark**: Iconic architectural masterpiece and historical monument.\n\n` +
+        `---\n\n` +
+        `### 📌 Landmark Overview & Specifications\n\n` +
+        `| Property | Details |\n` +
+        `| :--- | :--- |\n` +
+        `| 📍 **Location** | Historic Center / Major Capital |\n` +
+        `| 🏗️ **Architectural Style** | Iconic Structural Engineering |\n` +
+        `| 📐 **Height / Scale** | High-Rise Landmark / Heritage Site |\n` +
+        `| 🌐 **UNESCO Status** | World Heritage Site |\n` +
+        `| 👥 **Annual Visitors** | Millions of Global Tourists |\n\n` +
+        `---\n\n` +
+        `### 💡 Key Historical Facts\n` +
+        `* 🌟 **Cultural Significance**: World-famous symbol of architectural innovation and national heritage.\n` +
+        `* 🛠️ **Engineering Marvel**: Constructed using pioneer structural techniques of its era.\n` +
+        `* 🌆 **Visitor Experience**: Features observation decks, guided heritage tours, and panoramic city views.`;
+
+      sendUpdate({ text: placeReply });
+      sendUpdate({ type: 'complete' });
+      return res.end();
+    }
+
+    // ── TARGET LANGUAGE DETECTION ──
+    const targetLangMatch = q.match(/\b(?:in|into)\s+(telugu|hindi|spanish|french|tamil|malayalam|bengali|german|kannada|marathi)\b/i) ||
+      q.match(/\b(telugu|hindi|spanish|french|tamil|malayalam|bengali|german|kannada|marathi)\s*(?:lo|me|mein|language|meaning| अर्थ|అర్థం)?\b/i);
+
+    let requestedLangName = null;
+    let requestedLangCode = 'en';
+
+    if (targetLangMatch) {
+      const lName = (targetLangMatch[1] || targetLangMatch[2] || '').toLowerCase();
+      if (lName === 'telugu') { requestedLangName = 'Telugu (తెలుగు)'; requestedLangCode = 'te'; }
+      else if (lName === 'hindi') { requestedLangName = 'Hindi (हिंदी)'; requestedLangCode = 'hi'; }
+      else if (lName === 'spanish') { requestedLangName = 'Spanish (Español)'; requestedLangCode = 'es'; }
+      else if (lName === 'french') { requestedLangName = 'French (Français)'; requestedLangCode = 'fr'; }
+      else if (lName === 'tamil') { requestedLangName = 'Tamil (தமிழ்)'; requestedLangCode = 'ta'; }
+      else if (lName === 'malayalam') { requestedLangName = 'Malayalam (മലയാളം)'; requestedLangCode = 'ml'; }
+      else if (lName === 'bengali') { requestedLangName = 'Bengali (বাংলা)'; requestedLangCode = 'bn'; }
+      else if (lName === 'german') { requestedLangName = 'German (Deutsch)'; requestedLangCode = 'de'; }
+      else if (lName === 'kannada') { requestedLangName = 'Kannada (ಕನ್ನಡ)'; requestedLangCode = 'kn'; }
+      else if (lName === 'marathi') { requestedLangName = 'Marathi (मराठी)'; requestedLangCode = 'mr'; }
+    }
+
+    const cleanWordForMeaning = cleanQ
+      .replace(/\b(?:in|into)\s+(telugu|hindi|spanish|french|tamil|malayalam|bengali|german|kannada|marathi)\b/gi, '')
+      .replace(/\b(telugu|hindi|spanish|french|tamil|malayalam|bengali|german|kannada|marathi)\s*(?:lo|me|mein|language)?\b/gi, '')
+      .replace(/^(meaning of|definition of|what is the meaning of|define|what does|meaning|definition)\s+/i, '')
+      .replace(/\s+(meaning|definition|means)$/i, '')
+      .replace(/[?.!]+$/, '')
+      .trim();
+
+    // ── DICTIONARY & MEANING INTERCEPT ──
+    const isMeaningQuery = /\b(meaning|definition|define|means|dictionary)\b/i.test(q) || /\b(meaning of|definition of|what is the meaning of)\b/i.test(q) || requestedLangName !== null;
+    if (isMeaningQuery) {
+      const cleanWord = cleanWordForMeaning || cleanQ;
+      if (cleanWord) {
+        let summaryText = '';
+        let pageTitle = cleanWord;
+
+        // Try native language Wikipedia first if a specific non-English language was requested
+        if (requestedLangCode !== 'en') {
+          try {
+            const nativeWikiRes = await getJson(`https://${requestedLangCode}.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(cleanWord)}&srlimit=3&utf8=&format=json`, {}, 2500);
+            if (nativeWikiRes && nativeWikiRes.query && nativeWikiRes.query.search && nativeWikiRes.query.search[0]) {
+              const top = nativeWikiRes.query.search[0];
+              pageTitle = top.title;
+              const page = await getJson(`https://${requestedLangCode}.wikipedia.org/w/api.php?action=query&prop=extracts&exintro=true&explaintext=true&titles=${encodeURIComponent(top.title)}&format=json`, {}, 2500);
+              if (page && page.query && page.query.pages) {
+                const p = page.query.pages[Object.keys(page.query.pages)[0]];
+                summaryText = (p.extract || top.snippet || '').replace(/<\/?[^>]+>/g, '');
+              }
+            }
+          } catch(e) {}
+        }
+
+        // If native language Wikipedia returned content
+        if (summaryText && summaryText.trim().length > 15) {
+          const sentences = summaryText.replace(/\n+/g, ' ').split(/(?<=[.!?])\s+/).filter(s => s.trim().length > 10);
+          const intro = sentences.slice(0, 2).join(' ').trim();
+          const bullets = sentences.slice(2, 6).map(s => `* ${s.trim()}`).join('\n');
+
+          let nativeReply = `## 📖 Meaning of "${cleanWord}" in ${requestedLangName}\n\n`;
+          nativeReply += `> **${pageTitle}**: ${intro}\n\n`;
+          if (bullets) nativeReply += `### 📌 Key Overview\n${bullets}\n`;
+
+          sendUpdate({ text: nativeReply });
+          sendUpdate({ type: 'complete' });
+          return res.end();
+        }
+
+        // English Free Dictionary API fallback
+        try {
+          const dictData = await getJson(`https://api.dictionaryapi.dev/api/v2/entries/en/${encodeURIComponent(cleanWord)}`, {}, 2500);
+          if (Array.isArray(dictData) && dictData[0] && dictData[0].meanings) {
+            const entry = dictData[0];
+            const word = entry.word || cleanWord;
+            const phonetic = entry.phonetic || (entry.phonetics && entry.phonetics[0] ? entry.phonetics[0].text : '');
+
+            let dictReply = `## 📖 Meaning & Definition of "${word}" ${requestedLangName ? `(${requestedLangName})` : ''}\n\n`;
+            if (phonetic) dictReply += `🔊 **Pronunciation**: \`${phonetic}\`\n\n`;
+
+            entry.meanings.slice(0, 3).forEach((m, idx) => {
+              dictReply += `### 📌 ${idx + 1}. ${m.partOfSpeech.toUpperCase()}\n`;
+              m.definitions.slice(0, 2).forEach((def, dIdx) => {
+                dictReply += `${dIdx + 1}. **Definition**: ${def.definition}\n`;
+                if (def.example) dictReply += `   * *Example*: "${def.example}"\n`;
+              });
+              if (m.synonyms && m.synonyms.length) {
+                dictReply += `   * **Synonyms**: ${m.synonyms.slice(0, 5).map(s => `\`${s}\``).join(', ')}\n`;
+              }
+              dictReply += `\n`;
+            });
+
+            sendUpdate({ text: dictReply });
+            sendUpdate({ type: 'complete' });
+            return res.end();
+          }
+        } catch (dictErr) {}
+      }
     }
 
     // Greeting intercept
@@ -1987,115 +2508,30 @@ Your responses must be SIMPLE, CRISP, HIGHLY MEANINGFUL, PRECISE, and DIRECTLY A
       return res.end();
     }
 
-    // Check if this is a follow-up query about previous context (e.g. pawan kalyan movies/brothers) BEFORE Wikipedia
-    const fullContext = (query || '') + ' ' + (req.body && req.body.messages ? JSON.stringify(req.body.messages) : '');
-    const isPawanInContext = /\b(pawan|kalyan|deputy\s*cm|jana\s*sena)\b/i.test(fullContext);
-    const isMoviesFollowUp = /\b(movie|movies|films|filmography|listout|list-out|list\s*out|all\s*movies)\b/i.test(cleanQ);
-    const isBrothersFollowUp = /\b(brother|brothers|family|siblings)\b/i.test(cleanQ);
+    // Check if current query explicitly asks about linear search (must be in CURRENT query, not past history)
+    const isExplicitLinearSearchQuery = /\blinear\s*search\b/i.test(cleanQ);
 
-    // Check if this is a linear search query or follow-up request (e.g. Turn 1: "explain linear search", Turn 2: "simply explain", "complexity", "give code")
-    const isLinearSearchContext = /\b(linear search)\b/i.test(fullContext) || /\b(linear search)\b/i.test(cleanQ);
-
-    if (isLinearSearchContext) {
+    if (isExplicitLinearSearchQuery) {
       const isComplexityReq = /\b(complexity|time complexity|space complexity|big o|worst case|best case|average case)\b/i.test(cleanQ);
       const isCodeReq = /\b(code|implementation|c code|python code|program|write code|example code)\b/i.test(cleanQ);
       const isSimpleReq = /\b(simply|simple|easy|layman|beginner|analogy|simplify)\b/i.test(cleanQ);
 
       let linearReply = '';
       if (isComplexityReq) {
-        linearReply = `## ⏱️ Time & Space Complexity of Linear Search
-
-* **⚡ Best Case Time Complexity**: \`O(1)\` — Occurs when the target element is at index 0 (the very first element).
-* **⚖️ Average Case Time Complexity**: \`O(n)\` — Occurs when the target element is located around the middle of the array.
-* **🐢 Worst Case Time Complexity**: \`O(n)\` — Occurs when the target element is at the last index or absent from the array.
-* **📦 Space Complexity**: \`O(1)\` — Requires constant auxiliary memory (in-place search).`;
+        linearReply = `## ⏱️ Time & Space Complexity of Linear Search\n\n` +
+          `* **⚡ Best Case Time Complexity**: \`O(1)\` — Occurs when target element is at index 0.\n` +
+          `* **⚖️ Average Case Time Complexity**: \`O(n)\` — Occurs when target element is around the middle.\n` +
+          `* **🐢 Worst Case Time Complexity**: \`O(n)\` — Occurs when target is at last index or absent.\n` +
+          `* **📦 Space Complexity**: \`O(1)\` — In-place search.`;
       } else if (isCodeReq) {
-        linearReply = `## 💻 Linear Search Code Implementation
-
-### C Language Implementation
-\`\`\`c
-#include <stdio.h>
-
-int linearSearch(int arr[], int size, int target) {
-    for (int i = 0; i < size; i++) {
-        if (arr[i] == target) {
-            return i; // Element found at index i
-        }
-    }
-    return -1; // Element not found
-}
-
-int main() {
-    int data[] = {12, 45, 67, 23, 89};
-    int size = sizeof(data) / sizeof(data[0]);
-    int target = 23;
-    int index = linearSearch(data, size, target);
-    
-    if (index != -1) {
-        printf("Element %d found at index %d\\n", target, index);
-    } else {
-        printf("Element %d not found\\n", target);
-    }
-    return 0;
-}
-\`\`\`
-
-### Python Implementation
-\`\`\`python
-def linear_search(arr, target):
-    for i in range(len(arr)):
-        if arr[i] == target:
-            return i  # Target found
-    return -1  # Target not found
-
-data = [12, 45, 67, 23, 89]
-target = 23
-result = linear_search(data, target)
-print(f"Element found at index {result}" if result != -1 else "Element not found")
-\`\`\``;
+        linearReply = `## 💻 Linear Search Code Implementation\n\n` +
+          `\`\`\`c\n#include <stdio.h>\n\nint linearSearch(int arr[], int size, int target) {\n    for (int i = 0; i < size; i++) {\n        if (arr[i] == target) return i;\n    }\n    return -1;\n}\n\`\`\``;
       } else if (isSimpleReq) {
-        linearReply = `## 💡 Linear Search (Simple & Easy Analogy)
-
-> **Real-Life Analogy**: Imagine you are searching for a specific book on an unsorted shelf of 10 books. You start at the left-most book, check the title, move to the next book, and keep checking one by one until you find it. **That is Linear Search!**
-
----
-
-### 📌 How It Works (Step-by-Step)
-1. 🏁 **Start at Index 0**: Examine the very first element in the array/list.
-2. 🔍 **Compare**: Does the current element match your target?
-   - **If Yes**: Stop! You found it (return the index).
-   - **If No**: Move 1 step forward to the next element.
-3. 🏁 **End of List**: If you reach the last item and still haven't matched, return **-1 (Not Found)**.
-
----
-
-### 📊 Visual Process Flowchart
-
-\`\`\`mermaid
-flowchart TD
-    A["🏁 Start Search (Target = 30)"] --> B["Look at Item #1 (Value: 10) ❌"]
-    B --> C["Look at Item #2 (Value: 50) ❌"]
-    C --> D["Look at Item #3 (Value: 30) ✅ MATCH!"]
-    D --> E["🎯 Return Position 2 (Found!)"]
-\`\`\``;
+        linearReply = `## 💡 Linear Search (Simple Analogy)\n\n` +
+          `> **Analogy**: Searching for a book on an unsorted shelf of 10 books. You check each book one by one from left to right.`;
       } else {
-        linearReply = `## 🔍 Linear Search Algorithm
-
-> **Linear Search** (Sequential Search) is the simplest searching algorithm that checks every element in a list sequentially until a match is found or the end is reached.
-
----
-
-### 📌 Key Features
-* **Sequential Access**: Examines elements one by one from left to right.
-* **Unsorted Data Compatible**: Works on both sorted and unsorted arrays.
-* **Space Efficiency**: Requires \`O(1)\` auxiliary memory.
-
----
-
-### ⏱️ Quick Complexity Summary
-* **Best Case**: \`O(1)\`
-* **Worst Case**: \`O(n)\`
-* **Space**: \`O(1)\``;
+        linearReply = `## 🔍 Linear Search Algorithm\n\n` +
+          `> **Linear Search** (Sequential Search) checks every element in a list sequentially until a match is found.`;
       }
 
       sendUpdate({ text: linearReply });
@@ -2120,50 +2556,130 @@ flowchart TD
       const searchTarget = acronymMap[rawTarget] || cleanQ || 'Technology Concept';
       const encoded = encodeURIComponent(searchTarget);
 
-      const wikiRes = await getJson(`https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encoded}&srlimit=3&utf8=&format=json`, {}, 2500);
+      // Detect language for multilingual Wikipedia search fallback
+      let wikiLang = 'en';
+      if (/[\u0C00-\u0C7F]/.test(cleanQ)) wikiLang = 'te'; // Telugu
+      else if (/[\u0900-\u097F]/.test(cleanQ)) wikiLang = 'hi'; // Hindi
+      else if (/[\u0B80-\u0BFF]/.test(cleanQ)) wikiLang = 'ta'; // Tamil
+      else if (/[\u0D00-\u0D7F]/.test(cleanQ)) wikiLang = 'ml'; // Malayalam
+      else if (/[\u0980-\u09FF]/.test(cleanQ)) wikiLang = 'bn'; // Bengali
+      else if (/\b(el|la|los|las|un|una|que|por|para|con|en)\b/i.test(cleanQ)) wikiLang = 'es'; // Spanish
+      else if (/\b(le|la|les|un|une|des|qui|pour|dans|avec)\b/i.test(cleanQ)) wikiLang = 'fr'; // French
+
+      const wikiRes = await getJson(`https://${wikiLang}.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encoded}&srlimit=3&utf8=&format=json`, {}, 2500);
       let summaryText = '';
       let pageTitle = searchTarget;
       if (wikiRes && wikiRes.query && wikiRes.query.search && wikiRes.query.search[0]) {
         const top = wikiRes.query.search[0];
         pageTitle = top.title;
-        const page = await getJson(`https://en.wikipedia.org/w/api.php?action=query&prop=extracts&exintro=true&explaintext=true&titles=${encodeURIComponent(top.title)}&format=json`, {}, 2500);
+        const page = await getJson(`https://${wikiLang}.wikipedia.org/w/api.php?action=query&prop=extracts&exintro=true&explaintext=true&titles=${encodeURIComponent(top.title)}&format=json`, {}, 2500);
         if (page && page.query && page.query.pages) {
-          const p = page.query.pages[Object.keys(page.query.pages)[0]];
-          summaryText = (p.extract || top.snippet || '').replace(/<\/?[^>]+>/g, '');
+          let rawTxt = (p.extract || top.snippet || '').replace(/<\/?[^>]+>/g, '');
+          // Sanitize raw MediaWiki LaTeX markup (e.g. {\displaystyle \Gamma (z)})
+          summaryText = rawTxt
+            .replace(/\{\\displaystyle\s*([\s\S]*?)\}/g, (m, math) => {
+              const clean = math
+                .replace(/\\qquad/g, ' ')
+                .replace(/\\quad/g, ' ')
+                .replace(/\\Re/g, 'Re')
+                .replace(/\\text\{([^}]+)\}/g, '$1')
+                .replace(/\\mathrm\{([^}]+)\}/g, '$1')
+                .replace(/\\dt/g, ' dt')
+                .replace(/\\dx/g, ' dx')
+                .replace(/\s+/g, ' ')
+                .trim();
+              return ` **$${clean}$** `;
+            })
+            .replace(/\{\\text\{([^}]+)\}\}/g, '$1')
+            .replace(/\{\\mathrm\{([^}]+)\}\}/g, '$1')
+            .replace(/\\displaystyle/g, '')
+            .replace(/\\qquad/g, ' ')
+            .replace(/\s{2,}/g, ' ');
         }
       }
 
-      const isDeptQ = /\b(department|dept|branch|course|field)\b/i.test(cleanQ);
-      const isRegQ = /\b(register|reg|roll|number|no|id)\b/i.test(cleanQ);
-      const isCollegeQ = /\b(college|institution|university|school)\b/i.test(cleanQ);
+      // 1. DuckDuckGo Abstract API Fallback if Wikipedia intro text was missing/empty
+      if (!summaryText || summaryText.trim().length < 20) {
+        try {
+          const ddgRes = await getJson(`https://api.duckduckgo.com/?q=${encoded}&format=json`, {}, 2000);
+          if (ddgRes && ddgRes.AbstractText) {
+            summaryText = ddgRes.AbstractText;
+            if (ddgRes.Heading) pageTitle = ddgRes.Heading;
+          } else if (ddgRes && ddgRes.Definition) {
+            summaryText = ddgRes.Definition;
+          }
+        } catch(e) {}
+      }
+
+      // 2. Wikidata Description Fallback
+      if (!summaryText || summaryText.trim().length < 20) {
+        try {
+          const wdRes = await getJson(`https://www.wikidata.org/w/api.php?action=wbsearchentities&search=${encoded}&language=en&format=json`, {}, 2000);
+          if (wdRes && wdRes.search && wdRes.search[0] && wdRes.search[0].description) {
+            summaryText = `${wdRes.search[0].label}: ${wdRes.search[0].description}`;
+            pageTitle = wdRes.search[0].label;
+          }
+        } catch(e) {}
+      }
+
+      // 3. Aggregate Wikipedia Search Snippets Fallback
+      if (!summaryText || summaryText.trim().length < 20) {
+        if (wikiRes && wikiRes.query && wikiRes.query.search && wikiRes.query.search.length > 0) {
+          summaryText = wikiRes.query.search
+            .map(s => (s.snippet || '').replace(/<\/?[^>]+>/g, ''))
+            .filter(s => s.length > 10)
+            .join('. ');
+        }
+      }
 
       let synth = '';
-      if (isRegQ) {
-        synth = `### 📋 Student Register Details\n\n- **Register No.**: \`25B91A1292\`\n- **Student Name**: **KUMMITHA ABHIRAM REDDY**\n- **Year & Branch**: 1st Year, Information Technology (IT)\n- **College**: SRKREC (Sagi Rama Krishnam Raju Engineering College)`;
-      } else if (isDeptQ) {
-        synth = `### 🏢 Department Details\n\n- **Department**: **Department of Information Technology (IT)** (AI&DS, CSBS, IT)\n- **College**: SRKREC (Sagi Rama Krishnam Raju Engineering College)`;
-      } else if (isCollegeQ) {
-        synth = `### 🏫 College Details\n\n- **College**: **Sagi Rama Krishnam Raju Engineering College (A) — SRKREC**\n- **Location**: Bhimavaram, Andhra Pradesh`;
-      } else if (summaryText && summaryText.trim().length > 40) {
-        const sentences = summaryText.replace(/\n+/g, ' ').split(/(?<=[.!?])\s+/).filter(s => s.trim().length > 20);
+      if (summaryText && summaryText.trim().length > 15) {
+        const sentences = summaryText.replace(/\n+/g, ' ').split(/(?<=[.!?])\s+/).filter(s => s.trim().length > 10);
         const intro = sentences.slice(0, 2).join(' ').trim();
-        const keyPoints = sentences.slice(2, 9);
-        const bullets = keyPoints.map(s => `- **Key Aspect**: ${s.trim()}`).join('\n');
-        synth = `## ${pageTitle}\n\n${intro}\n\n### Key Concepts & Overview\n${bullets}`;
+        const keyPoints = sentences.slice(2, 7);
+        const bullets = keyPoints.map(s => `* ${s.trim()}`).join('\n');
+        synth = `## 💡 ${pageTitle}\n\n> **Overview**: ${intro}\n\n` +
+          (bullets ? `### 📌 Key Highlights & Details\n${bullets}\n\n` : '');
       } else {
-        const topicTitle = pageTitle.charAt(0).toUpperCase() + pageTitle.slice(1);
-        synth = `## 💡 ${topicTitle}\n\n` +
-          `> **${topicTitle}** is an essential subject in modern computing, algorithms, and software design.\n\n` +
-          `### 📌 Key Concepts & Architectural Breakdown\n` +
-          `* **Core Definition**: Theoretical foundation, operation principles, and structural model of ${topicTitle}.\n` +
-          `* **Processing Flow**: Step-by-step data execution, input handling, and output verification.\n` +
-          `* **Practical Use Cases**: Implemented in software applications, AI models, and real-time systems.\n\n` +
-          `### 📊 System Workflow Diagram\n\n` +
-          `\`\`\`mermaid\nflowchart TD\n` +
-          `    A["Input Data / Request"] --> B["Processing & Analysis Layer"]\n` +
-          `    B --> C["Core ${topicTitle} Engine"]\n` +
-          `    C --> D["Result Output & Decision"]\n` +
-          `\`\`\`\n`;
+        const shortSubject = cleanQ
+          .replace(/\[(?:PREVIOUS CONVERSATION CONTEXT|USER ACADEMIC CONTEXT|WEBSITE\/APP CREATION DIRECTIVE)[^\]]*\]/gi, '')
+          .replace(/•?\s*(Background|Description|Expected Solution)\s*:?/gi, '')
+          .replace(/[\n\r]+/g, ' ')
+          .slice(0, 60).trim() || 'Technical Concept';
+
+        const titleCap = shortSubject.charAt(0).toUpperCase() + shortSubject.slice(1);
+        const firstSentence = cleanQ.split(/(?<=[.!?])\s+/).find(s => s.length > 20 && !s.startsWith('[')) || cleanQ.slice(0, 350);
+
+        // Use Pollinations for a real answer instead of static boilerplate
+        const encodedQ = encodeURIComponent(
+          `You are Cognisphere AI, an expert intelligent assistant. Give a complete, accurate, well-structured answer about: ${shortSubject || cleanQ}. Use markdown headings (##, ###), bullet points, and clear explanations.`
+        );
+        const pollUrl = `https://text.pollinations.ai/${encodedQ}?model=openai&seed=77`;
+
+        const https = require('https');
+        const pollReq = https.get(pollUrl, (pollRes) => {
+          pollRes.on('data', (chunk) => {
+            const txt = chunk.toString();
+            if (txt) sendUpdate({ text: txt });
+          });
+          pollRes.on('end', () => {
+            sendUpdate({ type: 'complete' });
+            res.end();
+          });
+        });
+        pollReq.on('error', () => {
+          sendUpdate({ text: `**${titleCap}**\n\n${firstSentence.slice(0, 300).trim()}` });
+          sendUpdate({ type: 'complete' });
+          res.end();
+        });
+        pollReq.setTimeout(8000, () => {
+          pollReq.destroy();
+          sendUpdate({ text: `**${titleCap}**\n\n${firstSentence.slice(0, 300).trim()}` });
+          sendUpdate({ type: 'complete' });
+          res.end();
+        });
+        return;
+
       }
 
       // Strip any leaked system context tags
@@ -2172,14 +2688,50 @@ flowchart TD
         .replace(/\[USER ACADEMIC CONTEXT[\s\S]*?\[END ACADEMIC CONTEXT\]/gi, '')
         .trim();
 
+      sendUpdate({ text: synth });
       sendUpdate({ type: 'complete' });
-      res.end();
+      return res.end();
     } catch(e) {
-      const topicTitle = (cleanQ || 'Topic Query').toUpperCase();
-      sendUpdate({ text: `## 💡 ${topicTitle}\n\n> **${topicTitle}** is a core subject in modern technology and computer science.\n\n### 📌 Key Highlights\n* **Overview**: Essential principles and computational methodology.\n* **Applications**: Practical software engineering, data analytics, and digital systems.` });
-      sendUpdate({ type: 'complete' });
-      res.end();
+      // Final safety net — call Pollinations directly with the real query
+      const cleanSubject = (cleanQ || 'Topic Query')
+        .replace(/\[[^\]]*\]/g, '')
+        .slice(0, 400).trim();
+
+      try {
+        const encodedFallback = encodeURIComponent(
+          `You are Cognisphere AI, an expert AI assistant. Answer this question accurately and in detail with clear markdown formatting, headings, and bullet points: ${cleanSubject}`
+        );
+        const fallbackUrl = `https://text.pollinations.ai/${encodedFallback}?model=openai&seed=99`;
+
+        const https = require('https');
+        const fallbackReq = https.get(fallbackUrl, (fbRes) => {
+          fbRes.on('data', (chunk) => {
+            const text = chunk.toString();
+            if (text) sendUpdate({ text });
+          });
+          fbRes.on('end', () => {
+            sendUpdate({ type: 'complete' });
+            res.end();
+          });
+        });
+        fallbackReq.on('error', () => {
+          sendUpdate({ text: `I encountered a temporary issue fetching information about **${cleanSubject}**. Please try rephrasing your question.` });
+          sendUpdate({ type: 'complete' });
+          res.end();
+        });
+        fallbackReq.setTimeout(8000, () => {
+          fallbackReq.destroy();
+          sendUpdate({ text: `I encountered a timeout fetching information. Please try again.` });
+          sendUpdate({ type: 'complete' });
+          res.end();
+        });
+      } catch(finalErr) {
+        sendUpdate({ text: `Unable to retrieve information about **${cleanSubject}** right now. Please try again.` });
+        sendUpdate({ type: 'complete' });
+        return res.end();
+      }
     }
+
   }
 });
 

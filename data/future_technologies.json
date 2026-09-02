@@ -1,0 +1,62 @@
+{
+  "id": "future_technologies",
+  "domain": "Future Technologies",
+  "description": "Emerging and speculative technologies expected to shape the coming decades.",
+  "subdomains": [
+    {
+      "name": "Quantum AI",
+      "description": "Integration of quantum computing principles with artificial intelligence methods.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "AGI",
+      "description": "Artificial General Intelligence — hypothetical AI with human-level reasoning across all domains.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "Brain-Computer Interface",
+      "description": "Technology enabling direct communication between the brain and external devices.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "Nanotechnology",
+      "description": "Manipulation of matter at the atomic or molecular scale for new applications.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "Synthetic Biology",
+      "description": "Engineering of biological systems and organisms for novel functions.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "Smart Cities",
+      "description": "Urban areas that use connected technology to manage services and infrastructure.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "Autonomous Systems",
+      "description": "Machines and vehicles capable of operating without direct human control.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "Space Colonization",
+      "description": "Concept and technology development for sustained human settlement beyond Earth.",
+      "status": "overview",
+      "expandable": true
+    }
+  ],
+  "meta": {
+    "version": 1,
+    "last_updated": "2026-07-11",
+    "detail_level": "brief_overview",
+    "extensible": true,
+    "notes": "This file is a seed/overview record. Each subdomain entry is designed to be expanded with deeper structured knowledge (facts, definitions, key figures, sub-subtopics, sources) over time."
+  }
+}

@@ -1,0 +1,40 @@
+{
+  "domain_id": 1,
+  "domain": "Science",
+  "description": "The systematic study of the structure and behavior of the physical and natural world through observation, experiment, and mathematical reasoning.",
+  "subdomain_count": 8,
+  "subdomains": [
+    {
+      "name": "Physics",
+      "description": "Studies matter, energy, motion, and force, from subatomic particles to the cosmos; core branches include mechanics, thermodynamics, electromagnetism, and quantum theory."
+    },
+    {
+      "name": "Chemistry",
+      "description": "Examines the composition, structure, properties, and reactions of substances; spans organic, inorganic, physical, and analytical chemistry."
+    },
+    {
+      "name": "Biology",
+      "description": "The study of living organisms, covering genetics, cell biology, evolution, ecology, physiology, and molecular biology."
+    },
+    {
+      "name": "Mathematics",
+      "description": "The abstract science of number, quantity, structure, and space, underpinning algebra, geometry, calculus, statistics, and logic."
+    },
+    {
+      "name": "Astronomy",
+      "description": "Studies celestial objects, space, and the physical universe, including stars, planets, galaxies, and cosmology."
+    },
+    {
+      "name": "Earth Science",
+      "description": "Covers geology, meteorology, oceanography, and the physical processes shaping the planet."
+    },
+    {
+      "name": "Environmental Science",
+      "description": "An interdisciplinary study of ecosystems, pollution, conservation, and the interaction between humans and the natural world."
+    },
+    {
+      "name": "Space Science",
+      "description": "Focuses on space exploration, astrophysics, planetary science, and spacecraft/satellite technology."
+    }
+  ]
+}

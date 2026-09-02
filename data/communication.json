@@ -1,0 +1,44 @@
+{
+  "id": "communication",
+  "domain": "Communication",
+  "description": "The exchange and dissemination of information through media and interpersonal channels.",
+  "subdomains": [
+    {
+      "name": "Journalism",
+      "description": "The practice of gathering, assessing, and presenting news and information.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "Social Media",
+      "description": "Digital platforms enabling users to create and share content and interact.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "Public Relations",
+      "description": "Management of an organization's communication and reputation with the public.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "Broadcasting",
+      "description": "Distribution of audio or video content to a wide audience via media channels.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "Content Creation",
+      "description": "Production of material such as text, video, or audio for distribution.",
+      "status": "overview",
+      "expandable": true
+    }
+  ],
+  "meta": {
+    "version": 1,
+    "last_updated": "2026-07-11",
+    "detail_level": "brief_overview",
+    "extensible": true,
+    "notes": "This file is a seed/overview record. Each subdomain entry is designed to be expanded with deeper structured knowledge (facts, definitions, key figures, sub-subtopics, sources) over time."
+  }
+}

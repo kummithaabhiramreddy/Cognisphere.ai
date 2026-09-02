@@ -1,0 +1,62 @@
+{
+  "id": "arts_creativity",
+  "domain": "Arts & Creativity",
+  "description": "Human expression through visual, performing, and creative disciplines.",
+  "subdomains": [
+    {
+      "name": "Music",
+      "description": "Art of arranging sound through melody, harmony, rhythm, and timbre.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "Dance",
+      "description": "Art of expressive or aesthetic movement of the body.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "Painting",
+      "description": "Art of applying pigment to a surface to create visual works.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "Sculpture",
+      "description": "Art of creating three-dimensional works by shaping materials.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "Photography",
+      "description": "Art and practice of capturing images using light-sensitive media or sensors.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "Film Making",
+      "description": "Process of creating motion pictures, from writing to production and editing.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "Animation",
+      "description": "Technique of creating the illusion of movement through sequential images.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "Graphic Design",
+      "description": "Visual communication through typography, imagery, and layout.",
+      "status": "overview",
+      "expandable": true
+    }
+  ],
+  "meta": {
+    "version": 1,
+    "last_updated": "2026-07-11",
+    "detail_level": "brief_overview",
+    "extensible": true,
+    "notes": "This file is a seed/overview record. Each subdomain entry is designed to be expanded with deeper structured knowledge (facts, definitions, key figures, sub-subtopics, sources) over time."
+  }
+}

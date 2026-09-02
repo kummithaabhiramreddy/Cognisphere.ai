@@ -1,0 +1,169 @@
+{
+  "title": "World Brain AI - Domain Index",
+  "total_domains": 26,
+  "domains": [
+    {
+      "domain_id": 1,
+      "domain": "Science",
+      "file": "01_science.json",
+      "subdomain_count": 8
+    },
+    {
+      "domain_id": 2,
+      "domain": "Engineering",
+      "file": "02_engineering.json",
+      "subdomain_count": 17
+    },
+    {
+      "domain_id": 3,
+      "domain": "Artificial Intelligence",
+      "file": "03_artificial_intelligence.json",
+      "subdomain_count": 10
+    },
+    {
+      "domain_id": 4,
+      "domain": "Medicine & Healthcare",
+      "file": "04_medicine_healthcare.json",
+      "subdomain_count": 12
+    },
+    {
+      "domain_id": 5,
+      "domain": "Business",
+      "file": "05_business.json",
+      "subdomain_count": 11
+    },
+    {
+      "domain_id": 6,
+      "domain": "Education",
+      "file": "06_education.json",
+      "subdomain_count": 7
+    },
+    {
+      "domain_id": 7,
+      "domain": "Technology",
+      "file": "07_technology.json",
+      "subdomain_count": 11
+    },
+    {
+      "domain_id": 8,
+      "domain": "Government & Law",
+      "file": "08_government_law.json",
+      "subdomain_count": 8
+    },
+    {
+      "domain_id": 9,
+      "domain": "Agriculture",
+      "file": "09_agriculture.json",
+      "subdomain_count": 8
+    },
+    {
+      "domain_id": 10,
+      "domain": "Environment",
+      "file": "10_environment.json",
+      "subdomain_count": 7
+    },
+    {
+      "domain_id": 11,
+      "domain": "Arts & Creativity",
+      "file": "11_arts_creativity.json",
+      "subdomain_count": 8
+    },
+    {
+      "domain_id": 12,
+      "domain": "Language",
+      "file": "12_language.json",
+      "subdomain_count": 11
+    },
+    {
+      "domain_id": 13,
+      "domain": "Social Sciences",
+      "file": "13_social_sciences.json",
+      "subdomain_count": 6
+    },
+    {
+      "domain_id": 14,
+      "domain": "Sports",
+      "file": "14_sports.json",
+      "subdomain_count": 8
+    },
+    {
+      "domain_id": 15,
+      "domain": "Entertainment",
+      "file": "15_entertainment.json",
+      "subdomain_count": 8
+    },
+    {
+      "domain_id": 16,
+      "domain": "Lifestyle",
+      "file": "16_lifestyle.json",
+      "subdomain_count": 7
+    },
+    {
+      "domain_id": 17,
+      "domain": "Industry",
+      "file": "17_industry.json",
+      "subdomain_count": 10
+    },
+    {
+      "domain_id": 18,
+      "domain": "Security",
+      "file": "18_security.json",
+      "subdomain_count": 4
+    },
+    {
+      "domain_id": 19,
+      "domain": "Religion & Culture",
+      "file": "19_religion_culture.json",
+      "subdomain_count": 5
+    },
+    {
+      "domain_id": 20,
+      "domain": "Commerce",
+      "file": "20_commerce.json",
+      "subdomain_count": 5
+    },
+    {
+      "domain_id": 21,
+      "domain": "Research",
+      "file": "21_research.json",
+      "subdomain_count": 5
+    },
+    {
+      "domain_id": 22,
+      "domain": "Data & Analytics",
+      "file": "22_data_analytics.json",
+      "subdomain_count": 6
+    },
+    {
+      "domain_id": 23,
+      "domain": "Communication",
+      "file": "23_communication.json",
+      "subdomain_count": 5
+    },
+    {
+      "domain_id": 24,
+      "domain": "Future Technologies",
+      "file": "24_future_technologies.json",
+      "subdomain_count": 8
+    },
+    {
+      "domain_id": 25,
+      "domain": "User Knowledge",
+      "file": "25_user_knowledge.json",
+      "subdomain_count": 6
+    },
+    {
+      "domain_id": 26,
+      "domain": "World Knowledge",
+      "file": "26_world_knowledge.json",
+      "subdomain_count": 8
+    },
+    {
+      "domain_id": 27,
+      "domain": "System Architecture",
+      "file": "27_system_architecture.json",
+      "subdomain_count": 5
+    }
+  ],
+  "core_agents_file": "00_core_ai_agents.json"
+}

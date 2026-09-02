@@ -1,0 +1,56 @@
+{
+  "id": "lifestyle",
+  "domain": "Lifestyle",
+  "description": "Everyday habits, interests, and choices that shape personal well-being and identity.",
+  "subdomains": [
+    {
+      "name": "Fashion",
+      "description": "Trends and styles in clothing, accessories, and personal appearance.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "Beauty",
+      "description": "Practices and products related to skincare, cosmetics, and personal grooming.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "Travel",
+      "description": "Movement between destinations for leisure, business, or exploration.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "Food",
+      "description": "Culinary practices, cuisines, and the culture surrounding eating.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "Fitness",
+      "description": "Physical exercise and practices aimed at improving health and strength.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "Relationships",
+      "description": "Interpersonal connections including family, friendship, and romantic partnerships.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "Parenting",
+      "description": "The process of raising and nurturing children.",
+      "status": "overview",
+      "expandable": true
+    }
+  ],
+  "meta": {
+    "version": 1,
+    "last_updated": "2026-07-11",
+    "detail_level": "brief_overview",
+    "extensible": true,
+    "notes": "This file is a seed/overview record. Each subdomain entry is designed to be expanded with deeper structured knowledge (facts, definitions, key figures, sub-subtopics, sources) over time."
+  }
+}

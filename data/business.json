@@ -1,0 +1,80 @@
+{
+  "id": "business",
+  "domain": "Business",
+  "description": "The organization, management, and operation of commercial enterprises to create and deliver value.",
+  "subdomains": [
+    {
+      "name": "Finance",
+      "description": "Management of money, investments, and financial risk for individuals and organizations.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "Accounting",
+      "description": "Recording, summarizing, and reporting financial transactions of a business.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "Marketing",
+      "description": "Activities aimed at promoting and selling products or services to customers.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "Sales",
+      "description": "Direct processes of persuading and converting prospects into paying customers.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "Entrepreneurship",
+      "description": "Process of designing, launching, and running a new business venture.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "Management",
+      "description": "Coordination and administration of people and resources to achieve organizational goals.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "HR",
+      "description": "Human Resources — recruiting, developing, and managing an organization's workforce.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "Supply Chain",
+      "description": "Management of the flow of goods, services, and information from origin to consumer.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "Economics",
+      "description": "Study of production, distribution, and consumption of goods and services.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "Banking",
+      "description": "Provision of financial services such as deposits, loans, and payments by institutions.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "Investment",
+      "description": "Allocation of capital into assets with the expectation of generating returns.",
+      "status": "overview",
+      "expandable": true
+    }
+  ],
+  "meta": {
+    "version": 1,
+    "last_updated": "2026-07-11",
+    "detail_level": "brief_overview",
+    "extensible": true,
+    "notes": "This file is a seed/overview record. Each subdomain entry is designed to be expanded with deeper structured knowledge (facts, definitions, key figures, sub-subtopics, sources) over time."
+  }
+}

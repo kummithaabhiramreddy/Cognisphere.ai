@@ -1,0 +1,28 @@
+{
+  "domain_id": 20,
+  "domain": "Commerce",
+  "description": "The exchange of goods and services, and the systems that support trade.",
+  "subdomain_count": 5,
+  "subdomains": [
+    {
+      "name": "E-commerce",
+      "description": "Buying and selling goods and services over the internet."
+    },
+    {
+      "name": "Retail",
+      "description": "The sale of goods directly to consumers through stores or online channels."
+    },
+    {
+      "name": "Wholesale",
+      "description": "Selling goods in large quantities, typically to retailers rather than consumers."
+    },
+    {
+      "name": "Logistics",
+      "description": "Planning and managing the flow of goods from origin to destination."
+    },
+    {
+      "name": "International Trade",
+      "description": "The exchange of goods and services across national borders."
+    }
+  ]
+}

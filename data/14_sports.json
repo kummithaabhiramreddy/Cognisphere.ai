@@ -1,0 +1,40 @@
+{
+  "domain_id": 14,
+  "domain": "Sports",
+  "description": "Physical activities and competitive games governed by rules, played for recreation or professional competition.",
+  "subdomain_count": 8,
+  "subdomains": [
+    {
+      "name": "Cricket",
+      "description": "A bat-and-ball sport especially popular in South Asia, UK, and Australia."
+    },
+    {
+      "name": "Football",
+      "description": "The world's most popular sport, played between two teams aiming to score goals."
+    },
+    {
+      "name": "Tennis",
+      "description": "A racket sport played individually or in doubles across various court surfaces."
+    },
+    {
+      "name": "Basketball",
+      "description": "A team sport where players score by shooting a ball through a hoop."
+    },
+    {
+      "name": "Volleyball",
+      "description": "A team sport played by hitting a ball over a net without letting it touch the ground."
+    },
+    {
+      "name": "Athletics",
+      "description": "Track and field events including running, jumping, and throwing disciplines."
+    },
+    {
+      "name": "Olympics",
+      "description": "The world's foremost international multi-sport event held every four years."
+    },
+    {
+      "name": "Esports",
+      "description": "Competitive video gaming at a professional level, often broadcast to large audiences."
+    }
+  ]
+}

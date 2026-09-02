@@ -1,0 +1,40 @@
+{
+  "domain_id": 9,
+  "domain": "Agriculture",
+  "description": "The practice of cultivating crops and raising livestock to produce food, fiber, and other products.",
+  "subdomain_count": 8,
+  "subdomains": [
+    {
+      "name": "Crops",
+      "description": "Cultivation of plants for food, fiber, and industrial use."
+    },
+    {
+      "name": "Irrigation",
+      "description": "Controlled application of water to assist crop growth in dry conditions."
+    },
+    {
+      "name": "Fertilizers",
+      "description": "Substances added to soil to supply nutrients essential for plant growth."
+    },
+    {
+      "name": "Organic Farming",
+      "description": "Agricultural methods avoiding synthetic pesticides and fertilizers, emphasizing sustainability."
+    },
+    {
+      "name": "Livestock",
+      "description": "Raising animals such as cattle, poultry, and goats for food and other products."
+    },
+    {
+      "name": "Fisheries",
+      "description": "The management and harvesting of fish and aquatic resources."
+    },
+    {
+      "name": "Dairy",
+      "description": "Production and processing of milk and milk-based products."
+    },
+    {
+      "name": "Food Processing",
+      "description": "Transforming raw agricultural products into consumable food products."
+    }
+  ]
+}

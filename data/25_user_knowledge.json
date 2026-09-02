@@ -1,0 +1,32 @@
+{
+  "domain_id": 25,
+  "domain": "User Knowledge",
+  "description": "Knowledge contributed, curated, or verified by individuals and communities rather than formal institutions.",
+  "subdomain_count": 6,
+  "subdomains": [
+    {
+      "name": "Personal Notes",
+      "description": "Individually maintained records, ideas, and reference material."
+    },
+    {
+      "name": "Community Contributions",
+      "description": "Knowledge crowdsourced and refined collaboratively by groups of users."
+    },
+    {
+      "name": "Local Knowledge",
+      "description": "Region-specific, practical, or traditional knowledge held by local communities."
+    },
+    {
+      "name": "Project Documents",
+      "description": "Documentation created to support specific projects, plans, or initiatives."
+    },
+    {
+      "name": "Expert Knowledge",
+      "description": "Specialized insight and experience contributed by domain experts."
+    },
+    {
+      "name": "Verified User Contributions",
+      "description": "User-submitted knowledge that has been fact-checked or validated for accuracy."
+    }
+  ]
+}

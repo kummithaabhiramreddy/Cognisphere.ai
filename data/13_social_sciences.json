@@ -1,0 +1,32 @@
+{
+  "domain_id": 13,
+  "domain": "Social Sciences",
+  "description": "Academic disciplines studying human society, behavior, and relationships.",
+  "subdomain_count": 6,
+  "subdomains": [
+    {
+      "name": "Psychology",
+      "description": "The scientific study of the human mind and behavior."
+    },
+    {
+      "name": "Sociology",
+      "description": "The study of society, social relationships, and institutions."
+    },
+    {
+      "name": "Anthropology",
+      "description": "The study of human societies, cultures, and their development over time."
+    },
+    {
+      "name": "Geography",
+      "description": "Studies the physical features of the earth and human interaction with them."
+    },
+    {
+      "name": "History",
+      "description": "The study of past events, particularly human affairs and civilizations."
+    },
+    {
+      "name": "Philosophy",
+      "description": "The study of fundamental questions about existence, knowledge, ethics, and reason."
+    }
+  ]
+}

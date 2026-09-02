@@ -1,0 +1,44 @@
+{
+  "id": "religion_culture",
+  "domain": "Religion & Culture",
+  "description": "Belief systems, traditions, and shared practices that shape communities and identities.",
+  "subdomains": [
+    {
+      "name": "Religions",
+      "description": "Organized systems of belief, worship, and moral guidance.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "Festivals",
+      "description": "Celebratory events marking cultural, religious, or seasonal occasions.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "Traditions",
+      "description": "Customs and practices passed down within a community over generations.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "Cultural Heritage",
+      "description": "Inherited traditions, monuments, and practices of a society.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "Archaeology",
+      "description": "Study of human history through excavation and analysis of artifacts.",
+      "status": "overview",
+      "expandable": true
+    }
+  ],
+  "meta": {
+    "version": 1,
+    "last_updated": "2026-07-11",
+    "detail_level": "brief_overview",
+    "extensible": true,
+    "notes": "This file is a seed/overview record. Each subdomain entry is designed to be expanded with deeper structured knowledge (facts, definitions, key figures, sub-subtopics, sources) over time."
+  }
+}

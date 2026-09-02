@@ -1,0 +1,44 @@
+{
+  "id": "commerce",
+  "domain": "Commerce",
+  "description": "The exchange of goods and services, including trade, retail, and distribution systems.",
+  "subdomains": [
+    {
+      "name": "E-commerce",
+      "description": "Buying and selling of goods and services over the internet.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "Retail",
+      "description": "Sale of goods directly to consumers through stores or other channels.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "Wholesale",
+      "description": "Sale of goods in large quantities, typically to retailers rather than consumers.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "Logistics",
+      "description": "Planning and management of the flow of goods, information, and resources.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "International Trade",
+      "description": "Exchange of goods and services across national borders.",
+      "status": "overview",
+      "expandable": true
+    }
+  ],
+  "meta": {
+    "version": 1,
+    "last_updated": "2026-07-11",
+    "detail_level": "brief_overview",
+    "extensible": true,
+    "notes": "This file is a seed/overview record. Each subdomain entry is designed to be expanded with deeper structured knowledge (facts, definitions, key figures, sub-subtopics, sources) over time."
+  }
+}

@@ -1,0 +1,40 @@
+{
+  "domain_id": 15,
+  "domain": "Entertainment",
+  "description": "Media and activities designed to amuse, engage, or entertain audiences.",
+  "subdomain_count": 8,
+  "subdomains": [
+    {
+      "name": "Movies",
+      "description": "Feature-length films produced for theatrical or streaming release."
+    },
+    {
+      "name": "TV Shows",
+      "description": "Episodic programming broadcast on television or streaming platforms."
+    },
+    {
+      "name": "OTT",
+      "description": "Over-the-top streaming platforms delivering content directly via the internet."
+    },
+    {
+      "name": "Music",
+      "description": "Recorded and performed audio entertainment across genres and cultures."
+    },
+    {
+      "name": "Celebrities",
+      "description": "Public figures known for achievements in entertainment, sports, or media."
+    },
+    {
+      "name": "Games",
+      "description": "Interactive digital or physical entertainment across consoles, PC, and mobile."
+    },
+    {
+      "name": "Comics",
+      "description": "Sequential art storytelling, often featuring illustrated narratives and superheroes."
+    },
+    {
+      "name": "Anime",
+      "description": "Japanese animated productions spanning many genres and global audiences."
+    }
+  ]
+}

@@ -1,0 +1,38 @@
+{
+  "id": "security",
+  "domain": "Security",
+  "description": "Measures and systems designed to protect people, assets, and information from harm.",
+  "subdomains": [
+    {
+      "name": "Cyber Security",
+      "description": "Protection of digital systems, networks, and data from cyber threats.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "Physical Security",
+      "description": "Protection of people, property, and assets from physical threats.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "National Security",
+      "description": "Protection of a nation's sovereignty, citizens, and interests.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "Digital Forensics",
+      "description": "Investigation and recovery of material found in digital devices for evidence.",
+      "status": "overview",
+      "expandable": true
+    }
+  ],
+  "meta": {
+    "version": 1,
+    "last_updated": "2026-07-11",
+    "detail_level": "brief_overview",
+    "extensible": true,
+    "notes": "This file is a seed/overview record. Each subdomain entry is designed to be expanded with deeper structured knowledge (facts, definitions, key figures, sub-subtopics, sources) over time."
+  }
+}

@@ -1,0 +1,40 @@
+{
+  "domain_id": 11,
+  "domain": "Arts & Creativity",
+  "description": "Human expression through visual, performing, and creative disciplines.",
+  "subdomain_count": 8,
+  "subdomains": [
+    {
+      "name": "Music",
+      "description": "The art of arranging sound through melody, harmony, and rhythm."
+    },
+    {
+      "name": "Dance",
+      "description": "Expressive movement of the body, often set to music, across many cultural forms."
+    },
+    {
+      "name": "Painting",
+      "description": "Visual art created using pigments applied to a surface."
+    },
+    {
+      "name": "Sculpture",
+      "description": "Three-dimensional art created by shaping materials like stone, metal, or clay."
+    },
+    {
+      "name": "Photography",
+      "description": "The art and technique of capturing images using light and cameras."
+    },
+    {
+      "name": "Film Making",
+      "description": "The process of creating motion pictures, from writing to production and editing."
+    },
+    {
+      "name": "Animation",
+      "description": "Creating the illusion of motion through sequential images or digital techniques."
+    },
+    {
+      "name": "Graphic Design",
+      "description": "Visual communication through typography, imagery, and layout."
+    }
+  ]
+}

@@ -1,0 +1,32 @@
+{
+  "domain_id": 22,
+  "domain": "Data & Analytics",
+  "description": "The collection, processing, and interpretation of data to support insights and decisions.",
+  "subdomain_count": 6,
+  "subdomains": [
+    {
+      "name": "Big Data",
+      "description": "Extremely large and complex datasets requiring specialized tools to process and analyze."
+    },
+    {
+      "name": "Data Engineering",
+      "description": "Designing and building systems for collecting, storing, and processing data."
+    },
+    {
+      "name": "Data Warehousing",
+      "description": "Centralized repositories that store integrated data from multiple sources for analysis."
+    },
+    {
+      "name": "Business Intelligence",
+      "description": "Technologies and strategies used to analyze business data and support decisions."
+    },
+    {
+      "name": "Statistics",
+      "description": "The mathematical science of collecting, analyzing, and interpreting data."
+    },
+    {
+      "name": "Visualization",
+      "description": "Representing data graphically to reveal patterns, trends, and insights."
+    }
+  ]
+}

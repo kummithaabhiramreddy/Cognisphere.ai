@@ -1,0 +1,44 @@
+{
+  "id": "research",
+  "domain": "Research",
+  "description": "Systematic investigation and inquiry aimed at discovering and validating new knowledge.",
+  "subdomains": [
+    {
+      "name": "Journals",
+      "description": "Periodic publications presenting peer-reviewed scholarly research.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "Patents",
+      "description": "Legal protections granted for inventions, giving exclusive rights to inventors.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "Innovation",
+      "description": "Development and application of new ideas, methods, or products.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "Scientific Papers",
+      "description": "Formal written reports describing original research findings.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "Experiments",
+      "description": "Controlled procedures conducted to test hypotheses and gather data.",
+      "status": "overview",
+      "expandable": true
+    }
+  ],
+  "meta": {
+    "version": 1,
+    "last_updated": "2026-07-11",
+    "detail_level": "brief_overview",
+    "extensible": true,
+    "notes": "This file is a seed/overview record. Each subdomain entry is designed to be expanded with deeper structured knowledge (facts, definitions, key figures, sub-subtopics, sources) over time."
+  }
+}

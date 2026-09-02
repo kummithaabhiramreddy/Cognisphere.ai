@@ -1,0 +1,52 @@
+{
+  "domain_id": 12,
+  "domain": "Language",
+  "description": "Systems of communication, written and spoken, and the study of linguistics and translation.",
+  "subdomain_count": 11,
+  "subdomains": [
+    {
+      "name": "English",
+      "description": "A global lingua franca and one of the most widely spoken languages in business and science."
+    },
+    {
+      "name": "Telugu",
+      "description": "A Dravidian language primarily spoken in the Indian states of Andhra Pradesh and Telangana."
+    },
+    {
+      "name": "Hindi",
+      "description": "An Indo-Aryan language and one of the official languages of India."
+    },
+    {
+      "name": "Tamil",
+      "description": "One of the oldest Dravidian languages, spoken mainly in Tamil Nadu and Sri Lanka."
+    },
+    {
+      "name": "Kannada",
+      "description": "A Dravidian language spoken primarily in the Indian state of Karnataka."
+    },
+    {
+      "name": "Japanese",
+      "description": "The national language of Japan, written using kanji, hiragana, and katakana."
+    },
+    {
+      "name": "Chinese",
+      "description": "A group of languages including Mandarin, the most spoken language in the world by native speakers."
+    },
+    {
+      "name": "French",
+      "description": "A Romance language widely spoken across Europe, Africa, and Canada."
+    },
+    {
+      "name": "German",
+      "description": "A West Germanic language spoken mainly in Germany, Austria, and Switzerland."
+    },
+    {
+      "name": "Translation",
+      "description": "Converting text or speech from one language to another while preserving meaning."
+    },
+    {
+      "name": "Grammar",
+      "description": "The set of rules governing the structure and composition of a language."
+    }
+  ]
+}

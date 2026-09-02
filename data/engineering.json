@@ -1,0 +1,116 @@
+{
+  "id": "engineering",
+  "domain": "Engineering",
+  "description": "The application of scientific and mathematical principles to design, build, and maintain structures, machines, and systems.",
+  "subdomains": [
+    {
+      "name": "Mechanical",
+      "description": "Design and analysis of machines, mechanisms, thermal systems, and manufacturing processes.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "Civil",
+      "description": "Design and construction of infrastructure such as buildings, bridges, roads, and water systems.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "Electrical",
+      "description": "Study and application of electricity, electromagnetism, and electronics in power and control systems.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "Electronics",
+      "description": "Design of circuits and devices using semiconductors and electronic components.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "Computer Science",
+      "description": "Study of computation, algorithms, programming languages, and information systems.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "Information Technology",
+      "description": "Deployment and management of computer systems, networks, and software for organizations.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "Aerospace",
+      "description": "Design and development of aircraft, spacecraft, and related systems.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "Mechatronics",
+      "description": "Integration of mechanical, electronic, and computer engineering to design smart devices.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "Robotics",
+      "description": "Design, construction, and operation of robots and autonomous machines.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "Biomedical",
+      "description": "Application of engineering principles to medicine and biology, including devices and prosthetics.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "Chemical",
+      "description": "Design of processes for large-scale chemical, fuel, and material production.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "Petroleum",
+      "description": "Engineering related to the extraction and processing of oil and natural gas.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "Marine",
+      "description": "Design and construction of ships, submarines, and offshore structures.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "Agricultural",
+      "description": "Engineering applied to farm equipment, irrigation, and food production systems.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "Mining",
+      "description": "Engineering focused on safe and efficient extraction of minerals and resources.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "Materials Engineering",
+      "description": "Study and development of new materials with tailored physical and chemical properties.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "Industrial Engineering",
+      "description": "Optimization of complex processes, systems, and organizations for efficiency.",
+      "status": "overview",
+      "expandable": true
+    }
+  ],
+  "meta": {
+    "version": 1,
+    "last_updated": "2026-07-11",
+    "detail_level": "brief_overview",
+    "extensible": true,
+    "notes": "This file is a seed/overview record. Each subdomain entry is designed to be expanded with deeper structured knowledge (facts, definitions, key figures, sub-subtopics, sources) over time."
+  }
+}

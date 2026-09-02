@@ -1,0 +1,62 @@
+{
+  "id": "entertainment",
+  "domain": "Entertainment",
+  "description": "Media and activities designed to provide amusement, enjoyment, or engagement to audiences.",
+  "subdomains": [
+    {
+      "name": "Movies",
+      "description": "Feature-length visual storytelling produced for cinema or streaming release.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "TV Shows",
+      "description": "Serialized visual content produced for television or streaming platforms.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "OTT",
+      "description": "Over-the-top streaming platforms delivering media directly via the internet.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "Music",
+      "description": "Recorded and performed audio art consumed for entertainment.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "Celebrities",
+      "description": "Public figures known through media, entertainment, or notable achievement.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "Games",
+      "description": "Interactive digital or physical activities played for entertainment.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "Comics",
+      "description": "Sequential art narratives combining images and text.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "Anime",
+      "description": "Japanese animated productions with a distinctive visual style and storytelling.",
+      "status": "overview",
+      "expandable": true
+    }
+  ],
+  "meta": {
+    "version": 1,
+    "last_updated": "2026-07-11",
+    "detail_level": "brief_overview",
+    "extensible": true,
+    "notes": "This file is a seed/overview record. Each subdomain entry is designed to be expanded with deeper structured knowledge (facts, definitions, key figures, sub-subtopics, sources) over time."
+  }
+}

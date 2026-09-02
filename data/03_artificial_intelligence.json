@@ -1,0 +1,48 @@
+{
+  "domain_id": 3,
+  "domain": "Artificial Intelligence",
+  "description": "The field of building systems that can perform tasks typically requiring human intelligence, such as learning, reasoning, and perception.",
+  "subdomain_count": 10,
+  "subdomains": [
+    {
+      "name": "Machine Learning",
+      "description": "Algorithms that learn patterns from data to make predictions or decisions without explicit programming."
+    },
+    {
+      "name": "Deep Learning",
+      "description": "A subset of machine learning using multi-layered neural networks to model complex patterns."
+    },
+    {
+      "name": "NLP",
+      "description": "Natural Language Processing enables machines to understand, generate, and interact using human language."
+    },
+    {
+      "name": "Computer Vision",
+      "description": "Enables machines to interpret and process visual information from images and video."
+    },
+    {
+      "name": "Robotics AI",
+      "description": "AI techniques applied to perception, planning, and control in physical robots."
+    },
+    {
+      "name": "Reinforcement Learning",
+      "description": "Agents learn optimal behavior through trial-and-error interactions with an environment and reward signals."
+    },
+    {
+      "name": "Generative AI",
+      "description": "Models that create new content such as text, images, audio, or code from learned patterns."
+    },
+    {
+      "name": "Multi-Agent Systems",
+      "description": "Systems where multiple AI agents interact, cooperate, or compete to achieve goals."
+    },
+    {
+      "name": "AI Safety",
+      "description": "Research focused on ensuring AI systems behave reliably, predictably, and without unintended harm."
+    },
+    {
+      "name": "AI Ethics",
+      "description": "Examines fairness, bias, accountability, and societal impact of AI systems."
+    }
+  ]
+}

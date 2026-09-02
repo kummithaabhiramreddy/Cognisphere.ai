@@ -1,0 +1,40 @@
+{
+  "domain_id": 26,
+  "domain": "World Knowledge",
+  "description": "General reference knowledge about countries, geography, economies, and global affairs.",
+  "subdomain_count": 8,
+  "subdomains": [
+    {
+      "name": "Countries",
+      "description": "Sovereign nations of the world, their governments, and characteristics."
+    },
+    {
+      "name": "Cities",
+      "description": "Major urban centers and their demographic and economic significance."
+    },
+    {
+      "name": "Population",
+      "description": "Demographic data and trends about human populations globally."
+    },
+    {
+      "name": "Economy",
+      "description": "The production, distribution, and consumption of goods and services at national and global scale."
+    },
+    {
+      "name": "Geography",
+      "description": "The physical layout of the world, including terrain, climate, and natural resources."
+    },
+    {
+      "name": "Organizations",
+      "description": "International and intergovernmental bodies such as the UN, WHO, and World Bank."
+    },
+    {
+      "name": "Global Events",
+      "description": "Major historical and contemporary events affecting the world at large."
+    },
+    {
+      "name": "International Statistics",
+      "description": "Quantitative data used to compare countries across economic and social indicators."
+    }
+  ]
+}

@@ -1,0 +1,50 @@
+{
+  "id": "data_analytics",
+  "domain": "Data & Analytics",
+  "description": "The collection, processing, and interpretation of data to inform decisions.",
+  "subdomains": [
+    {
+      "name": "Big Data",
+      "description": "Extremely large and complex data sets requiring specialized processing methods.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "Data Engineering",
+      "description": "Design and building of systems for collecting and processing data at scale.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "Data Warehousing",
+      "description": "Centralized storage of integrated data from multiple sources for analysis.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "Business Intelligence",
+      "description": "Technologies and practices for analyzing business data to support decisions.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "Statistics",
+      "description": "Mathematical discipline involving the collection and interpretation of numerical data.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "Visualization",
+      "description": "Graphical representation of data to reveal patterns and insights.",
+      "status": "overview",
+      "expandable": true
+    }
+  ],
+  "meta": {
+    "version": 1,
+    "last_updated": "2026-07-11",
+    "detail_level": "brief_overview",
+    "extensible": true,
+    "notes": "This file is a seed/overview record. Each subdomain entry is designed to be expanded with deeper structured knowledge (facts, definitions, key figures, sub-subtopics, sources) over time."
+  }
+}

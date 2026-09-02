@@ -1,0 +1,40 @@
+{
+  "domain_id": 8,
+  "domain": "Government & Law",
+  "description": "The systems of governance, legislation, and legal frameworks that regulate societies and protect rights.",
+  "subdomain_count": 8,
+  "subdomains": [
+    {
+      "name": "Constitution",
+      "description": "The fundamental legal document establishing a nation's structure of government and rights."
+    },
+    {
+      "name": "Politics",
+      "description": "The activities and processes involved in governing and exercising power."
+    },
+    {
+      "name": "Public Administration",
+      "description": "Implementation of government policy and management of public programs."
+    },
+    {
+      "name": "Law",
+      "description": "The system of rules enforced by institutions to regulate behavior and resolve disputes."
+    },
+    {
+      "name": "Human Rights",
+      "description": "Fundamental rights and freedoms inherent to all individuals, protected by law."
+    },
+    {
+      "name": "International Relations",
+      "description": "Studies interactions between nations, including diplomacy, trade, and conflict."
+    },
+    {
+      "name": "Defense",
+      "description": "Military and strategic systems for national security and protection."
+    },
+    {
+      "name": "Taxation",
+      "description": "The system by which governments levy and collect revenue from individuals and businesses."
+    }
+  ]
+}

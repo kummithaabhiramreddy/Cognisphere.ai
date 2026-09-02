@@ -1,8 +1,15 @@
 node_modules
+*/node_modules
 .env
+*.env
+*.env.local
+.next
+*/.next
 *.log
 .DS_Store
 scratch/
 scratch_script*.js
 frontend.worktrees/
-
+__pycache__/
+*/__pycache__/
+*.pyc

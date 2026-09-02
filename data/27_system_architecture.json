@@ -1,0 +1,28 @@
+{
+  "domain_id": 27,
+  "domain": "System Architecture",
+  "description": "The architectural components of WorldBrain AI, detailing its core agents, information sources, features, and future quantum computing integration.",
+  "subdomain_count": 5,
+  "subdomains": [
+    {
+      "name": "Main AI Agents",
+      "description": "Intent AI, Search AI, Knowledge Graph AI, Memory AI, Planning AI, Research AI, Image AI, Video AI, Audio AI, Translation AI, Coding AI, Scientific AI, Medical AI, Financial AI, Legal AI, Education AI, Math AI, Recommendation AI, Security AI, Response AI"
+    },
+    {
+      "name": "World Information Sources",
+      "description": "Government open data, Research papers, Books, Wikipedia, News websites, Educational websites, Scientific journals, Weather services, Maps, Satellite imagery, Public APIs, Open-source code repositories, Social media, User-uploaded documents, Company information, Healthcare guidelines, Financial market data, Sports data, Entertainment databases"
+    },
+    {
+      "name": "AI Features",
+      "description": "Natural conversation, Multi-language support, Voice assistant, Real-time search, Fact verification, Source citations, AI-generated summaries, Deep research mode, Code generation, Document analysis, PDF understanding, Image understanding, Video understanding, Audio transcription, OCR, Live translation, Personalized memory, AI tutoring, Meeting assistant, Workflow automation"
+    },
+    {
+      "name": "Advanced Features",
+      "description": "World Knowledge Graph, Global Semantic Search, AI Memory, AI Agents, Autonomous Research, AI Planning, AI Reasoning, Live Web Index, Live News Index, Live Scientific Database, Personalized AI Workspace, Enterprise AI, Quantum Computing Integration"
+    },
+    {
+      "name": "Quantum Computing Integration (Future)",
+      "description": "Utilizing quantum computing for Knowledge graph optimization, Large-scale optimization problems, Drug discovery simulations, Scientific simulations, Cryptography research, AI model optimization, Complex scheduling, and Supply-chain optimization. The main AI system will run on conventional GPUs and cloud servers while delegating specific advantageous tasks to quantum computing."
+    }
+  ]
+}

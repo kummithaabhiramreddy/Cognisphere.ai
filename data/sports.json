@@ -1,0 +1,62 @@
+{
+  "id": "sports",
+  "domain": "Sports",
+  "description": "Organized physical competitions and games played for recreation, competition, or profession.",
+  "subdomains": [
+    {
+      "name": "Cricket",
+      "description": "A bat-and-ball team sport especially popular in South Asia, the UK, and Australia.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "Football",
+      "description": "A team sport played with a ball, known as soccer in some countries, with global popularity.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "Tennis",
+      "description": "A racket sport played individually or in pairs across a net.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "Basketball",
+      "description": "A team sport played by shooting a ball through an elevated hoop.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "Volleyball",
+      "description": "A team sport where players hit a ball over a net without letting it touch the ground.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "Athletics",
+      "description": "Track and field events including running, jumping, and throwing disciplines.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "Olympics",
+      "description": "A major international multi-sport event held every four years.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "Esports",
+      "description": "Competitive video gaming played individually or in teams.",
+      "status": "overview",
+      "expandable": true
+    }
+  ],
+  "meta": {
+    "version": 1,
+    "last_updated": "2026-07-11",
+    "detail_level": "brief_overview",
+    "extensible": true,
+    "notes": "This file is a seed/overview record. Each subdomain entry is designed to be expanded with deeper structured knowledge (facts, definitions, key figures, sub-subtopics, sources) over time."
+  }
+}

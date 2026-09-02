@@ -1,0 +1,36 @@
+{
+  "domain_id": 6,
+  "domain": "Education",
+  "description": "The process and institutions through which knowledge, skills, and values are imparted and acquired.",
+  "subdomain_count": 7,
+  "subdomains": [
+    {
+      "name": "School Education",
+      "description": "Primary and secondary education building foundational knowledge and skills."
+    },
+    {
+      "name": "Higher Education",
+      "description": "University and college-level education leading to degrees and specialization."
+    },
+    {
+      "name": "Online Learning",
+      "description": "Education delivered through digital platforms, enabling remote and self-paced study."
+    },
+    {
+      "name": "Skill Development",
+      "description": "Training focused on practical, job-ready competencies and vocational skills."
+    },
+    {
+      "name": "Research",
+      "description": "Systematic investigation to establish facts and reach new conclusions in academia."
+    },
+    {
+      "name": "Competitive Exams",
+      "description": "Standardized tests used for admissions, scholarships, or employment selection."
+    },
+    {
+      "name": "Certifications",
+      "description": "Formal recognition of skills or knowledge in a specific field or profession."
+    }
+  ]
+}

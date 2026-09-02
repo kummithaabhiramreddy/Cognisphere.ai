@@ -1,0 +1,62 @@
+{
+  "id": "science",
+  "domain": "Science",
+  "description": "The systematic study of the structure and behavior of the physical and natural world through observation and experiment.",
+  "subdomains": [
+    {
+      "name": "Physics",
+      "description": "Study of matter, energy, motion, and force across scales from subatomic particles to the cosmos.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "Chemistry",
+      "description": "Study of substances, their properties, composition, and the reactions they undergo.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "Biology",
+      "description": "Study of living organisms, their structure, function, growth, evolution, and interactions.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "Mathematics",
+      "description": "The abstract science of number, quantity, structure, space, and change, underpinning all quantitative reasoning.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "Astronomy",
+      "description": "Study of celestial objects, space, and the physical universe as a whole.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "Earth Science",
+      "description": "Study of Earth's physical structure, substance, processes, and history, including geology and meteorology.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "Environmental Science",
+      "description": "Interdisciplinary study of the environment and solutions to environmental problems.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "Space Science",
+      "description": "Study of outer space, including planetary science, space physics, and space exploration technology.",
+      "status": "overview",
+      "expandable": true
+    }
+  ],
+  "meta": {
+    "version": 1,
+    "last_updated": "2026-07-11",
+    "detail_level": "brief_overview",
+    "extensible": true,
+    "notes": "This file is a seed/overview record. Each subdomain entry is designed to be expanded with deeper structured knowledge (facts, definitions, key figures, sub-subtopics, sources) over time."
+  }
+}

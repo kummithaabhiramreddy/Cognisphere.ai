@@ -1,0 +1,74 @@
+{
+  "id": "industry",
+  "domain": "Industry",
+  "description": "Large-scale production and economic activity involving manufacturing and infrastructure sectors.",
+  "subdomains": [
+    {
+      "name": "Manufacturing",
+      "description": "Production of goods through processing of raw materials or components.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "Construction",
+      "description": "Process of building infrastructure, buildings, and structures.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "Automotive",
+      "description": "Industry involved in the design, manufacture, and sale of motor vehicles.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "Aviation",
+      "description": "Industry related to aircraft design, manufacturing, and air travel.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "Shipping",
+      "description": "Industry involved in the transport of goods and people by sea.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "Textile",
+      "description": "Industry involved in the production of fabric, clothing, and fibers.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "Pharma",
+      "description": "Industry involved in the discovery, production, and marketing of medicines.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "Energy",
+      "description": "Industry involved in the production and distribution of power resources.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "Mining",
+      "description": "Industry involved in the extraction of minerals and natural resources from the earth.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "Telecom",
+      "description": "Industry involved in the transmission of information across distances electronically.",
+      "status": "overview",
+      "expandable": true
+    }
+  ],
+  "meta": {
+    "version": 1,
+    "last_updated": "2026-07-11",
+    "detail_level": "brief_overview",
+    "extensible": true,
+    "notes": "This file is a seed/overview record. Each subdomain entry is designed to be expanded with deeper structured knowledge (facts, definitions, key figures, sub-subtopics, sources) over time."
+  }
+}

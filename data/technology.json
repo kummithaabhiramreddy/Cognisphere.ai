@@ -1,0 +1,80 @@
+{
+  "id": "technology",
+  "domain": "Technology",
+  "description": "The application of scientific knowledge for practical purposes, especially in industry and computing.",
+  "subdomains": [
+    {
+      "name": "Software",
+      "description": "Programs and applications that run on computing devices to perform tasks.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "Hardware",
+      "description": "Physical components of computing devices and systems.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "Cloud Computing",
+      "description": "Delivery of computing services such as storage and processing over the internet.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "Cybersecurity",
+      "description": "Protection of systems, networks, and data from digital attacks.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "Networking",
+      "description": "Design and management of systems that connect computers to share data.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "IoT",
+      "description": "Internet of Things — network of physical devices embedded with sensors and connectivity.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "Blockchain",
+      "description": "Distributed ledger technology enabling secure, decentralized record-keeping.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "Quantum Computing",
+      "description": "Computing that uses quantum-mechanical phenomena to perform calculations.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "Data Science",
+      "description": "Extraction of knowledge and insights from structured and unstructured data.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "Web Development",
+      "description": "Building and maintaining websites and web applications.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "Mobile Development",
+      "description": "Building applications for smartphones and other mobile devices.",
+      "status": "overview",
+      "expandable": true
+    }
+  ],
+  "meta": {
+    "version": 1,
+    "last_updated": "2026-07-11",
+    "detail_level": "brief_overview",
+    "extensible": true,
+    "notes": "This file is a seed/overview record. Each subdomain entry is designed to be expanded with deeper structured knowledge (facts, definitions, key figures, sub-subtopics, sources) over time."
+  }
+}

@@ -1,0 +1,74 @@
+{
+  "id": "artificial_intelligence",
+  "domain": "Artificial Intelligence",
+  "description": "The field of building systems capable of performing tasks that typically require human intelligence.",
+  "subdomains": [
+    {
+      "name": "Machine Learning",
+      "description": "Algorithms that learn patterns from data to make predictions or decisions without explicit programming.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "Deep Learning",
+      "description": "Machine learning using multi-layered neural networks to model complex patterns.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "NLP",
+      "description": "Natural Language Processing — enabling machines to understand, generate, and interact using human language.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "Computer Vision",
+      "description": "Enabling machines to interpret and understand visual information from images and video.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "Robotics AI",
+      "description": "AI techniques applied specifically to perception, planning, and control in robots.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "Reinforcement Learning",
+      "description": "Learning optimal behavior through trial-and-error interaction with an environment via rewards.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "Generative AI",
+      "description": "Models that generate new content such as text, images, audio, or code.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "Multi-Agent Systems",
+      "description": "Systems of multiple interacting intelligent agents that cooperate or compete.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "AI Safety",
+      "description": "Research ensuring AI systems behave reliably, predictably, and in line with human intent.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "AI Ethics",
+      "description": "Study of moral, social, and policy implications of AI development and deployment.",
+      "status": "overview",
+      "expandable": true
+    }
+  ],
+  "meta": {
+    "version": 1,
+    "last_updated": "2026-07-11",
+    "detail_level": "brief_overview",
+    "extensible": true,
+    "notes": "This file is a seed/overview record. Each subdomain entry is designed to be expanded with deeper structured knowledge (facts, definitions, key figures, sub-subtopics, sources) over time."
+  }
+}

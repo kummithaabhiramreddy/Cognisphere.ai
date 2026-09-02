@@ -1,0 +1,40 @@
+{
+  "domain_id": 24,
+  "domain": "Future Technologies",
+  "description": "Emerging and speculative technologies expected to shape the future of humanity.",
+  "subdomain_count": 8,
+  "subdomains": [
+    {
+      "name": "Quantum AI",
+      "description": "The intersection of quantum computing and artificial intelligence for advanced computation."
+    },
+    {
+      "name": "AGI",
+      "description": "Artificial General Intelligence, a hypothetical AI with human-level cognitive abilities across domains."
+    },
+    {
+      "name": "Brain-Computer Interface",
+      "description": "Technology enabling direct communication between the brain and external devices."
+    },
+    {
+      "name": "Nanotechnology",
+      "description": "Manipulation of matter at the atomic and molecular scale for new materials and devices."
+    },
+    {
+      "name": "Synthetic Biology",
+      "description": "Engineering biological systems and organisms for novel functions."
+    },
+    {
+      "name": "Smart Cities",
+      "description": "Urban areas using digital technology to improve efficiency, sustainability, and quality of life."
+    },
+    {
+      "name": "Autonomous Systems",
+      "description": "Machines and vehicles capable of operating without direct human control."
+    },
+    {
+      "name": "Space Colonization",
+      "description": "The concept and technology of establishing permanent human settlements beyond Earth."
+    }
+  ]
+}

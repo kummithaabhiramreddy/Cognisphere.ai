@@ -1,0 +1,80 @@
+{
+  "id": "language",
+  "domain": "Language",
+  "description": "Systems of communication used by humans, including spoken, written, and translated forms.",
+  "subdomains": [
+    {
+      "name": "English",
+      "description": "A West Germanic language and global lingua franca for communication and commerce.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "Telugu",
+      "description": "A Dravidian language primarily spoken in the Indian states of Andhra Pradesh and Telangana.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "Hindi",
+      "description": "An Indo-Aryan language and one of the official languages of India.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "Tamil",
+      "description": "A Dravidian language with a classical literary tradition, spoken widely in South India and Sri Lanka.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "Kannada",
+      "description": "A Dravidian language primarily spoken in the Indian state of Karnataka.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "Japanese",
+      "description": "An East Asian language spoken primarily in Japan, written using kanji and kana scripts.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "Chinese",
+      "description": "A group of Sino-Tibetan languages, with Mandarin as the most widely spoken variety.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "French",
+      "description": "A Romance language spoken in France and many countries worldwide.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "German",
+      "description": "A West Germanic language spoken primarily in Germany, Austria, and Switzerland.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "Translation",
+      "description": "The process of converting text or speech from one language into another.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "Grammar",
+      "description": "The set of structural rules governing the composition of clauses, phrases, and words.",
+      "status": "overview",
+      "expandable": true
+    }
+  ],
+  "meta": {
+    "version": 1,
+    "last_updated": "2026-07-11",
+    "detail_level": "brief_overview",
+    "extensible": true,
+    "notes": "This file is a seed/overview record. Each subdomain entry is designed to be expanded with deeper structured knowledge (facts, definitions, key figures, sub-subtopics, sources) over time."
+  }
+}

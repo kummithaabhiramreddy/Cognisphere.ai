@@ -1,0 +1,50 @@
+{
+  "id": "social_sciences",
+  "domain": "Social Sciences",
+  "description": "Academic disciplines concerned with society and relationships among individuals within it.",
+  "subdomains": [
+    {
+      "name": "Psychology",
+      "description": "Scientific study of the mind and behavior.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "Sociology",
+      "description": "Study of the development, structure, and functioning of human society.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "Anthropology",
+      "description": "Study of human societies, cultures, and their development.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "Geography",
+      "description": "Study of places, spatial relationships, and Earth's landscapes.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "History",
+      "description": "Study of past events, particularly human affairs.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "Philosophy",
+      "description": "Study of fundamental questions about existence, knowledge, values, and reason.",
+      "status": "overview",
+      "expandable": true
+    }
+  ],
+  "meta": {
+    "version": 1,
+    "last_updated": "2026-07-11",
+    "detail_level": "brief_overview",
+    "extensible": true,
+    "notes": "This file is a seed/overview record. Each subdomain entry is designed to be expanded with deeper structured knowledge (facts, definitions, key figures, sub-subtopics, sources) over time."
+  }
+}

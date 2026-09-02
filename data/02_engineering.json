@@ -1,0 +1,76 @@
+{
+  "domain_id": 2,
+  "domain": "Engineering",
+  "description": "The application of scientific and mathematical principles to design, build, and maintain structures, machines, systems, and processes.",
+  "subdomain_count": 17,
+  "subdomains": [
+    {
+      "name": "Mechanical",
+      "description": "Design and analysis of machines, engines, and mechanical systems using principles of motion, energy, and force."
+    },
+    {
+      "name": "Civil",
+      "description": "Planning, design, and construction of infrastructure such as roads, bridges, buildings, and water systems."
+    },
+    {
+      "name": "Electrical",
+      "description": "Deals with electricity, power generation, distribution, and electrical machinery."
+    },
+    {
+      "name": "Electronics",
+      "description": "Focuses on circuits, semiconductors, and electronic devices used in communication and computing."
+    },
+    {
+      "name": "Computer Science",
+      "description": "The theory and practice of computation, algorithms, software, and computing systems."
+    },
+    {
+      "name": "Information Technology",
+      "description": "Application of computing systems to store, retrieve, transmit, and manipulate data for organizations."
+    },
+    {
+      "name": "Aerospace",
+      "description": "Design and development of aircraft and spacecraft, including aerodynamics and propulsion."
+    },
+    {
+      "name": "Mechatronics",
+      "description": "Integrates mechanical, electronic, and computer engineering to design smart systems and automation."
+    },
+    {
+      "name": "Robotics",
+      "description": "Design, construction, and operation of robots for industrial, medical, and consumer applications."
+    },
+    {
+      "name": "Biomedical",
+      "description": "Applies engineering principles to medicine and biology, including medical devices and prosthetics."
+    },
+    {
+      "name": "Chemical",
+      "description": "Designs processes for large-scale production of chemicals, fuels, and materials."
+    },
+    {
+      "name": "Petroleum",
+      "description": "Focuses on extraction, production, and processing of oil and natural gas."
+    },
+    {
+      "name": "Marine",
+      "description": "Deals with design, construction, and maintenance of ships, submarines, and offshore structures."
+    },
+    {
+      "name": "Agricultural",
+      "description": "Applies engineering to farming equipment, irrigation, and food production systems."
+    },
+    {
+      "name": "Mining",
+      "description": "Focuses on extraction of minerals and resources from the earth safely and efficiently."
+    },
+    {
+      "name": "Materials Engineering",
+      "description": "Studies the properties and applications of metals, polymers, ceramics, and composites."
+    },
+    {
+      "name": "Industrial Engineering",
+      "description": "Optimizes complex processes, systems, and organizations to improve efficiency and productivity."
+    }
+  ]
+}

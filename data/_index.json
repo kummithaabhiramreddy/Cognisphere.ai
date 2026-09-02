@@ -1,0 +1,190 @@
+{
+  "project": "World Brain AI - Domain Knowledge Base",
+  "total_domains": 26,
+  "domains": [
+    {
+      "id": "science",
+      "domain": "Science",
+      "file": "science.json",
+      "subdomain_count": 8
+    },
+    {
+      "id": "engineering",
+      "domain": "Engineering",
+      "file": "engineering.json",
+      "subdomain_count": 17
+    },
+    {
+      "id": "artificial_intelligence",
+      "domain": "Artificial Intelligence",
+      "file": "artificial_intelligence.json",
+      "subdomain_count": 10
+    },
+    {
+      "id": "medicine_healthcare",
+      "domain": "Medicine & Healthcare",
+      "file": "medicine_healthcare.json",
+      "subdomain_count": 12
+    },
+    {
+      "id": "business",
+      "domain": "Business",
+      "file": "business.json",
+      "subdomain_count": 11
+    },
+    {
+      "id": "education",
+      "domain": "Education",
+      "file": "education.json",
+      "subdomain_count": 7
+    },
+    {
+      "id": "technology",
+      "domain": "Technology",
+      "file": "technology.json",
+      "subdomain_count": 11
+    },
+    {
+      "id": "government_law",
+      "domain": "Government & Law",
+      "file": "government_law.json",
+      "subdomain_count": 8
+    },
+    {
+      "id": "agriculture",
+      "domain": "Agriculture",
+      "file": "agriculture.json",
+      "subdomain_count": 8
+    },
+    {
+      "id": "environment",
+      "domain": "Environment",
+      "file": "environment.json",
+      "subdomain_count": 7
+    },
+    {
+      "id": "arts_creativity",
+      "domain": "Arts & Creativity",
+      "file": "arts_creativity.json",
+      "subdomain_count": 8
+    },
+    {
+      "id": "language",
+      "domain": "Language",
+      "file": "language.json",
+      "subdomain_count": 11
+    },
+    {
+      "id": "social_sciences",
+      "domain": "Social Sciences",
+      "file": "social_sciences.json",
+      "subdomain_count": 6
+    },
+    {
+      "id": "sports",
+      "domain": "Sports",
+      "file": "sports.json",
+      "subdomain_count": 8
+    },
+    {
+      "id": "entertainment",
+      "domain": "Entertainment",
+      "file": "entertainment.json",
+      "subdomain_count": 8
+    },
+    {
+      "id": "lifestyle",
+      "domain": "Lifestyle",
+      "file": "lifestyle.json",
+      "subdomain_count": 7
+    },
+    {
+      "id": "industry",
+      "domain": "Industry",
+      "file": "industry.json",
+      "subdomain_count": 10
+    },
+    {
+      "id": "security",
+      "domain": "Security",
+      "file": "security.json",
+      "subdomain_count": 4
+    },
+    {
+      "id": "religion_culture",
+      "domain": "Religion & Culture",
+      "file": "religion_culture.json",
+      "subdomain_count": 5
+    },
+    {
+      "id": "commerce",
+      "domain": "Commerce",
+      "file": "commerce.json",
+      "subdomain_count": 5
+    },
+    {
+      "id": "research",
+      "domain": "Research",
+      "file": "research.json",
+      "subdomain_count": 5
+    },
+    {
+      "id": "data_analytics",
+      "domain": "Data & Analytics",
+      "file": "data_analytics.json",
+      "subdomain_count": 6
+    },
+    {
+      "id": "communication",
+      "domain": "Communication",
+      "file": "communication.json",
+      "subdomain_count": 5
+    },
+    {
+      "id": "future_technologies",
+      "domain": "Future Technologies",
+      "file": "future_technologies.json",
+      "subdomain_count": 8
+    },
+    {
+      "id": "user_knowledge",
+      "domain": "User Knowledge",
+      "file": "user_knowledge.json",
+      "subdomain_count": 6
+    },
+    {
+      "id": "world_knowledge",
+      "domain": "World Knowledge",
+      "file": "world_knowledge.json",
+      "subdomain_count": 8
+    },
+    {
+      "id": "system_architecture",
+      "domain": "System Architecture",
+      "file": "27_system_architecture.json",
+      "subdomain_count": 5
+    }
+  ],
+  "core_ai_agents": [
+    "Intent AI",
+    "Search AI",
+    "Knowledge Graph AI",
+    "Memory AI",
+    "Planning AI",
+    "Research AI",
+    "Image AI",
+    "Video AI",
+    "Audio AI",
+    "Translation AI",
+    "Coding AI",
+    "Scientific AI",
+    "Medical AI",
+    "Financial AI",
+    "Legal AI",
+    "Education AI",
+    "Math AI",
+    "Recommendation AI",
+    "Security AI",
+    "Response AI"
+  ]
+}

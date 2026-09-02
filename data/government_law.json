@@ -1,0 +1,62 @@
+{
+  "id": "government_law",
+  "domain": "Government & Law",
+  "description": "The systems, institutions, and rules that govern societies and regulate behavior.",
+  "subdomains": [
+    {
+      "name": "Constitution",
+      "description": "The fundamental legal framework establishing a country's governance and rights.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "Politics",
+      "description": "Activities associated with governance, policy-making, and the exercise of power.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "Public Administration",
+      "description": "Implementation of government policy and management of public programs.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "Law",
+      "description": "The system of rules created and enforced by institutions to regulate behavior.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "Human Rights",
+      "description": "Fundamental rights and freedoms belonging to every person.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "International Relations",
+      "description": "Study of interactions between nations, including diplomacy and conflict.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "Defense",
+      "description": "National security systems including armed forces and strategic policy.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "Taxation",
+      "description": "Government imposition of financial charges on individuals and entities.",
+      "status": "overview",
+      "expandable": true
+    }
+  ],
+  "meta": {
+    "version": 1,
+    "last_updated": "2026-07-11",
+    "detail_level": "brief_overview",
+    "extensible": true,
+    "notes": "This file is a seed/overview record. Each subdomain entry is designed to be expanded with deeper structured knowledge (facts, definitions, key figures, sub-subtopics, sources) over time."
+  }
+}

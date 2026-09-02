@@ -1,0 +1,86 @@
+{
+  "category": "Core AI Agents",
+  "description": "The main orchestration layer of the World Brain AI system.",
+  "agents": [
+    {
+      "name": "Intent AI",
+      "description": "Interprets user queries to determine underlying goals and required actions."
+    },
+    {
+      "name": "Search AI",
+      "description": "Retrieves relevant information from indexed knowledge and external sources."
+    },
+    {
+      "name": "Knowledge Graph AI",
+      "description": "Maintains structured relationships between entities and concepts."
+    },
+    {
+      "name": "Memory AI",
+      "description": "Stores and retrieves context and historical information across interactions."
+    },
+    {
+      "name": "Planning AI",
+      "description": "Breaks down goals into ordered, actionable steps."
+    },
+    {
+      "name": "Research AI",
+      "description": "Conducts deeper investigation into complex or novel queries."
+    },
+    {
+      "name": "Image AI",
+      "description": "Analyzes and generates images for visual understanding and creation."
+    },
+    {
+      "name": "Video AI",
+      "description": "Processes, analyzes, and synthesizes video content."
+    },
+    {
+      "name": "Audio AI",
+      "description": "Handles speech recognition, transcription, and audio synthesis."
+    },
+    {
+      "name": "Translation AI",
+      "description": "Provides real-time multi-language translation and localization."
+    },
+    {
+      "name": "Coding AI",
+      "description": "Assists with code generation, debugging, and software architecture."
+    },
+    {
+      "name": "Scientific AI",
+      "description": "Simulates and processes scientific tasks and research."
+    },
+    {
+      "name": "Medical AI",
+      "description": "Assists with healthcare data, guidelines, and medical research."
+    },
+    {
+      "name": "Financial AI",
+      "description": "Analyzes financial market data and models economic scenarios."
+    },
+    {
+      "name": "Legal AI",
+      "description": "Navigates legal frameworks and interprets government/law data."
+    },
+    {
+      "name": "Education AI",
+      "description": "Functions as an AI tutor and educational assistant."
+    },
+    {
+      "name": "Math AI",
+      "description": "Solves complex mathematical equations and logical reasoning problems."
+    },
+    {
+      "name": "Recommendation AI",
+      "description": "Suggests relevant content, actions, or knowledge based on user context."
+    },
+    {
+      "name": "Security AI",
+      "description": "Detects and mitigates security threats to the system and its data."
+    },
+    {
+      "name": "Response AI",
+      "description": "Produces the final natural-language output delivered to the user."
+    }
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "domain_id": 23,
+  "domain": "Communication",
+  "description": "The exchange of information, ideas, and messages across media and channels.",
+  "subdomain_count": 5,
+  "subdomains": [
+    {
+      "name": "Journalism",
+      "description": "The practice of gathering, verifying, and reporting news and information."
+    },
+    {
+      "name": "Social Media",
+      "description": "Digital platforms enabling users to create, share, and interact with content."
+    },
+    {
+      "name": "Public Relations",
+      "description": "Managing the spread of information between an organization and the public."
+    },
+    {
+      "name": "Broadcasting",
+      "description": "Transmission of audio and video content to a wide audience via television or radio."
+    },
+    {
+      "name": "Content Creation",
+      "description": "Producing written, visual, or audio material for digital and traditional media."
+    }
+  ]
+}

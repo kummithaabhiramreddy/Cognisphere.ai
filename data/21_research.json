@@ -1,0 +1,28 @@
+{
+  "domain_id": 21,
+  "domain": "Research",
+  "description": "Systematic inquiry aimed at discovering, interpreting, and applying new knowledge.",
+  "subdomain_count": 5,
+  "subdomains": [
+    {
+      "name": "Journals",
+      "description": "Periodicals publishing peer-reviewed academic and scientific research."
+    },
+    {
+      "name": "Patents",
+      "description": "Legal protections granting exclusive rights to inventors for their inventions."
+    },
+    {
+      "name": "Innovation",
+      "description": "The process of translating new ideas into practical products or processes."
+    },
+    {
+      "name": "Scientific Papers",
+      "description": "Formal documents reporting original research findings and methodology."
+    },
+    {
+      "name": "Experiments",
+      "description": "Controlled procedures designed to test hypotheses and validate theories."
+    }
+  ]
+}

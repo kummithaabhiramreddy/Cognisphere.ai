@@ -1,0 +1,24 @@
+{
+  "domain_id": 18,
+  "domain": "Security",
+  "description": "Systems and practices designed to protect people, information, and assets from threats.",
+  "subdomain_count": 4,
+  "subdomains": [
+    {
+      "name": "Cyber Security",
+      "description": "Protecting digital systems, networks, and data from cyberattacks and breaches."
+    },
+    {
+      "name": "Physical Security",
+      "description": "Measures to protect people, property, and assets from physical threats."
+    },
+    {
+      "name": "National Security",
+      "description": "Protection of a nation's sovereignty, citizens, and interests from external and internal threats."
+    },
+    {
+      "name": "Digital Forensics",
+      "description": "Investigating and analyzing digital evidence for legal or security purposes."
+    }
+  ]
+}

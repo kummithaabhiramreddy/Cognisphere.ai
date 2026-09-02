@@ -1,0 +1,86 @@
+{
+  "id": "medicine_healthcare",
+  "domain": "Medicine & Healthcare",
+  "description": "The science and practice of diagnosing, treating, and preventing disease and promoting health.",
+  "subdomains": [
+    {
+      "name": "General Medicine",
+      "description": "Diagnosis and non-surgical treatment of adult diseases across body systems.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "Surgery",
+      "description": "Treatment of injury or disease through operative and invasive procedures.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "Cardiology",
+      "description": "Branch of medicine dealing with disorders of the heart and blood vessels.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "Neurology",
+      "description": "Branch of medicine dealing with disorders of the nervous system.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "Pediatrics",
+      "description": "Medical care of infants, children, and adolescents.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "Oncology",
+      "description": "Branch of medicine dealing with the prevention, diagnosis, and treatment of cancer.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "Dentistry",
+      "description": "Diagnosis, treatment, and prevention of diseases of the teeth, gums, and mouth.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "Nursing",
+      "description": "Provision of patient care, health education, and support within healthcare systems.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "Pharmacy",
+      "description": "Science and practice of preparing, dispensing, and reviewing medications.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "Mental Health",
+      "description": "Diagnosis, treatment, and support for psychological and emotional well-being.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "Nutrition",
+      "description": "Study of how food and diet affect health and bodily function.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "Public Health",
+      "description": "Protection and improvement of health at the population and community level.",
+      "status": "overview",
+      "expandable": true
+    }
+  ],
+  "meta": {
+    "version": 1,
+    "last_updated": "2026-07-11",
+    "detail_level": "brief_overview",
+    "extensible": true,
+    "notes": "This file is a seed/overview record. Each subdomain entry is designed to be expanded with deeper structured knowledge (facts, definitions, key figures, sub-subtopics, sources) over time."
+  }
+}

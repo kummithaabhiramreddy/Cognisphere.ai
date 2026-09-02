@@ -1,0 +1,36 @@
+{
+  "domain_id": 16,
+  "domain": "Lifestyle",
+  "description": "Everyday practices, choices, and interests that shape how people live.",
+  "subdomain_count": 7,
+  "subdomains": [
+    {
+      "name": "Fashion",
+      "description": "Trends and styles in clothing, accessories, and personal presentation."
+    },
+    {
+      "name": "Beauty",
+      "description": "Practices and products related to skincare, cosmetics, and personal grooming."
+    },
+    {
+      "name": "Travel",
+      "description": "Exploring destinations for leisure, culture, or business purposes."
+    },
+    {
+      "name": "Food",
+      "description": "Culinary traditions, cooking techniques, and cuisines from around the world."
+    },
+    {
+      "name": "Fitness",
+      "description": "Physical exercise and training practices to maintain health and strength."
+    },
+    {
+      "name": "Relationships",
+      "description": "Interpersonal connections including family, friendship, and romantic partnerships."
+    },
+    {
+      "name": "Parenting",
+      "description": "The practices and responsibilities involved in raising children."
+    }
+  ]
+}

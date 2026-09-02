@@ -1,0 +1,56 @@
+{
+  "id": "environment",
+  "domain": "Environment",
+  "description": "The natural world and systems, and the study of human impact and sustainability efforts.",
+  "subdomains": [
+    {
+      "name": "Climate Change",
+      "description": "Long-term shifts in temperature and weather patterns, largely driven by human activity.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "Renewable Energy",
+      "description": "Energy derived from naturally replenishing sources such as solar and wind.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "Pollution",
+      "description": "Introduction of harmful substances into the environment causing damage.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "Wildlife",
+      "description": "Study and conservation of wild animal species and their habitats.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "Forestry",
+      "description": "Science and practice of managing forests and woodlands.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "Sustainability",
+      "description": "Practices that meet present needs without compromising future generations.",
+      "status": "overview",
+      "expandable": true
+    },
+    {
+      "name": "Disaster Management",
+      "description": "Planning and response systems for natural and man-made disasters.",
+      "status": "overview",
+      "expandable": true
+    }
+  ],
+  "meta": {
+    "version": 1,
+    "last_updated": "2026-07-11",
+    "detail_level": "brief_overview",
+    "extensible": true,
+    "notes": "This file is a seed/overview record. Each subdomain entry is designed to be expanded with deeper structured knowledge (facts, definitions, key figures, sub-subtopics, sources) over time."
+  }
+}
