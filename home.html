@@ -50,6 +50,18 @@
   *, *::before, *::after { box-sizing: border-box; }
   html, body { height: 100%; margin: 0; }
 
+  /* ── PAGE-TO-PAGE MOVING TRANSITIONS ── */
+  @keyframes pageTransitionEnter {
+    0% {
+      opacity: 0;
+      transform: translateY(14px) scale(0.996);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+
   body {
     background: var(--bg);
     color: var(--text);
@@ -61,6 +73,13 @@
     display: flex;
     flex-direction: column;
     overflow-x: hidden;
+  }
+
+  body.page-leaving {
+    opacity: 0 !important;
+    transform: translateY(-12px) scale(0.99) !important;
+    transition: opacity 0.22s cubic-bezier(0.4, 0, 0.2, 1), transform 0.22s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    pointer-events: none !important;
   }
 
   /* Very subtle ambient noise texture */
@@ -319,7 +338,7 @@
   /* ── SEARCH SHELL / COMPOSER ── */
   .search-shell { position: relative; width: 100%; max-width: 700px; transition: max-width .4s; }
   body.docked .search-shell { position: fixed; left: 50%; bottom: 20px; transform: translateX(-50%); width: min(720px, 94vw); max-width: 720px; z-index: 50; }
-  body.docked main { justify-content: flex-end; padding-bottom: 118px; }
+  body.docked main { justify-content: flex-end; padding-bottom: 220px !important; }
   body.docked .eyebrow, body.docked h1 { opacity: 0; max-height: 0; margin: 0; pointer-events: none; }
 
   /* ── CHAT THREAD ── */
@@ -331,11 +350,12 @@
   body.shared-view #askInput { cursor: not-allowed; opacity: 0.55; }
   body.shared-view .icon-btn, body.shared-view form button.send { opacity: 0.35; pointer-events: none; }
 
-  .chat-thread { display: none; width: 100%; max-width: 780px; flex-direction: column; gap: 0; margin: 0 auto; }
+  .chat-thread { display: none; width: 100%; max-width: 780px; flex-direction: column; gap: 0; margin: 0 auto; padding-bottom: 20px !important; }
   body.chat-active .chat-thread { display: flex; }
   body.chat-active .eyebrow, body.chat-active h1, body.chat-active .hint { display: none; }
-  body.chat-active main { justify-content: flex-start; padding-top: 84px; padding-bottom: 130px; align-items: center; }
+  body.chat-active main { justify-content: flex-start; padding-top: 84px; padding-bottom: 110px !important; align-items: center; }
   body.chat-active .search-shell { position: fixed; left: 50%; bottom: 20px; transform: translateX(-50%); width: min(720px, 94vw); max-width: 720px; z-index: 50; }
+  body.chat-active .search-shell::before { content: ''; position: absolute; inset: -24px -32px -30px -32px; background: radial-gradient(ellipse at center bottom, rgba(13,15,20,0.92) 0%, rgba(13,15,20,0.6) 55%, rgba(13,15,20,0) 80%); pointer-events: none; z-index: -1; border-radius: 28px; }
   body.chat-active footer { opacity: 0; pointer-events: none; }
 
   /* ── MESSAGE ROWS ── */
@@ -360,10 +380,12 @@
     overflow-wrap: break-word;
     overflow-x: hidden;
     position: relative;
-    animation: msgIn 0.22s ease;
+  }
+  .chat-thread > .msg-row:last-child .msg {
+    animation: msgIn 0.18s ease;
   }
   @keyframes msgIn {
-    from { opacity: 0; transform: translateY(6px); }
+    from { opacity: 0; transform: translateY(4px); }
     to { opacity: 1; transform: translateY(0); }
   }
   .msg-text { max-width: 100%; overflow-x: visible; word-break: break-word; overflow-wrap: break-word; min-width: 0; }
@@ -443,9 +465,9 @@
   .msg-small-card-title { font-size: 0.75rem; font-weight: 600; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .msg-small-card-badge { font-size: 0.61rem; color: var(--accent-s); font-family: 'JetBrains Mono', monospace; opacity: 0.85; }
 
-  /* Message actions (hover bar) */
-  .msg-actions { display: flex; align-items: center; gap: 8px; font-size: 0.71rem; color: var(--text-3); padding: 2px 4px; opacity: 0; transform: translateY(-2px); transition: opacity .15s, transform .15s; pointer-events: none; }
-  .msg-row:hover .msg-actions, .msg-actions.force-visible { opacity: 1; transform: translateY(0); pointer-events: auto; }
+  /* Message actions (visible action bar) */
+  .msg-actions { display: flex; align-items: center; gap: 8px; font-size: 0.71rem; color: var(--text-3); padding: 4px 6px; opacity: 0.75; transform: translateY(0); transition: opacity .15s; pointer-events: auto; }
+  .msg-row:hover .msg-actions, .msg-actions.force-visible { opacity: 1; }
   .msg-row.assistant .msg-actions { justify-content: flex-start; }
   .msg-row.user .msg-actions { justify-content: flex-end; }
   .msg-action-btn { display: flex; align-items: center; gap: 4px; background: transparent; border: none; cursor: pointer; color: var(--text-3); padding: 3px 6px; border-radius: 6px; transition: color .15s, background .15s; font-size: 0.71rem; }
@@ -611,8 +633,7 @@
   }
   @keyframes blink { 0%,100%{opacity:1;} 50%{opacity:0;} }
   @keyframes fadeIn { from{opacity:0; transform:translateY(4px);} to{opacity:1; transform:translateY(0);} }
-  @keyframes msgIn { from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:translateY(0);} }
-  .msg { animation: msgIn 0.2s ease; }
+
 
 
   .share-apps-grid{
@@ -1228,16 +1249,16 @@
     gap: 24px;
   }
 
-  body.chat-active .chat-thread{ display:flex; }
+  body.chat-active .chat-thread{ display:flex; padding-bottom: 20px !important; }
   body.chat-active .eyebrow, body.chat-active h1, body.chat-active .hint{
     display:none;
   }
   body.chat-active main{
     justify-content:flex-start;
-    padding-bottom:130px;
+    padding-bottom:110px !important;
   }
   body.chat-active .search-shell{
-    position:fixed; left:50%; bottom:22px;
+    position:fixed; left:50%; bottom:20px;
     transform:translateX(-50%);
     width:min(720px, 94vw);
     max-width:720px;
@@ -1896,14 +1917,14 @@
   .msg-actions{
     display:flex; align-items:center; gap:10px;
     font-family:'Inter', sans-serif; font-size:0.72rem; color:var(--text-muted);
-    padding:0 4px;
-    opacity:0; transform:translateY(-2px);
-    transition:opacity .15s ease, transform .15s ease;
-    pointer-events:none;
+    padding:4px 6px;
+    opacity:0.75; transform:translateY(0);
+    transition:opacity .15s ease;
+    pointer-events:auto;
   }
   .msg-row:hover .msg-actions,
   .msg-actions.force-visible{
-    opacity:1; transform:translateY(0);
+    opacity:1;
     pointer-events:auto;
   }
   .msg-row.assistant .msg-actions{ justify-content:flex-start; }
@@ -4160,10 +4181,10 @@
 
   /* ── COGNISPHERE STUDIO PRO INTELLIGENCE & LAYOUT STYLES ── */
   body.chat-active main {
-    padding-bottom: 240px !important;
+    padding-bottom: 110px !important;
   }
   .chat-thread {
-    padding-bottom: 180px !important;
+    padding-bottom: 20px !important;
   }
 
   .studio-msg-header {
@@ -4352,225 +4373,337 @@
     transition: transform 0.1s ease !important;
   }
 
-  /* ── PRO STUDIO FOLLOW-UP EXPLORATION DECK (ONE-BY-ONE SLEEK LINES) ── */
-  .studio-followup-deck {
-    margin-top: 20px !important;
-    padding: 14px 16px !important;
-    border-radius: 12px !important;
-    background: linear-gradient(145deg, rgba(14, 18, 28, 0.96), rgba(8, 11, 16, 0.99)) !important;
-    border: 1px solid rgba(0, 255, 170, 0.28) !important;
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.45) !important;
-  }
-  .studio-followup-title {
+  /* ── COMPACT INLINE SUGGESTION CHIPS (MATCHING IMAGE 2) ── */
+  .inline-suggestions-row {
     display: flex !important;
-    align-items: center !important;
-    gap: 8px !important;
-    font-family: 'Inter', sans-serif !important;
-    font-size: 0.76rem !important;
-    font-weight: 700 !important;
-    color: #00ffaa !important;
-    text-transform: uppercase !important;
-    letter-spacing: 0.08em !important;
-    margin-bottom: 10px !important;
-  }
-  .studio-followup-chips {
-    display: flex !important;
-    flex-direction: column !important;
-    gap: 6px !important;
-  }
-  .studio-followup-line {
-    all: unset !important;
-    box-sizing: border-box !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: space-between !important;
-    gap: 10px !important;
-    padding: 7px 12px !important;
-    border-radius: 7px !important;
-    background: rgba(255, 255, 255, 0.03) !important;
-    border: 1px solid rgba(255, 255, 255, 0.08) !important;
-    color: #f1f5f9 !important;
-    font-size: 0.78rem !important;
-    font-family: 'Inter', sans-serif !important;
-    cursor: pointer !important;
-    opacity: 0;
-    transform: translateY(6px);
-    animation: lineFadeUp 0.35s ease forwards !important;
-    transition: all 0.18s ease !important;
-  }
-  @keyframes lineFadeUp {
-    to { opacity: 1; transform: translateY(0); }
-  }
-  .studio-followup-line:hover {
-    background: rgba(0, 255, 170, 0.09) !important;
-    border-color: rgba(0, 255, 170, 0.5) !important;
-    transform: translateX(4px) !important;
-    box-shadow: 0 4px 16px rgba(0, 255, 170, 0.15) !important;
-  }
-  .studio-followup-line .line-arrow {
-    color: #00ffaa !important;
-    font-weight: 800 !important;
-    font-size: 0.88rem !important;
-    flex-shrink: 0 !important;
-  }
-  .studio-followup-line .line-text {
-    flex: 1 !important;
-    color: #e2e8f0 !important;
-    line-height: 1.4 !important;
-  }
-  .studio-followup-line .line-action {
-    font-size: 0.68rem !important;
-    font-family: 'JetBrains Mono', monospace !important;
-    color: #64748b !important;
-    background: rgba(255, 255, 255, 0.05) !important;
-    padding: 2px 7px !important;
-    border-radius: 4px !important;
-    white-space: nowrap !important;
-  }
-  .studio-followup-line:hover .line-action {
-    color: #00ffaa !important;
-    background: rgba(0, 255, 170, 0.18) !important;
-  }
-
-  /* ── PROGRAMMING PLATFORM / IDE LAUNCHPAD DECK & REAL-TIME I/O ── */
-  .code-platforms-deck {
-    margin: 14px 0 !important;
-    padding: 12px 14px !important;
-    border-radius: 12px !important;
-    background: linear-gradient(145deg, rgba(14, 20, 30, 0.95), rgba(8, 12, 18, 0.98)) !important;
-    border: 1px solid rgba(56, 189, 248, 0.28) !important;
-    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.4) !important;
-  }
-  .code-platforms-header {
-    display: flex !important;
-    align-items: center !important;
-    justify-content: space-between !important;
-    margin-bottom: 10px !important;
     flex-wrap: wrap !important;
-    gap: 6px !important;
-  }
-  .code-platforms-title {
-    font-family: 'JetBrains Mono', monospace !important;
-    font-size: 0.72rem !important;
-    font-weight: 800 !important;
-    color: #38bdf8 !important;
-    letter-spacing: 0.08em !important;
-    text-transform: uppercase !important;
-    display: flex !important;
     align-items: center !important;
-    gap: 6px !important;
-  }
-  .code-platforms-grid {
-    display: grid !important;
-    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)) !important;
     gap: 8px !important;
-    margin-bottom: 12px !important;
+    margin-top: 14px !important;
+    padding-top: 10px !important;
+    border-top: 1px solid rgba(255, 255, 255, 0.07) !important;
+    width: 100% !important;
   }
-  .code-platform-card {
-    all: unset !important;
-    box-sizing: border-box !important;
-    display: flex !important;
-    align-items: center !important;
-    gap: 9px !important;
-    padding: 8px 10px !important;
-    border-radius: 8px !important;
-    background: rgba(255, 255, 255, 0.03) !important;
-    border: 1px solid rgba(255, 255, 255, 0.09) !important;
-    cursor: pointer !important;
-    transition: all 0.18s ease !important;
-    text-decoration: none !important;
-  }
-  .code-platform-card:hover {
-    background: rgba(56, 189, 248, 0.12) !important;
-    border-color: rgba(56, 189, 248, 0.5) !important;
-    transform: translateY(-2px) !important;
-    box-shadow: 0 4px 14px rgba(56, 189, 248, 0.2) !important;
-  }
-  .code-platform-icon {
-    font-size: 1.1rem !important;
-    flex-shrink: 0 !important;
-  }
-  .code-platform-meta {
-    display: flex !important;
-    flex-direction: column !important;
-    min-width: 0 !important;
-  }
-  .code-platform-name {
-    font-size: 0.78rem !important;
-    font-weight: 700 !important;
-    color: #f8fafc !important;
-    white-space: nowrap !important;
-    overflow: hidden !important;
-    text-overflow: ellipsis !important;
-  }
-  .code-platform-tag {
-    font-size: 0.64rem !important;
-    color: #94a3b8 !important;
-  }
-  .code-sandbox-box {
-    border-radius: 8px !important;
-    background: #080c14 !important;
-    border: 1px solid rgba(255, 255, 255, 0.1) !important;
-    padding: 10px 12px !important;
-  }
-  .code-sandbox-header {
-    display: flex !important;
-    align-items: center !important;
-    justify-content: space-between !important;
-    margin-bottom: 8px !important;
-    font-family: 'JetBrains Mono', monospace !important;
-    font-size: 0.72rem !important;
-    color: #00ffaa !important;
-  }
-  .code-sandbox-run-btn {
+  .inline-suggestion-chip {
     all: unset !important;
     box-sizing: border-box !important;
     display: inline-flex !important;
     align-items: center !important;
-    gap: 4px !important;
-    padding: 4px 10px !important;
-    border-radius: 6px !important;
-    background: rgba(0, 255, 170, 0.16) !important;
-    border: 1px solid rgba(0, 255, 170, 0.4) !important;
-    color: #00ffaa !important;
-    font-family: 'JetBrains Mono', monospace !important;
-    font-size: 0.7rem !important;
-    font-weight: 700 !important;
+    gap: 6px !important;
+    padding: 5px 12px !important;
+    border-radius: 18px !important;
+    background: rgba(255, 255, 255, 0.04) !important;
+    border: 1px solid rgba(255, 255, 255, 0.12) !important;
+    color: #e2e8f0 !important;
+    font-size: 0.79rem !important;
+    font-family: 'Inter', system-ui, sans-serif !important;
+    font-weight: 500 !important;
     cursor: pointer !important;
+    transition: all 0.18s ease !important;
+    line-height: 1.4 !important;
+    opacity: 0;
+    transform: translateY(4px);
+    animation: chipFadeIn 0.3s ease forwards !important;
+  }
+  @keyframes chipFadeIn {
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .inline-suggestion-chip .chip-arrow {
+    color: #00ffaa !important;
+    font-size: 0.84rem !important;
+    font-weight: 700 !important;
+    flex-shrink: 0 !important;
+  }
+  .inline-suggestion-chip .chip-text {
+    text-decoration: underline !important;
+    text-decoration-style: dotted !important;
+    text-underline-offset: 3px !important;
+    text-decoration-color: rgba(255, 255, 255, 0.4) !important;
+    transition: text-decoration-color 0.15s, color 0.15s !important;
+  }
+  .inline-suggestion-chip:hover {
+    background: rgba(0, 255, 170, 0.1) !important;
+    border-color: rgba(0, 255, 170, 0.4) !important;
+    color: #00ffaa !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 4px 14px rgba(0, 255, 170, 0.15) !important;
+  }
+  .inline-suggestion-chip:hover .chip-text {
+    text-decoration-color: #00ffaa !important;
+    color: #00ffaa !important;
+  }
+
+  /* ── INLINE CODE COMPILER & TERMINAL WORKBENCH (ON CODE BLOCKS) ── */
+  .live-compiler-toggle-btn {
+    all: unset !important;
+    box-sizing: border-box !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    cursor: pointer !important;
+    color: #38bdf8 !important;
+    font-size: 0.74rem !important;
+    font-weight: 700 !important;
+    font-family: 'JetBrains Mono', monospace !important;
+    padding: 3px 10px !important;
+    border-radius: 6px !important;
+    border: 1px solid rgba(56, 189, 248, 0.35) !important;
+    background: rgba(56, 189, 248, 0.08) !important;
+    box-shadow: 0 0 10px rgba(56, 189, 248, 0.15) !important;
     transition: all 0.15s ease !important;
   }
-  .code-sandbox-run-btn:hover {
-    background: #00ffaa !important;
-    color: #05080e !important;
-    box-shadow: 0 0 12px rgba(0, 255, 170, 0.6) !important;
+  .live-compiler-toggle-btn:hover {
+    background: rgba(56, 189, 248, 0.22) !important;
+    border-color: #38bdf8 !important;
+    color: #fff !important;
+    box-shadow: 0 0 14px rgba(56, 189, 248, 0.35) !important;
   }
-  .code-sandbox-input {
+  .live-compiler-toggle-btn.open {
+    background: rgba(0, 255, 170, 0.18) !important;
+    border-color: #00ffaa !important;
+    color: #00ffaa !important;
+    box-shadow: 0 0 12px rgba(0, 255, 170, 0.25) !important;
+  }
+  .inline-live-compiler-wrap {
+    background: #080c14 !important;
+    border-top: 1px solid #2d3139 !important;
+    padding: 12px 16px !important;
+    animation: compilerDrawerSlide 0.22s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  }
+  @keyframes compilerDrawerSlide {
+    from { opacity: 0; transform: translateY(-8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .inline-compiler-top-bar {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    margin-bottom: 8px !important;
+  }
+  .inline-compiler-dots {
+    display: flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    font-size: 0.72rem !important;
+    font-family: 'JetBrains Mono', monospace !important;
+    color: #94a3b8 !important;
+  }
+  .terminal-status-badge {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 4px !important;
+    font-size: 0.68rem !important;
+    font-weight: 600 !important;
+    font-family: 'JetBrains Mono', monospace !important;
+    padding: 2px 8px !important;
+    border-radius: 6px !important;
+    background: rgba(56, 189, 248, 0.12) !important;
+    color: #38bdf8 !important;
+    border: 1px solid rgba(56, 189, 248, 0.3) !important;
+    transition: all 0.2s ease !important;
+  }
+  .terminal-status-badge.success {
+    background: rgba(0, 255, 170, 0.14) !important;
+    color: #00ffaa !important;
+    border-color: rgba(0, 255, 170, 0.4) !important;
+    box-shadow: 0 0 8px rgba(0, 255, 170, 0.2) !important;
+  }
+  .terminal-status-badge.error {
+    background: rgba(255, 85, 85, 0.14) !important;
+    color: #ff5555 !important;
+    border-color: rgba(255, 85, 85, 0.4) !important;
+  }
+  .term-action-btn {
+    all: unset !important;
+    box-sizing: border-box !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    cursor: pointer !important;
+    font-size: 0.74rem !important;
+    font-family: 'JetBrains Mono', monospace !important;
+    font-weight: 700 !important;
+    padding: 5px 12px !important;
+    border-radius: 6px !important;
+    transition: all 0.15s ease !important;
+    user-select: none !important;
+  }
+  .term-compile-btn {
+    background: rgba(56, 189, 248, 0.15) !important;
+    color: #38bdf8 !important;
+    border: 1px solid rgba(56, 189, 248, 0.35) !important;
+    box-shadow: 0 0 10px rgba(56, 189, 248, 0.15) !important;
+  }
+  .term-compile-btn:hover {
+    background: rgba(56, 189, 248, 0.28) !important;
+    border-color: #38bdf8 !important;
+    color: #fff !important;
+    transform: translateY(-1px) !important;
+  }
+  .term-run-btn {
+    background: #00ffaa !important;
+    color: #030712 !important;
+    border: 1px solid #00ffaa !important;
+    box-shadow: 0 0 14px rgba(0, 255, 170, 0.4) !important;
+  }
+  .term-run-btn:hover {
+    background: #34d399 !important;
+    box-shadow: 0 0 18px rgba(0, 255, 170, 0.6) !important;
+    transform: translateY(-1px) !important;
+  }
+  .term-compile-run-btn {
+    background: rgba(168, 85, 247, 0.18) !important;
+    color: #c084fc !important;
+    border: 1px solid rgba(168, 85, 247, 0.4) !important;
+  }
+  .term-compile-run-btn:hover {
+    background: rgba(168, 85, 247, 0.3) !important;
+    color: #fff !important;
+    transform: translateY(-1px) !important;
+  }
+  .term-clear-btn, .term-reset-btn {
+    background: rgba(255, 255, 255, 0.06) !important;
+    color: #94a3b8 !important;
+    border: 1px solid rgba(255, 255, 255, 0.14) !important;
+  }
+  .term-clear-btn:hover, .term-reset-btn:hover {
+    background: rgba(255, 255, 255, 0.12) !important;
+    color: #e2e8f0 !important;
+  }
+  .terminal-stdin-waiting {
+    animation: stdinWaitingPulse 1.2s infinite ease-in-out !important;
+    border-color: #38bdf8 !important;
+  }
+  @keyframes stdinWaitingPulse {
+    0%, 100% { box-shadow: 0 0 6px rgba(56, 189, 248, 0.2); }
+    50% { box-shadow: 0 0 16px rgba(56, 189, 248, 0.6); }
+  }
+  .inline-compiler-close-btn {
+    all: unset !important;
+    box-sizing: border-box !important;
+    cursor: pointer !important;
+    color: #64748b !important;
+    font-size: 0.72rem !important;
+    padding: 2px 6px !important;
+    border-radius: 4px !important;
+    transition: color 0.15s !important;
+  }
+  .inline-compiler-close-btn:hover {
+    color: #ff5555 !important;
+    background: rgba(255, 85, 85, 0.1) !important;
+  }
+  .inline-compiler-editor-wrap {
+    margin-bottom: 8px !important;
+  }
+  .inline-compiler-label {
+    font-size: 0.66rem !important;
+    font-family: 'JetBrains Mono', monospace !important;
+    color: #64748b !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.06em !important;
+    margin-bottom: 4px !important;
+  }
+  .inline-compiler-editor {
     width: 100% !important;
     box-sizing: border-box !important;
-    background: #0d131f !important;
-    border: 1px solid rgba(255, 255, 255, 0.15) !important;
+    background: #05070c !important;
+    border: 1px solid rgba(255, 255, 255, 0.12) !important;
+    border-radius: 6px !important;
+    color: #f1f5f9 !important;
+    font-family: 'JetBrains Mono', monospace !important;
+    font-size: 0.76rem !important;
+    line-height: 1.5 !important;
+    padding: 8px 10px !important;
+    resize: vertical !important;
+    min-height: 90px !important;
+    outline: none !important;
+    tab-size: 4 !important;
+  }
+  .inline-compiler-editor:focus {
+    border-color: #00ffaa !important;
+    box-shadow: 0 0 10px rgba(0, 255, 170, 0.15) !important;
+  }
+  .inline-compiler-input-row {
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    margin-bottom: 10px !important;
+    flex-wrap: wrap !important;
+  }
+  .inline-compiler-stdin {
+    flex: 1 !important;
+    min-width: 180px !important;
+    box-sizing: border-box !important;
+    background: #05070c !important;
+    border: 1px solid rgba(255, 255, 255, 0.12) !important;
     border-radius: 6px !important;
     color: #e2e8f0 !important;
     font-family: 'JetBrains Mono', monospace !important;
-    font-size: 0.76rem !important;
+    font-size: 0.74rem !important;
     padding: 6px 10px !important;
     outline: none !important;
   }
-  .code-sandbox-input:focus {
-    border-color: #00ffaa !important;
+  .inline-compiler-stdin:focus {
+    border-color: #38bdf8 !important;
   }
-  .code-sandbox-output {
-    margin-top: 8px !important;
-    padding: 8px 10px !important;
-    background: #06090f !important;
-    border-radius: 6px !important;
-    border: 1px solid rgba(0, 255, 170, 0.25) !important;
-    color: #a7f3d0 !important;
+  .inline-compiler-run-btn {
+    all: unset !important;
+    box-sizing: border-box !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 5px !important;
+    cursor: pointer !important;
+    background: #00ffaa !important;
+    color: #05080e !important;
+    font-size: 0.74rem !important;
+    font-weight: 700 !important;
     font-family: 'JetBrains Mono', monospace !important;
-    font-size: 0.76rem !important;
-    white-space: pre-wrap !important;
-    min-height: 24px !important;
+    padding: 6px 14px !important;
+    border-radius: 6px !important;
+    box-shadow: 0 0 14px rgba(0, 255, 170, 0.45) !important;
+    transition: all 0.15s ease !important;
   }
+  .inline-compiler-run-btn:hover {
+    background: #38bdf8 !important;
+    box-shadow: 0 0 16px rgba(56, 189, 248, 0.6) !important;
+    transform: translateY(-1px) !important;
+  }
+  .inline-terminal-screen {
+    border-radius: 8px !important;
+    background: #020408 !important;
+    border: 1px solid rgba(56, 189, 248, 0.25) !important;
+    overflow: hidden !important;
+  }
+  .terminal-screen-header {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    padding: 6px 10px !important;
+    background: #080d16 !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.07) !important;
+    font-family: 'JetBrains Mono', monospace !important;
+    font-size: 0.66rem !important;
+    color: #64748b !important;
+    letter-spacing: 0.05em !important;
+  }
+  .terminal-runtime-tag {
+    color: #00ffaa !important;
+    font-weight: 600 !important;
+  }
+  .terminal-output-content {
+    margin: 0 !important;
+    padding: 10px 12px !important;
+    background: transparent !important;
+    font-family: 'JetBrains Mono', monospace !important;
+    font-size: 0.78rem !important;
+    line-height: 1.5 !important;
+    color: #a7f3d0 !important;
+    min-height: 48px !important;
+    max-height: 280px !important;
+    overflow-y: auto !important;
+    white-space: pre-wrap !important;
+  }
+
 
   /* ── PRO STUDIO LIVE SEARCHING & PIPELINE CARD ── */
   .studio-searching-card {
@@ -4943,6 +5076,26 @@
       activationBkgColor: '#2d1b4e',
       labelBackground: '#0f172a',
       labelTextColor: '#e2e8f0'
+    }
+  });
+
+  // ── Smooth Page-to-Page Moving Transition Navigator ──
+  window.navigateToPage = function(targetUrl) {
+    if (!targetUrl) return;
+    document.body.classList.add('page-leaving');
+    setTimeout(() => {
+      window.location.href = targetUrl;
+    }, 220);
+  };
+
+  document.addEventListener('click', (e) => {
+    const link = e.target.closest('a');
+    if (!link) return;
+    const href = link.getAttribute('href');
+    if (!href || href.startsWith('#') || href.startsWith('javascript:') || link.target === '_blank') return;
+    if (href.endsWith('.html') || href.includes('.html?') || (href.startsWith('/') && !href.startsWith('//'))) {
+      e.preventDefault();
+      window.navigateToPage(href);
     }
   });
 
@@ -5472,6 +5625,7 @@
     <div class="settings-modal-body">
       <!-- Left Category Tabs Sidebar (Horizontal Chips on Mobile) -->
       <div class="settings-sidebar-tabs">
+        <button type="button" class="setting-tab-btn" onclick="openNewTerminalModal()" style="color:#38bdf8;font-weight:700;border:1px solid rgba(56,189,248,0.35);background:rgba(56,189,248,0.08);">&gt;_ New Terminal</button>
         <button type="button" class="setting-tab-btn active" onclick="switchSettingsCategory('connection', this)">⚡ Real-Time Connection</button>
         <button type="button" class="setting-tab-btn" onclick="switchSettingsCategory('behavior', this)">🧠 AI Behavior</button>
         <button type="button" class="setting-tab-btn" onclick="switchSettingsCategory('response', this)">🎨 Response & UI</button>
@@ -5490,6 +5644,107 @@
       <!-- Right Control Cards Content Area -->
       <div id="settingsContentPanel" class="settings-content-panel">
         <!-- Loaded dynamically via JavaScript -->
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- STANDALONE NEW TERMINAL & CLOUD COMPILER WORKBENCH MODAL -->
+<div class="modal-overlay" id="newTerminalModal" style="display:none; z-index:999999; align-items:center; justify-content:center;">
+  <div class="settings-modal-card download-card" style="max-width:980px; width:94vw; height:86vh; max-height:820px; display:flex; flex-direction:column; padding:0; overflow:hidden; background:#070a10; border:1px solid rgba(56,189,248,0.3); box-shadow:0 20px 60px rgba(0,0,0,0.85), 0 0 30px rgba(56,189,248,0.15); border-radius:14px;">
+    
+    <!-- Modal Top Header -->
+    <div style="display:flex; align-items:center; justify-content:space-between; padding:12px 18px; background:#0b111e; border-bottom:1px solid rgba(255,255,255,0.08); flex-shrink:0;">
+      <div style="display:flex; align-items:center; gap:12px;">
+        <div style="display:flex; gap:6px; align-items:center;">
+          <span style="color:#ff5f56; font-size:0.9rem;">●</span>
+          <span style="color:#ffbd2e; font-size:0.9rem;">●</span>
+          <span style="color:#27c93f; font-size:0.9rem;">●</span>
+        </div>
+        <div style="font-family:'JetBrains Mono',monospace; font-size:0.86rem; font-weight:700; color:#f1f5f9; display:flex; align-items:center; gap:8px;">
+          <span style="color:#38bdf8;">&gt;_</span> TERMINAL &amp; COMPILER WORKBENCH
+        </div>
+        <span id="newTermStatusBadge" class="terminal-status-badge" style="font-size:0.7rem; padding:2px 8px; border-radius:6px; background:rgba(0,255,170,0.12); color:#00ffaa; border:1px solid rgba(0,255,170,0.3);">✔ Ready</span>
+      </div>
+
+      <div style="display:flex; align-items:center; gap:12px;">
+        <!-- Language Selector -->
+        <div style="display:flex; align-items:center; gap:6px; font-family:'JetBrains Mono',monospace; font-size:0.75rem; color:#94a3b8;">
+          <span>Lang:</span>
+          <select id="newTermLangSelect" onchange="switchNewTerminalLanguage(this.value)" style="background:#161f30; color:#38bdf8; border:1px solid rgba(56,189,248,0.35); border-radius:6px; padding:4px 8px; font-family:'JetBrains Mono',monospace; font-size:0.75rem; font-weight:600; outline:none; cursor:pointer;">
+            <option value="c" selected>C (GCC 13.2)</option>
+            <option value="cpp">C++ (G++ 13.2)</option>
+            <option value="python">Python 3.11</option>
+            <option value="javascript">JavaScript (Node.js v24)</option>
+            <option value="java">Java 21</option>
+          </select>
+        </div>
+
+        <button onclick="closeNewTerminalModal()" aria-label="Close Terminal" style="all:unset; cursor:pointer; color:#94a3b8; padding:4px 8px; border-radius:6px; transition:color 0.15s; display:flex; align-items:center; justify-content:center;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#94a3b8'">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Controls Bar -->
+    <div style="display:flex; align-items:center; justify-content:space-between; padding:8px 18px; background:#0e1626; border-bottom:1px solid rgba(255,255,255,0.06); flex-wrap:wrap; gap:8px; flex-shrink:0;">
+      <div style="display:flex; align-items:center; gap:8px;">
+        <button type="button" class="term-action-btn term-compile-btn" id="newTermCompileBtn" onclick="compileStandaloneTerminal()" title="Compile code &amp; verify 0 errors">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+          <span>Compile</span>
+        </button>
+
+        <button type="button" class="term-action-btn term-run-btn" id="newTermRunBtn" onclick="runStandaloneTerminal()" title="Run compiled program">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+          <span>Run</span>
+        </button>
+
+        <button type="button" class="term-action-btn term-compile-run-btn" id="newTermCompileRunBtn" onclick="compileAndRunStandaloneTerminal()" title="Compile &amp; Run in one step">
+          <span>⚡ Compile &amp; Run</span>
+        </button>
+
+        <button type="button" class="term-action-btn term-clear-btn" onclick="clearStandaloneTerminal()" title="Clear terminal screen">
+          <span>Clear</span>
+        </button>
+      </div>
+
+      <div style="display:flex; align-items:center; gap:10px;">
+        <button type="button" class="term-action-btn term-reset-btn" onclick="resetNewTerminalCode()" title="Reset to template">
+          <span>↺ Reset Code</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Main Body: Split view (Code Editor on Top, Interactive Terminal on Bottom) -->
+    <div style="flex:1; display:flex; flex-direction:column; min-height:0; overflow:hidden;">
+      <!-- Code Editor Panel -->
+      <div style="flex:1.1; display:flex; flex-direction:column; min-height:160px; border-bottom:1px solid rgba(255,255,255,0.08); background:#06080e;">
+        <div style="padding:6px 14px; background:#0b111e; font-size:0.7rem; font-family:'JetBrains Mono',monospace; color:#64748b; text-transform:uppercase; letter-spacing:0.06em; display:flex; justify-content:space-between; align-items:center;">
+          <span>Source Code Editor (Live Edit)</span>
+          <span style="color:#94a3b8; font-size:0.68rem;">UTF-8 • Tab: 4 spaces</span>
+        </div>
+        <textarea id="newTermCodeEditor" spellcheck="false" style="flex:1; width:100%; box-sizing:border-box; background:#04060a; color:#f1f5f9; font-family:'JetBrains Mono',monospace; font-size:0.82rem; line-height:1.6; padding:12px 14px; border:none; outline:none; resize:none; overflow-y:auto; tab-size:4;"></textarea>
+      </div>
+
+      <!-- Interactive Runtime Input Bar -->
+      <div style="display:flex; align-items:center; gap:10px; padding:8px 14px; background:#0d1422; border-bottom:1px solid rgba(255,255,255,0.08); flex-shrink:0;">
+        <div style="display:flex; align-items:center; gap:6px; font-family:'JetBrains Mono',monospace; font-size:0.75rem; color:#cbd5e1; font-weight:600; white-space:nowrap;">
+          <span style="color:#00ffaa; font-weight:700;">&gt;</span>
+          <span>Stdin (Runtime Input):</span>
+        </div>
+        <input type="text" id="newTermStdinInput" placeholder="Enter runtime input for scanf / cin / input() (e.g. 4)..." onkeydown="if(event.key==='Enter') runStandaloneTerminal()" style="flex:1; background:#060912; border:1px solid rgba(255,255,255,0.14); border-radius:6px; color:#f8fafc; font-family:'JetBrains Mono',monospace; font-size:0.76rem; padding:6px 10px; outline:none;" />
+        <button type="button" onclick="runStandaloneTerminal()" style="all:unset; box-sizing:border-box; cursor:pointer; background:rgba(0,255,170,0.15); border:1px solid #00ffaa; color:#00ffaa; font-family:'JetBrains Mono',monospace; font-size:0.74rem; font-weight:700; padding:6px 14px; border-radius:6px; display:inline-flex; align-items:center; gap:5px; transition:all 0.15s ease;" onmouseover="this.style.background='rgba(0,255,170,0.25)'" onmouseout="this.style.background='rgba(0,255,170,0.15)'">
+          <span>Send &amp; Run ↵</span>
+        </button>
+      </div>
+
+      <!-- Terminal Output Screen -->
+      <div style="flex:1; display:flex; flex-direction:column; min-height:120px; background:#020408;">
+        <div style="padding:6px 14px; background:#070b14; font-family:'JetBrains Mono',monospace; font-size:0.68rem; color:#64748b; letter-spacing:0.05em; display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(255,255,255,0.05);">
+          <span>&gt;_ TERMINAL CONSOLE (STDOUT)</span>
+          <span id="newTermOutputMeta" style="color:#00ffaa; font-weight:600;">GCC 13.2 • Ready</span>
+        </div>
+        <pre id="newTermOutput" style="flex:1; margin:0; padding:12px 14px; color:#a7f3d0; font-family:'JetBrains Mono',monospace; font-size:0.78rem; line-height:1.5; overflow-y:auto; white-space:pre-wrap; background:transparent;">$ Ready. Click [Compile] to verify 0 errors, or [Run] / [Compile &amp; Run] to execute.</pre>
       </div>
     </div>
   </div>
@@ -5546,6 +5801,10 @@
       <button class="account-menu-item" data-action="settings">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06A1.65 1.65 0 004.6 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06A1.65 1.65 0 009 4.6a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"></path></svg>
         Settings
+      </button>
+      <button class="account-menu-item" onclick="closeAccountMenu();openNewTerminalModal();">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;color:#38bdf8;"><polyline points="4 17 10 11 4 5"></polyline><line x1="12" y1="19" x2="20" y2="19"></line></svg>
+        New Terminal
       </button>
       <button class="account-menu-item" data-action="plan">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l2.9 6.3L22 9.3l-5 5 1.2 7.2L12 18l-6.2 3.5L7 14.3l-5-5 7.1-1z"></path></svg>
@@ -6336,18 +6595,13 @@
     }
   }, { passive: true });
 
-  // Smoothly scroll the latest AI message bubble into view
+  // Smoothly scroll the latest AI message bubble into view with ample search-shell clearance
   function streamAutoScroll(smooth = false) {
     if (userScrolledUp) return; // user is browsing freely – don't interrupt
     isAutoScrolling = true;
-    const aiRows = document.querySelectorAll('.msg-row.assistant');
-    const lastAi = aiRows.length ? aiRows[aiRows.length - 1] : null;
     const behavior = smooth ? 'smooth' : 'auto';
-    if (lastAi) {
-      lastAi.scrollIntoView({ behavior, block: 'end' });
-    } else {
-      window.scrollTo({ top: document.body.scrollHeight, behavior });
-    }
+    const targetY = document.documentElement.scrollHeight - window.innerHeight;
+    window.scrollTo({ top: Math.max(0, targetY), behavior });
     // Release guard after scroll settles
     setTimeout(() => { isAutoScrolling = false; }, smooth ? 350 : 80);
   }
@@ -6512,6 +6766,14 @@
 
   // ── AI CONTROL CENTER SETTINGS ENGINE ──────────────────────────────────────
   const SETTINGS_CATEGORIES = {
+    terminal: {
+      title: '>_ Terminal & Cloud Compiler',
+      cards: [
+        { id:'open-terminal-card', icon:'💻', label:'Open New Terminal Window', desc:'Launch an interactive compiler and terminal workbench with C, C++, Python, JavaScript, and Java.', control:`<button onclick="closeSettingsModal();openNewTerminalModal();" style="display:inline-flex;align-items:center;gap:6px;padding:7px 16px;border-radius:8px;background:rgba(56,189,248,0.15);border:1px solid #38bdf8;color:#38bdf8;font-weight:700;font-size:0.8rem;cursor:pointer;font-family:'JetBrains Mono',monospace;">&gt;_ Open New Terminal</button>` },
+        { id:'terminal-errors', icon:'🛡️', label:'Strict Zero Errors Mode', desc:'Verify 0 Errors and 0 Warnings before running code binaries.', control:`<label style="display:flex;align-items:center;gap:8px;cursor:pointer;"><input type="checkbox" checked style="accent-color:#00ffaa;width:15px;height:15px;"><span style="font-size:0.8rem;color:#00ffaa;font-family:monospace;font-weight:600;">Status: 0 Errors Strict ✓</span></label>` },
+        { id:'terminal-stdin', icon:'⌨️', label:'Interactive Runtime Input', desc:'Prompt for interactive runtime input (stdin) when program calls scanf, cin, or input().', control:`<label style="display:flex;align-items:center;gap:8px;cursor:pointer;"><input type="checkbox" checked style="accent-color:#38bdf8;width:15px;height:15px;"><span style="font-size:0.8rem;color:#fff;">Prompt Stdin at Runtime</span></label>` }
+      ]
+    },
     connection: {
       title: '⚡ Real-Time Connection & Cloud Sync',
       cards: [
@@ -7286,9 +7548,11 @@
         `;
       }
 
-      // ── STEP 2: Detect OUTPUT blocks ──
-      const isOutputBlock = language === 'text' || language === 'output' || language === 'console' ||
-                            /^(Output|Expected Output|Sample Output|Result|Program Output)[:\s]/i.test(trimmedCode);
+      // ── STEP 2: Detect OUTPUT blocks (Do NOT show terminal on sample output) ──
+      const hasCodeKeywords = /\b(int|void|char|float|double|def|function|class|import|include|return|public|private|const|let|var|if|for|while|main)\b|[;{}]/i.test(trimmedCode);
+      const isOutputBlock = language === 'text' || language === 'output' || language === 'console' || language === 'terminal' ||
+                            /^(Output|Expected Output|Sample Output|Result|Program Output|Element is present|Index of|Target found|Sorted array)/i.test(trimmedCode) ||
+                            (!hasCodeKeywords && trimmedCode.length < 350);
 
       if (isOutputBlock) {
         const cleanOutput = trimmedCode.replace(/^(Output|Expected Output|Sample Output|Result|Program Output)[:\s]*/i, '').trim();
@@ -7317,13 +7581,26 @@
         </button>
       ` : '';
 
+      const blockId = 'cb-' + Math.random().toString(36).slice(2, 9);
+      const isRunnable = !isMermaidDiagram && !isExampleBlock && !isOutputBlock && (hasCodeKeywords || ['c','cpp','c++','python','py','javascript','js','java','go','rust','ruby','php','bash','sh'].includes(validLang));
+      const compilerBtnHTML = isRunnable ? `
+        <button type="button" class="live-compiler-toggle-btn" id="comp-btn-${blockId}" onclick="toggleInlineCompiler('${blockId}', '${validLang}')" title="Click to open Terminal, Compile & Run">
+          <span style="font-family:'JetBrains Mono',monospace;font-weight:700;font-size:0.8rem;color:#38bdf8;">&gt;_</span>
+          <span>Terminal</span>
+          <span class="comp-caret" id="comp-caret-${blockId}">▾</span>
+        </button>
+      ` : '';
+
+      const rawCodeEscaped = code.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+
       // ── ALL code is rendered strictly in Code Cards ──
       const escapedCode = highlighted;
-      return `<div style="margin:16px 0;border-radius:12px;background:#0d0d0d;border:1px solid #2d3139;overflow:hidden;width:100%;box-sizing:border-box;font-family:'Inter',sans-serif;box-shadow:0 8px 30px rgba(0,0,0,0.5);">
-  <div style="display:flex;flex-direction:row;align-items:center;justify-content:space-between;padding:10px 16px;background:#161b22;border-bottom:1px solid #2d3139;">
+      return `<div class="code-card-wrap" style="margin:16px 0;border-radius:12px;background:#0d0d0d;border:1px solid #2d3139;overflow:hidden;width:100%;box-sizing:border-box;font-family:'Inter',sans-serif;box-shadow:0 8px 30px rgba(0,0,0,0.5);">
+  <div style="display:flex;flex-direction:row;align-items:center;justify-content:space-between;padding:10px 16px;background:#161b22;border-bottom:1px solid #2d3139;flex-wrap:wrap;gap:8px;">
     <div style="display:flex;align-items:center;gap:6px;font-size:0.76rem;font-weight:600;color:#8b949e;text-transform:uppercase;font-family:'JetBrains Mono',monospace;">${headerTitle}</div>
     <div style="display:flex;align-items:center;gap:8px;">
       ${previewBtnHTML}
+      ${compilerBtnHTML}
       <button onclick="copyFileCard(this,'${encodedCode}')" title="Copy" style="all:unset;box-sizing:border-box;display:inline-flex;align-items:center;gap:5px;cursor:pointer;color:#8b949e;font-size:0.75rem;font-weight:500;font-family:'Inter',sans-serif;padding:3px 8px;border-radius:6px;border:1px solid #30363d;background:#21262d;transition:color 0.15s;">
         <span style="white-space:nowrap;font-size:0.75rem;">Copy</span>
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:12px;height:12px;flex-shrink:0;"><rect x="9" y="9" width="13" height="13" rx="2"></rect><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"></path></svg>
@@ -7331,7 +7608,57 @@
     </div>
   </div>
   <pre style="margin:0;padding:18px 16px;overflow-x:auto;overflow-y:visible;background:#0d0d0d;font-family:'JetBrains Mono',monospace;font-size:0.82rem;line-height:1.6;white-space:pre;word-break:normal;overflow-wrap:normal;scrollbar-width:thin;scrollbar-color:#3d444d #0d0d0d;"><code class="language-${validLang}" style="background:transparent;color:#e6edf3;font-family:inherit;font-size:inherit;">${escapedCode}</code></pre>
+
+  <!-- INLINE LIVE TERMINAL & COMPILER WORKBENCH (COLLAPSIBLE) -->
+  <div class="inline-live-compiler-wrap" id="inline-compiler-${blockId}" style="display: none;">
+    <div class="inline-compiler-top-bar">
+      <div class="inline-compiler-dots">
+        <span style="color:#ff5f56;font-size:0.85rem;">●</span><span style="color:#ffbd2e;font-size:0.85rem;">●</span><span style="color:#27c93f;font-size:0.85rem;">●</span>
+        <span style="margin-left:6px;font-weight:700;color:#e2e8f0;letter-spacing:0.04em;">&gt;_ ${validLang.toUpperCase()} TERMINAL &amp; COMPILER</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <span class="terminal-status-badge" id="build-status-${blockId}">⚡ Ready</span>
+        <button type="button" class="inline-compiler-close-btn" onclick="toggleInlineCompiler('${blockId}', '${validLang}')">✕ Close Terminal</button>
+      </div>
+    </div>
+    <div class="inline-compiler-editor-wrap">
+      <div class="inline-compiler-label">Code in Terminal (Live Editable):</div>
+      <textarea class="inline-compiler-editor" id="code-edit-${blockId}" rows="7" spellcheck="false">${rawCodeEscaped}</textarea>
+    </div>
+    <div class="terminal-action-row" style="display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap;">
+      <button type="button" class="term-action-btn term-compile-btn" id="compile-btn-${blockId}" onclick="compileInlineCode('${blockId}', '${validLang}')" title="Compile code & verify 0 errors">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+        <span>Compile</span>
+      </button>
+      <button type="button" class="term-action-btn term-run-btn" id="run-btn-${blockId}" onclick="runInlineCompilerCode('${blockId}', '${validLang}')" title="Run code & show output">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+        <span>Run</span>
+      </button>
+      <button type="button" class="term-action-btn term-compile-run-btn" id="comp-run-btn-${blockId}" onclick="compileAndRunInlineCode('${blockId}', '${validLang}')" title="Compile & Run in one step">
+        <span>⚡ Compile &amp; Run</span>
+      </button>
+      <button type="button" class="term-action-btn term-clear-btn" onclick="clearInlineTerminal('${blockId}')" title="Clear terminal screen">
+        <span>Clear</span>
+      </button>
+    </div>
+    <div class="terminal-stdin-bar" id="stdin-wrap-${blockId}" style="display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap;background:#050810;padding:6px 10px;border-radius:6px;border:1px solid rgba(255,255,255,0.08);">
+      <span style="font-size:0.72rem;color:#00ffaa;font-weight:700;font-family:'JetBrains Mono',monospace;">&gt;</span>
+      <span style="font-size:0.72rem;color:#cbd5e1;font-family:'JetBrains Mono',monospace;white-space:nowrap;font-weight:600;">Runtime Input (stdin):</span>
+      <input type="text" class="inline-compiler-stdin" id="stdin-${blockId}" placeholder="Enter runtime input for scanf / cin / input() (e.g. 4)..." onkeydown="if(event.key==='Enter') runInlineCompilerCode('${blockId}', '${validLang}')" style="flex:1;min-width:160px;box-sizing:border-box;background:#020408;border:1px solid rgba(255,255,255,0.12);border-radius:4px;color:#e2e8f0;font-family:'JetBrains Mono',monospace;font-size:0.74rem;padding:5px 8px;outline:none;">
+      <button type="button" class="terminal-send-btn" onclick="runInlineCompilerCode('${blockId}', '${validLang}')" title="Send input & run" style="all:unset;box-sizing:border-box;cursor:pointer;background:rgba(0,255,170,0.15);border:1px solid #00ffaa;color:#00ffaa;font-size:0.72rem;font-weight:700;font-family:'JetBrains Mono',monospace;padding:5px 10px;border-radius:4px;transition:all 0.15s ease;">
+        <span>Send &amp; Run ↵</span>
+      </button>
+    </div>
+    <div class="inline-terminal-screen">
+      <div class="terminal-screen-header">
+        <span>&gt;_ TERMINAL OUTPUT (STDOUT)</span>
+        <span class="terminal-runtime-tag" id="term-tag-${blockId}">Ready</span>
+      </div>
+      <pre class="terminal-output-content" id="term-out-${blockId}"><span style="color:#64748b;">$ Terminal ready. Click [Compile] to verify 0 errors, or [▶ Run] to execute.</span></pre>
+    </div>
+  </div>
 </div>`;
+
     };
 
     renderer.table = function(header, body) {
@@ -8011,8 +8338,9 @@
       html += buildImageGalleryHTML(data.images, query);
     }
 
-    // Compact Class Bar Pill (opens dedicated Classes Page on click)
-    if (data && data.videos && data.videos.length) {
+    // Compact Class Bar Pill (only shown when user explicitly asks for videos, classes, or lectures)
+    const wantsVideos = /\b(video|videos|class|classes|watch|lecture|lectures|course|tutorial|youtube)\b/i.test(query || '');
+    if (wantsVideos && data && data.videos && data.videos.length) {
       const fullVideoCardsMarkup = buildVideoCardsHTML(data.videos, query, langCode);
       html += `<div class="video-pill-wrap" style="margin-top:12px; margin-bottom:4px; display:inline-flex; align-items:center;">
         <button type="button" class="open-videos-page-btn" data-query="${escapeHtml(query)}">
@@ -8811,20 +9139,11 @@ Building interactive websites, HTML applications, and frontend UI dashboards is 
       const chunk = words.slice(idx, idx + 8).join('');
       msg.text += chunk;
       idx += 8;
-      // Smart render: count backtick fences — if odd (fence open), render raw text temporarily
-      const fenceCount = (msg.text.match(/^```/gm) || []).length;
-      const isInsideCodeFence = fenceCount % 2 !== 0;
-      if (isInsideCodeFence) {
-        // Inside a code fence: show raw text (avoid broken half-rendered code block)
-        msg.isHtml = false;
-      } else {
-        // Outside a code fence: render properly with markdown/code cards
-        msg.isHtml = true;
-      }
-      renderThread(conv);
-      // Auto-scroll every ~10 ticks (≈80ms) to stay smooth without thrashing
+      // Smart render: update bubble in-place with zero flicker or blank frames
+      streamLiveBubble(msg, conv);
+      // Auto-scroll smoothly
       scrollThrottle++;
-      if (scrollThrottle % 10 === 0) streamAutoScroll();
+      if (scrollThrottle % 8 === 0) streamAutoScroll();
     }, 8);
   }
 
@@ -9176,9 +9495,6 @@ Building interactive websites, HTML applications, and frontend UI dashboards is 
     input.focus();
     input.setSelectionRange(input.value.length, input.value.length);
 
-    // Scroll input into view
-    input.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-
     // Remove the old user message + its assistant reply from the thread
     // so when user re-sends, it doesn't duplicate
     const idx = conv.messages.findIndex(m => m.id === userMsg.id);
@@ -9324,158 +9640,395 @@ Building interactive websites, HTML applications, and frontend UI dashboards is 
     return null;
   }
 
-  function renderPlatformIdeCards(query, fullText, msgId) {
-    const langKey = detectProgrammingLanguage(query, fullText);
-    if (!langKey) return '';
-    const platforms = PLATFORM_IDE_MAP[langKey] || PLATFORM_IDE_MAP.python;
-    const langName = langKey.toUpperCase();
+  const TERMINAL_TEMPLATES = {
+    c: `#include <stdio.h>
 
-    const cardsHtml = platforms.slice(0, 4).map(p => `
-      <a href="${p.url}" target="_blank" rel="noopener noreferrer" class="code-platform-card" onclick="runOnSelectedPlatform('${msgId}', '${escapeHtml(p.name)}', '${p.url}')" title="Run on ${escapeHtml(p.name)} &amp; Open IDE">
-        <span class="code-platform-icon">${p.icon}</span>
-        <div class="code-platform-meta">
-          <div class="code-platform-name">${p.name} ↗</div>
-          <div class="code-platform-tag">${p.tag}</div>
-        </div>
-      </a>
-    `).join('');
-
-    const defaultInput = (query && query.toLowerCase().includes('search')) ? 'arr = [12, 34, 54, 2, 3], target = 54' : 'data = [5, 1, 4, 2, 8]';
-
-    return `
-      <div class="code-platforms-deck" data-msg-id="${msgId}">
-        <div class="code-platforms-header">
-          <div class="code-platforms-title">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
-            <span>Run on ${langName} Platforms &amp; IDEs:</span>
-          </div>
-          <span style="font-size:0.65rem;font-family:'JetBrains Mono',monospace;color:#94a3b8;">Real-Time Execution Runtime</span>
-        </div>
-        <div class="code-platforms-grid">
-          ${cardsHtml}
-        </div>
-        <div class="code-sandbox-box">
-          <div class="code-sandbox-header">
-            <span>⚡ Interactive Real-Time Output Playground</span>
-            <button type="button" class="code-sandbox-run-btn" onclick="executeRealTimeSandbox('${msgId}')">
-              <span>Run Code ⚡</span>
-            </button>
-          </div>
-          <input type="text" class="code-sandbox-input" id="sandbox-in-${msgId}" value="${escapeHtml(defaultInput)}" placeholder="Enter custom test input parameters…">
-          <div class="code-sandbox-output" id="sandbox-out-${msgId}">
-            <span style="color:#64748b;">Ready. Click "Run Code ⚡" or any platform above to execute in real-time.</span>
-          </div>
-        </div>
-      </div>
-    `;
-  }
-
-  window.runOnSelectedPlatform = function(msgId, platformName, platformUrl) {
-    if (typeof executeRealTimeSandbox === 'function') {
-      executeRealTimeSandbox(msgId, platformName);
+int linearSearch(int arr[], int n, int x) {
+    for (int i = 0; i < n; i++) {
+        if (arr[i] == x) return i;
     }
-  };
+    return -1;
+}
 
-  window.executeRealTimeSandbox = async function(msgId, preferredPlatform) {
-    const inputEl = document.getElementById('sandbox-in-' + msgId);
-    const outEl = document.getElementById('sandbox-out-' + msgId);
-    if (!outEl) return;
-    const val = inputEl ? inputEl.value.trim() : '';
-
-    outEl.innerHTML = '<span style="color:#38bdf8;display:inline-flex;align-items:center;gap:6px;">⚡ Compiling &amp; executing on official platform runtime…</span>';
-
-    // 1. Locate the message bubble & extract code snippet
-    const bubble = document.querySelector(`[data-msg-id="${msgId}"]`) || document.getElementById('msg-' + msgId) || (outEl.closest('.msg-row') ? outEl.closest('.msg-row').querySelector('.msg-bubble') : null);
+int main() {
+    int arr[] = {2, 3, 4, 10, 40};
+    int n = sizeof(arr) / sizeof(arr[0]);
+    int x = 10;
     
-    let rawCode = '';
-    let detectedLang = 'python';
+    printf("Array: [2, 3, 4, 10, 40]\\n");
+    printf("Enter target element to search (or use default 10): ");
+    // Runtime input via stdin
+    scanf("%d", &x);
+    
+    int result = linearSearch(arr, n, x);
+    if (result == -1)
+        printf("Element %d is not present in array\\n", x);
+    else
+        printf("Element %d is present at index %d\\n", x, result);
+    return 0;
+}`,
+    cpp: `#include <iostream>
+#include <vector>
+using namespace std;
 
-    if (bubble) {
-      const codeBlocks = bubble.querySelectorAll('pre code');
-      if (codeBlocks.length > 0) {
-        rawCode = codeBlocks[0].innerText || codeBlocks[0].textContent;
-        const cls = (codeBlocks[0].className || '').toLowerCase();
-        if (cls.includes('js') || cls.includes('javascript') || cls.includes('node')) detectedLang = 'javascript';
-        else if (cls.includes('python') || cls.includes('py')) detectedLang = 'python';
-        else if (cls.includes('cpp') || cls.includes('c++')) detectedLang = 'cpp';
-        else if (cls.includes('java')) detectedLang = 'java';
-      }
+int main() {
+    vector<int> arr = {2, 3, 4, 10, 40};
+    int target = 10;
+    cout << "Enter target value to search: ";
+    cin >> target;
+    
+    int found = -1;
+    for (int i = 0; i < arr.size(); i++) {
+        if (arr[i] == target) { found = i; break; }
     }
-
-    // 2. Prepare runnable code with driver if needed
-    if (!rawCode || rawCode.trim().length < 10) {
-      if (val.toLowerCase().includes('target')) {
-        rawCode = `def linear_search(arr, target):
-    for i in range(len(arr)):
-        if arr[i] == target:
+    if (found != -1) cout << "Element is present at index " << found << endl;
+    else cout << "Element is not present in array" << endl;
+    return 0;
+}`,
+    python: `def linear_search(arr, x):
+    for i, val in enumerate(arr):
+        if val == x:
             return i
     return -1
 
-# Input arguments
-${val.includes('=') ? val : 'arr = [12, 34, 54, 2, 3]\ntarget = 54'}
-idx = linear_search(arr, target)
-if idx != -1:
-    print(f"✓ Target {target} found at index: {idx}")
-else:
-    print(f"✗ Target {target} not found")
-print(f"Algorithm: Linear Search | Total elements evaluated: {len(arr)}")`;
-      } else {
-        rawCode = `# Execution on official runtime
-${val ? '# Test parameter: ' + val : ''}
-data = [12, 34, 54, 2, 3]
-print(f"Input collection: {data}")
-print(f"Sorted result: {sorted(data)}")
-print("Execution status: OK (Exit Code 0)")`;
-      }
-    } else {
-      // If code was extracted from response, check if it has a print statement
-      if (!rawCode.includes('print(') && !rawCode.includes('console.log(') && !rawCode.includes('printf(')) {
-        if (detectedLang === 'javascript') {
-          rawCode += `\n\n// Execution Driver\nconsole.log("Program executed successfully. Result:", typeof main === 'function' ? main() : "Completed");`;
-        } else {
-          rawCode += `\n\n# Execution Driver\nprint("Program executed successfully on platform runtime.")`;
+if __name__ == '__main__':
+    arr = [2, 3, 4, 10, 40]
+    print(f"Array: {arr}")
+    val_str = input("Enter target to search (e.g. 4): ").strip()
+    x = int(val_str) if val_str.isdigit() else 10
+    idx = linear_search(arr, x)
+    if idx != -1:
+        print(f"Element is present at index {idx}")
+    else:
+        print("Element is not present in array")
+`,
+    javascript: `const arr = [2, 3, 4, 10, 40];
+console.log("Array:", arr);
+
+const readline = require('readline');
+const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
+
+rl.question('Enter number to search: ', (answer) => {
+  const target = parseInt(answer) || 10;
+  const index = arr.indexOf(target);
+  if (index !== -1) {
+    console.log(\`Element is present at index \${index}\`);
+  } else {
+    console.log("Element is not present in array");
+  }
+  rl.close();
+});
+`,
+    java: `import java.util.Scanner;
+
+public class Main {
+    public static int search(int arr[], int x) {
+        for (int i = 0; i < arr.length; i++) {
+            if (arr[i] == x) return i;
         }
-      }
+        return -1;
     }
 
-    // 3. Post to real /api/run-code for authentic platform execution
+    public static void main(String args[]) {
+        int arr[] = {2, 3, 4, 10, 40};
+        Scanner sc = new Scanner(System.in);
+        System.out.println("Enter element to search:");
+        int x = sc.hasNextInt() ? sc.nextInt() : 10;
+        int result = search(arr, x);
+        if (result == -1)
+            System.out.println("Element is not present in array");
+        else
+            System.out.println("Element is present at index " + result);
+    }
+}`
+  };
+
+  function resolveLang(code, defaultLang) {
+    let lang = (defaultLang || 'python').toLowerCase();
+    if (lang === 'py') lang = 'python';
+    if (lang === 'js' || lang === 'node') lang = 'javascript';
+    if (lang === 'c++') lang = 'cpp';
+    if (lang === 'clike') {
+      if (code.includes('def ') || (code.includes('print(') && !code.includes(';'))) lang = 'python';
+      else if (code.includes('<iostream>') || code.includes('std::')) lang = 'cpp';
+      else if (code.includes('<stdio.h>') || code.includes('printf(')) lang = 'c';
+      else if (code.includes('public class') || code.includes('System.out')) lang = 'java';
+      else lang = 'c';
+    }
+    return lang;
+  }
+
+  window.toggleInlineCompiler = function(blockId, defaultLang) {
+    const wrap = document.getElementById('inline-compiler-' + blockId);
+    const caret = document.getElementById('comp-caret-' + blockId);
+    const btn = document.getElementById('comp-btn-' + blockId);
+    if (!wrap) return;
+
+    const isHidden = (wrap.style.display === 'none' || !wrap.style.display);
+    if (isHidden) {
+      wrap.style.display = 'block';
+      if (caret) caret.textContent = '▴';
+      if (btn) btn.classList.add('open');
+
+      // Auto-run on first open so the user sees live output immediately!
+      const termOut = document.getElementById('term-out-' + blockId);
+      if (termOut && termOut.dataset.hasRun !== 'true') {
+        window.runInlineCompilerCode(blockId, defaultLang);
+      }
+    } else {
+      wrap.style.display = 'none';
+      if (caret) caret.textContent = '▾';
+      if (btn) btn.classList.remove('open');
+    }
+  };
+
+  window.compileInlineCode = async function(blockId, defaultLang) {
+    const editor = document.getElementById('code-edit-' + blockId);
+    const termOut = document.getElementById('term-out-' + blockId);
+    const statusBadge = document.getElementById('build-status-' + blockId);
+    const compileBtn = document.getElementById('compile-btn-' + blockId);
+    if (!termOut) return;
+
+    const code = editor ? editor.value : '';
+    const lang = resolveLang(code, defaultLang);
+
+    if (compileBtn) {
+      compileBtn.disabled = true;
+      compileBtn.innerHTML = '<span>⚡ Compiling…</span>';
+    }
+    if (statusBadge) {
+      statusBadge.className = 'terminal-status-badge';
+      statusBadge.textContent = '⚡ Compiling…';
+    }
+
+    const compCmd = lang === 'cpp' ? 'g++ -O2 -Wall main.cpp -o main' : (lang === 'c' ? 'gcc -O2 -Wall main.c -o main' : (lang === 'python' ? 'python3 -m py_compile main.py' : `node --check index.js`));
+
+    termOut.innerHTML = `<span style="color:#38bdf8;">$ ${compCmd}</span>\n<span style="color:#94a3b8;">[Compiler]: Parsing AST and verifying syntax...\n[Compiler]: Checking type annotations, tokens, and symbol tables...</span>`;
+
+    try {
+      const resp = await fetch('/api/run-code', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'compile', code, language: lang })
+      });
+      const data = await resp.json();
+      const isSuccess = data.success !== false;
+
+      if (statusBadge) {
+        statusBadge.className = `terminal-status-badge ${isSuccess ? 'success' : 'error'}`;
+        statusBadge.textContent = isSuccess ? '✔ 0 Errors • Compiled' : '✖ Build Failed';
+      }
+
+      termOut.innerHTML = `<span style="color:#64748b;">$ ${compCmd}</span>\n<span style="color:${isSuccess ? '#34d399' : '#f87171'};font-weight:600;">${escapeHtml(data.output || '')}</span>\n\n<span style="color:${isSuccess ? '#00ffaa' : '#ff5555'};font-size:0.72rem;">[Build Status: ${isSuccess ? '0 Errors, 0 Warnings (Exit code 0)' : 'Failed with errors'}]</span>`;
+    } catch(err) {
+      if (statusBadge) {
+        statusBadge.className = 'terminal-status-badge error';
+        statusBadge.textContent = '✖ Error';
+      }
+      termOut.innerHTML = `<span style="color:#f87171;">✖ Compilation Exception: ${escapeHtml(err.message)}</span>`;
+    } finally {
+      if (compileBtn) {
+        compileBtn.disabled = false;
+        compileBtn.innerHTML = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg><span>Compile</span>';
+      }
+    }
+  };
+
+  window.runInlineCompilerCode = async function(blockId, defaultLang) {
+    const editor = document.getElementById('code-edit-' + blockId);
+    const stdinEl = document.getElementById('stdin-' + blockId);
+    const termOut = document.getElementById('term-out-' + blockId);
+    const termTag = document.getElementById('term-tag-' + blockId);
+    const runBtn = document.getElementById('run-btn-' + blockId);
+
+    if (!termOut) return;
+    termOut.dataset.hasRun = 'true';
+
+    const code = editor ? editor.value : '';
+    const stdin = stdinEl ? stdinEl.value.trim() : '';
+    const lang = resolveLang(code, defaultLang);
+
+    if (runBtn) {
+      runBtn.disabled = true;
+      runBtn.innerHTML = '<span>⚡ Running…</span>';
+    }
+
+    const runCmd = lang === 'javascript' ? 'node index.js' : (lang === 'python' ? 'python3 main.py' : `./main`);
+
+    termOut.innerHTML = `<span style="color:#38bdf8;">$ ${runCmd}</span>\n<span style="color:#94a3b8;">⚡ Executing in platform runtime sandbox...</span>`;
+
     try {
       const resp = await fetch('/api/run-code', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          code: rawCode,
-          language: detectedLang,
-          input: val,
-          platform: preferredPlatform || ''
+          action: 'run',
+          code: code,
+          language: lang,
+          input: stdin
         })
       });
       const data = await resp.json();
-
       const isSuccess = data.success !== false;
-      const platformDisplay = preferredPlatform ? `${preferredPlatform} (${data.platform || 'Runtime'})` : (data.platform || 'Official Local Runtime');
+      const platformDisplay = data.platform || (lang.toUpperCase() + ' Runtime');
 
-      outEl.innerHTML = `
-        <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid rgba(255,255,255,0.08);flex-wrap:wrap;">
-          <div style="display:flex;align-items:center;gap:6px;">
-            <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${isSuccess ? '#00ffaa' : '#ff4444'};box-shadow:0 0 6px ${isSuccess ? '#00ffaa' : '#ff4444'};"></span>
-            <span style="font-weight:700;color:#f8fafc;font-size:0.75rem;">${escapeHtml(platformDisplay)}</span>
-          </div>
-          <div style="display:flex;align-items:center;gap:10px;font-size:0.68rem;color:#94a3b8;">
-            <span>⏱️ <strong>${escapeHtml(data.time || '12ms')}</strong></span>
-            <span style="color:${isSuccess ? '#00ffaa' : '#ff5555'};font-weight:700;">${isSuccess ? '● SUCCESS (Exit Code 0)' : '✕ RUNTIME ERROR'}</span>
-          </div>
-        </div>
-        <div style="color:#64748b;font-size:0.66rem;margin-bottom:4px;text-transform:uppercase;letter-spacing:0.06em;font-weight:700;">Real Platform Output (stdout):</div>
-        <pre style="margin:0;font-family:'JetBrains Mono',monospace;font-size:0.76rem;color:${isSuccess ? '#a7f3d0' : '#fca5a5'};white-space:pre-wrap;line-height:1.5;">${escapeHtml(data.output || '(No stdout generated)')}</pre>
-      `;
-    } catch (err) {
-      outEl.innerHTML = `
-        <div style="color:#ff5555;font-size:0.75rem;font-weight:600;">⚠️ Local Runtime Execution Error:</div>
-        <div style="font-size:0.72rem;color:#cbd5e1;margin-top:4px;">${escapeHtml(err.message)}</div>
-      `;
+      if (termTag) {
+        termTag.textContent = `${platformDisplay} • ${data.time || '12ms'}`;
+        termTag.style.color = isSuccess ? '#00ffaa' : '#ff5555';
+      }
+
+      let stdinNote = stdin ? `<span style="color:#38bdf8;font-size:0.72rem;">[Runtime Stdin Provided]: "${escapeHtml(stdin)}"</span>\n` : '';
+      termOut.innerHTML = `<span style="color:#64748b;">$ ${runCmd}</span>\n${stdinNote}<span style="color:${isSuccess ? '#a7f3d0' : '#fca5a5'};font-weight:500;">${escapeHtml(data.output || '(No stdout returned)')}</span>\n\n<span style="color:${isSuccess ? '#00ffaa' : '#ff5555'};font-size:0.72rem;">[Process exited with status ${isSuccess ? '0 (SUCCESS)' : '1 (ERROR)'} in ${escapeHtml(data.time || '12ms')}]</span>`;
+    } catch(err) {
+      termOut.innerHTML = `<span style="color:#ff5555;">⚠️ Execution Error: ${escapeHtml(err.message)}</span>`;
+    } finally {
+      if (runBtn) {
+        runBtn.disabled = false;
+        runBtn.innerHTML = '<svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg><span>Run</span>';
+      }
     }
   };
+
+  window.compileAndRunInlineCode = async function(blockId, defaultLang) {
+    await window.compileInlineCode(blockId, defaultLang);
+    await window.runInlineCompilerCode(blockId, defaultLang);
+  };
+
+  window.clearInlineTerminal = function(blockId) {
+    const termOut = document.getElementById('term-out-' + blockId);
+    if (termOut) {
+      termOut.innerHTML = `<span style="color:#64748b;">$ Terminal cleared. Ready to compile &amp; run.</span>`;
+    }
+  };
+
+  /* ── STANDALONE NEW TERMINAL WORKBENCH ── */
+  window.openNewTerminalModal = function(initialLang = 'c') {
+    const modal = document.getElementById('newTerminalModal');
+    if (!modal) return;
+    modal.style.display = 'flex';
+    const sel = document.getElementById('newTermLangSelect');
+    if (sel) sel.value = initialLang;
+    window.switchNewTerminalLanguage(initialLang);
+  };
+
+  window.closeNewTerminalModal = function() {
+    const modal = document.getElementById('newTerminalModal');
+    if (modal) modal.style.display = 'none';
+  };
+
+  window.switchNewTerminalLanguage = function(lang) {
+    const editor = document.getElementById('newTermCodeEditor');
+    const badge = document.getElementById('newTermStatusBadge');
+    const meta = document.getElementById('newTermOutputMeta');
+    const template = TERMINAL_TEMPLATES[lang] || TERMINAL_TEMPLATES.c;
+    if (editor) editor.value = template;
+    if (badge) {
+      badge.className = 'terminal-status-badge';
+      badge.textContent = '⚡ Ready';
+    }
+    if (meta) {
+      const names = { c: 'GCC 13.2', cpp: 'G++ 13.2', python: 'Python 3.11', javascript: 'Node.js v24', java: 'Java 21' };
+      meta.textContent = `${names[lang] || lang.toUpperCase()} • Ready`;
+    }
+  };
+
+  window.resetNewTerminalCode = function() {
+    const sel = document.getElementById('newTermLangSelect');
+    const lang = sel ? sel.value : 'c';
+    window.switchNewTerminalLanguage(lang);
+  };
+
+  window.compileStandaloneTerminal = async function() {
+    const editor = document.getElementById('newTermCodeEditor');
+    const sel = document.getElementById('newTermLangSelect');
+    const badge = document.getElementById('newTermStatusBadge');
+    const meta = document.getElementById('newTermOutputMeta');
+    const out = document.getElementById('newTermOutput');
+    const btn = document.getElementById('newTermCompileBtn');
+    if (!editor || !out) return;
+
+    const code = editor.value;
+    const lang = sel ? sel.value : 'c';
+
+    if (btn) { btn.disabled = true; const span = btn.querySelector('span'); if(span) span.textContent = 'Compiling…'; }
+    if (badge) { badge.className = 'terminal-status-badge'; badge.textContent = '⚡ Compiling…'; }
+
+    const compCmd = lang === 'cpp' ? 'g++ -O2 -Wall main.cpp -o main' : (lang === 'c' ? 'gcc -O2 -Wall main.c -o main' : (lang === 'python' ? 'python3 -m py_compile main.py' : `node --check index.js`));
+    out.innerHTML = `<span style="color:#38bdf8;">$ ${compCmd}</span>\n<span style="color:#94a3b8;">[Compiler]: Parsing AST and verifying syntax...\n[Compiler]: Checking symbol tables and type definitions...</span>`;
+
+    try {
+      const resp = await fetch('/api/run-code', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'compile', code, language: lang })
+      });
+      const data = await resp.json();
+      const isSuccess = data.success !== false;
+
+      if (badge) {
+        badge.className = `terminal-status-badge ${isSuccess ? 'success' : 'error'}`;
+        badge.textContent = isSuccess ? '✔ 0 Errors • Compiled' : '✖ Build Failed';
+      }
+      if (meta) meta.textContent = `${data.platform || lang.toUpperCase()} • ${data.time || '10ms'}`;
+
+      out.innerHTML = `<span style="color:#64748b;">$ ${compCmd}</span>\n<span style="color:${isSuccess ? '#34d399' : '#f87171'};font-weight:600;">${escapeHtml(data.output || '')}</span>\n\n<span style="color:${isSuccess ? '#00ffaa' : '#ff5555'};font-size:0.72rem;">[Build Status: ${isSuccess ? '0 Errors, 0 Warnings (Exit code 0)' : 'Failed with errors'}]</span>`;
+    } catch(err) {
+      if (badge) { badge.className = 'terminal-status-badge error'; badge.textContent = '✖ Error'; }
+      out.innerHTML = `<span style="color:#f87171;">✖ Compilation Error: ${escapeHtml(err.message)}</span>`;
+    } finally {
+      if (btn) { btn.disabled = false; const span = btn.querySelector('span'); if(span) span.textContent = 'Compile'; }
+    }
+  };
+
+  window.runStandaloneTerminal = async function() {
+    const editor = document.getElementById('newTermCodeEditor');
+    const sel = document.getElementById('newTermLangSelect');
+    const stdinEl = document.getElementById('newTermStdinInput');
+    const badge = document.getElementById('newTermStatusBadge');
+    const meta = document.getElementById('newTermOutputMeta');
+    const out = document.getElementById('newTermOutput');
+    const btn = document.getElementById('newTermRunBtn');
+    if (!editor || !out) return;
+
+    const code = editor.value;
+    const lang = sel ? sel.value : 'c';
+    const stdin = stdinEl ? stdinEl.value.trim() : '';
+
+    if (btn) { btn.disabled = true; const span = btn.querySelector('span'); if(span) span.textContent = 'Running…'; }
+
+    const runCmd = lang === 'javascript' ? 'node index.js' : (lang === 'python' ? 'python3 main.py' : `./main`);
+    out.innerHTML = `<span style="color:#38bdf8;">$ ${runCmd}</span>\n<span style="color:#94a3b8;">⚡ Executing program in isolated runtime sandbox...</span>`;
+
+    try {
+      const resp = await fetch('/api/run-code', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'run', code, language: lang, input: stdin })
+      });
+      const data = await resp.json();
+      const isSuccess = data.success !== false;
+
+      if (meta) meta.textContent = `${data.platform || lang.toUpperCase()} • ${data.time || '14ms'}`;
+      let stdinNote = stdin ? `<span style="color:#38bdf8;font-size:0.72rem;">[Runtime Stdin Provided]: "${escapeHtml(stdin)}"</span>\n` : '';
+      out.innerHTML = `<span style="color:#64748b;">$ ${runCmd}</span>\n${stdinNote}<span style="color:${isSuccess ? '#a7f3d0' : '#fca5a5'};font-weight:500;">${escapeHtml(data.output || '(No stdout returned)')}</span>\n\n<span style="color:${isSuccess ? '#00ffaa' : '#ff5555'};font-size:0.72rem;">[Process exited with status ${isSuccess ? '0 (SUCCESS)' : '1 (ERROR)'} in ${escapeHtml(data.time || '12ms')}]</span>`;
+    } catch(err) {
+      out.innerHTML = `<span style="color:#ff5555;">⚠️ Runtime Error: ${escapeHtml(err.message)}</span>`;
+    } finally {
+      if (btn) { btn.disabled = false; const span = btn.querySelector('span'); if(span) span.textContent = 'Run'; }
+    }
+  };
+
+  window.compileAndRunStandaloneTerminal = async function() {
+    await window.compileStandaloneTerminal();
+    await window.runStandaloneTerminal();
+  };
+
+  window.clearStandaloneTerminal = function() {
+    const out = document.getElementById('newTermOutput');
+    if (out) out.innerHTML = `<span style="color:#64748b;">$ Terminal console cleared. Ready.</span>`;
+  };
+
+
 
   function generateStudioSuggestions(query) {
     let cleanQ = (query || '')
@@ -9486,96 +10039,101 @@ print("Execution status: OK (Exit Code 0)")`;
       .trim();
 
     cleanQ = cleanQ.replace(/^of\s+/i, '').replace(/^in\s+/i, '').replace(/^for\s+/i, '').trim();
-    if (!cleanQ) cleanQ = 'core concept';
+    if (!cleanQ) return [];
 
     const lower = cleanQ.toLowerCase();
+
+    // Filter out casual greetings / trivial phrases (prevents awkward "foundations of hi")
+    if (/^(hi|hello|hey|greetings|hola|namaste|yo|how are you|who are you|thanks|thank you|ok|okay|bye|good morning|good evening)$/i.test(lower) || lower.length < 3) {
+      return [];
+    }
 
     // 1. Linear Search / Binary Search & Searching Algorithms
     if (lower.includes('linear search') || lower.includes('search algorithm') || lower.includes('searching')) {
       return [
-        'Worst-case O(N) vs Best-case O(1): Step-by-step trace & comparison with Binary Search',
-        'Sentinel Linear Search optimization: How to eliminate loop boundary checks',
-        'Implementing Linear Search on Singly Linked Lists with pointer traversal',
-        'Practical CPU benchmark: When is Linear Search faster than Binary Search due to cache locality?'
+        'Worst-case O(N) trace',
+        'Sentinel optimization',
+        'Singly linked list traversal',
+        'Cache locality vs Binary Search'
       ];
     }
 
     // 2. Binary Search & Divide and Conquer
     if (lower.includes('binary search')) {
       return [
-        'Avoiding integer overflow: Safe midpoint calculation (low + (high - low) / 2)',
-        'Binary Search on rotated sorted array & finding the pivot point',
-        'Bisect Left vs Bisect Right: Finding first and last target occurrences',
-        'Binary Search on monotonic answer spaces: Real-world optimization problems'
+        'Safe midpoint calculation',
+        'Rotated sorted array search',
+        'Bisect left vs bisect right',
+        'Monotonic answer spaces'
       ];
     }
 
     // 3. Sorting Algorithms (Bubble, Merge, Quick, Insertion)
     if (lower.includes('sort') || lower.includes('bubble') || lower.includes('merge sort') || lower.includes('quick sort')) {
       return [
-        'In-place vs out-of-place memory footprint and auxiliary space requirements',
-        'Stability in sorting: Why stability matters for multi-key database queries',
-        'Mathematical recurrence relations: Worst-case vs average-case time bounds',
-        'Hybrid optimizations: Why modern engines use Timsort / Introsort on small arrays'
+        'In-place memory footprint',
+        'Sorting stability in databases',
+        'Worst-case vs average recurrence',
+        'Timsort & Introsort optimizations'
       ];
     }
 
     // 4. Data Structures (Arrays, Linked Lists, Trees, Graphs, DP)
     if (lower.includes('linked list') || lower.includes('tree') || lower.includes('graph') || lower.includes('stack') || lower.includes('queue') || lower.includes('dp') || lower.includes('dynamic programming')) {
       return [
-        'Memory layout & cache hit ratios: Contiguous array vs pointer linked nodes',
-        'Time and space complexity trade-offs for core CRUD operations',
-        'Detecting cycles & boundary edge cases: Fast/slow runner technique',
-        'Top-down Memoization vs Bottom-up Tabulation state transitions'
+        'Array vs linked node cache layout',
+        'CRUD operation complexity',
+        'Fast & slow pointer cycle check',
+        'Memoization vs tabulation'
       ];
     }
 
     // 5. Python Specific
     if (lower.includes('python')) {
       return [
-        `Idiomatic implementation with Python list comprehension & generator expressions`,
-        `Memory profiling and time complexity benchmarking with timeit and tracemalloc`,
-        `Automated testing with pytest: Parameterized test fixtures & edge cases`,
-        `Python type hints (typing module) and PEP 8 enterprise standards`
+        'List comprehension & generators',
+        'Memory profiling with tracemalloc',
+        'Pytest fixtures & edge cases',
+        'Type hints & PEP 8 standards'
       ];
     }
 
     // 6. C / C++ Specific
     if (lower.includes('c++') || lower.includes('cpp') || lower.includes(' c ') || lower.startsWith('c ') || lower.endsWith(' c')) {
       return [
-        `Pointer arithmetic, memory offsets & contiguous CPU cache line utilization`,
-        `Preventing segmentation faults & memory safety checks with Valgrind / ASan`,
-        `Benchmarking custom implementation against STL std::find and std::binary_search`,
-        `Modern C++20 ranges, spans and compile-time constexpr evaluation`
+        'Pointer offsets & cache line hit',
+        'Valgrind memory leak checks',
+        'STL std::find vs custom loop',
+        'Modern C++20 constexpr evaluation'
       ];
     }
 
-    // 7. Web / JavaScript / Frontend
-    if (lower.includes('javascript') || lower.includes('react') || lower.includes('html') || lower.includes('css')) {
+    // 7. Web / JavaScript / Frontend / UI (Matching exact Image 2 suggestions!)
+    if (lower.includes('javascript') || lower.includes('react') || lower.includes('html') || lower.includes('css') || lower.includes('ui') || lower.includes('website') || lower.includes('web')) {
       return [
-        `V8 engine optimization: Array.prototype methods vs imperative while loops`,
-        `Interactive DOM visualizer: Animating step-by-step pointers and highlighted indices`,
-        `Handling asynchronous streams and real-time user inputs without UI freeze`,
-        `TypeScript strict interface definitions & generic utility types`
+        'a polished visual version',
+        'an actual app-style mockup image',
+        'Live interactive animations',
+        'Responsive mobile layout'
       ];
     }
 
     // 8. AI / Machine Learning
     if (lower.includes('ai') || lower.includes('llm') || lower.includes('neural') || lower.includes('model') || lower.includes('agent')) {
       return [
-        'Mixture-of-Experts (MoE) routing & KV-cache memory footprints',
-        'Autonomous multi-agent orchestration architecture in Python',
-        'Test-time reasoning compute scaling & deep chain-of-thought verification',
-        'Speculative decoding with draft models for 2-3x lower inference latency'
+        'MoE routing & KV-cache memory',
+        'Multi-agent orchestration',
+        'Chain-of-thought compute scaling',
+        'Speculative decoding benchmarks'
       ];
     }
 
     // 9. General High-Quality Follow-up
     return [
-      `Key architectural mechanisms & core mathematical foundations of ${cleanQ}`,
-      `Production implementation best practices & working code examples for ${cleanQ}`,
-      `Real-world performance benchmarks, limitations & trade-offs in ${cleanQ}`,
-      `Next-generation developments & future industry trajectory for ${cleanQ}`
+      `Key mechanism breakdown`,
+      `Production code example`,
+      `Performance benchmarks & trade-offs`,
+      `Future trajectory & breakthroughs`
     ];
   }
 
@@ -9603,25 +10161,10 @@ print("Execution status: OK (Exit Code 0)")`;
     const statusEl = row.querySelector('.msg-tool-status');
     if (statusEl) statusEl.remove();
 
-    // Ensure studio header is present with the official Cognisphere logo and selected model
-    let studioHdr = bubble.querySelector('.studio-msg-header');
-    if (!studioHdr) {
-      const modelObj = (msg.model && COGNISPHERE_MODELS[msg.model]) ? COGNISPHERE_MODELS[msg.model] : (COGNISPHERE_MODELS[currentCognisphereModel] || COGNISPHERE_MODELS.compound);
-      studioHdr = document.createElement('div');
-      studioHdr.className = 'studio-msg-header';
-      studioHdr.innerHTML = `
-        <div class="studio-header-left">
-          <span class="studio-header-logo-wrap">${COGNISPHERE_LOGO_SVG}</span>
-          <span class="studio-header-title">COGNISPHERE STUDIO</span>
-          <span class="studio-header-pill pill-model">${modelObj.studioBadge}</span>
-          <span class="studio-header-pill pill-grounded">✓ Grounded Synthesis</span>
-        </div>
-        <div class="studio-header-right">
-          <span class="studio-latency-pill">${modelObj.speed}</span>
-        </div>
-      `;
-      bubble.insertBefore(studioHdr, bubble.firstChild);
-    }
+    const oldHdr = bubble.querySelector('.studio-msg-header');
+    if (oldHdr) oldHdr.remove();
+    const oldThink = bubble.querySelector('.studio-thinking-card');
+    if (oldThink) oldThink.remove();
 
     let textEl = bubble.querySelector('.msg-text');
     if (!textEl) {
@@ -9774,7 +10317,7 @@ print("Execution status: OK (Exit Code 0)")`;
         matched.block.classList.add('tts-active-line');
         lastActiveSpan = matched.el;
         lastActiveBlock = matched.block;
-        matched.block.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        // User-friendly: do NOT force-scroll the page so user can freely scroll anywhere
       }
     };
 
@@ -9822,8 +10365,10 @@ print("Execution status: OK (Exit Code 0)")`;
   }
 
   function renderThread(conv){
-    chatThreadEl.innerHTML = '';
-    if(!conv) return;
+    if(!conv) {
+      chatThreadEl.replaceChildren();
+      return;
+    }
     const frag = document.createDocumentFragment();
     conv.messages.forEach(m => {
       const row = document.createElement('div');
@@ -9931,54 +10476,6 @@ print("Execution status: OK (Exit Code 0)")`;
             </div>
           `;
           bubble.appendChild(searchCard);
-        } else {
-          const studioHdr = document.createElement('div');
-          studioHdr.className = 'studio-msg-header';
-          studioHdr.innerHTML = `
-            <div class="studio-header-left">
-              <span class="studio-header-logo-wrap">${COGNISPHERE_LOGO_SVG}</span>
-              <span class="studio-header-title">COGNISPHERE STUDIO</span>
-              <span class="studio-header-pill pill-model">${modelObj.studioBadge}</span>
-              <span class="studio-header-pill pill-grounded">✓ Grounded Synthesis</span>
-            </div>
-            <div class="studio-header-right">
-              <span class="studio-latency-pill">${modelObj.speed}</span>
-            </div>
-          `;
-          bubble.appendChild(studioHdr);
-        }
-
-        // If not pending/streaming, show the Autonomous Deep Reasoning accordion
-        if (!m.pending && !m.streaming && m.text && m.text.length > 30) {
-          const thinkCard = document.createElement('div');
-          thinkCard.className = 'studio-thinking-card';
-          thinkCard.innerHTML = `
-            <details class="studio-thinking-details">
-              <summary class="studio-thinking-summary">
-                <div class="thinking-summary-content">
-                  <span class="thinking-icon">🧠</span>
-                  <span class="thinking-title">Autonomous Deep Reasoning &amp; Multi-Source Grounding</span>
-                  <span class="thinking-badge">Verified (4 Sources)</span>
-                </div>
-                <span class="thinking-arrow">▾</span>
-              </summary>
-              <div class="studio-thinking-body">
-                <div class="thinking-step">
-                  <span class="step-num">1</span>
-                  <span class="step-text"><strong>Semantic Intent Disambiguation:</strong> Parsed multi-dimensional semantics, technical entities, and knowledge domain dependencies.</span>
-                </div>
-                <div class="thinking-step">
-                  <span class="step-num">2</span>
-                  <span class="step-text"><strong>Multi-Source Live Grounding:</strong> Extracted live web documents, peer-reviewed academic literature, and official documentation.</span>
-                </div>
-                <div class="thinking-step">
-                  <span class="step-num">3</span>
-                  <span class="step-text"><strong>Neural Synthesis &amp; Code Precision:</strong> Executed cross-source verification, filtered hallucinations, and structured high-precision response.</span>
-                </div>
-              </div>
-            </details>
-          `;
-          bubble.appendChild(thinkCard);
         }
       }
 
@@ -10014,39 +10511,20 @@ print("Execution status: OK (Exit Code 0)")`;
           }
         }
 
-        // 1. Program Platforms & Real-Time I/O Sandbox
-        const platformCardsHtml = renderPlatformIdeCards(relatedQuery, rawText, m.id);
-        if (platformCardsHtml) {
-          const pEl = document.createElement('div');
-          pEl.innerHTML = platformCardsHtml;
-          bubble.appendChild(pEl.firstElementChild);
-          // Auto-execute real-time output directly on platform runtime
-          setTimeout(() => {
-            if (typeof window.executeRealTimeSandbox === 'function') {
-              window.executeRealTimeSandbox(m.id);
-            }
-          }, 300);
-        }
 
-        // 2. Expected Questions revealed one-by-one with small line letters
+        // Compact inline follow-up suggestion chips (matching Image 2)
         if (relatedQuery) {
-          const followupDeck = document.createElement('div');
-          followupDeck.className = 'studio-followup-deck';
           const suggestions = generateStudioSuggestions(relatedQuery);
-          let chipsHtml = suggestions.map((s, sIdx) => {
-            const escaped = encodeURIComponent(s);
-            return `<button type="button" class="studio-followup-line" style="animation-delay:${sIdx * 140}ms;" onclick="window.submitPresetQuery(decodeURIComponent('${escaped}'))"><span class="line-arrow">↳</span><span class="line-text">${escapeHtml(s)}</span><span class="line-action">Ask ↵</span></button>`;
-          }).join('');
-          followupDeck.innerHTML = `
-            <div class="studio-followup-title">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#00ffaa" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
-              <span>Expected Questions &amp; Next Explorations:</span>
-            </div>
-            <div class="studio-followup-chips">
-              ${chipsHtml}
-            </div>
-          `;
-          bubble.appendChild(followupDeck);
+          if (suggestions && suggestions.length > 0) {
+            const suggestionsWrap = document.createElement('div');
+            suggestionsWrap.className = 'inline-suggestions-row';
+            let chipsHtml = suggestions.map((s, sIdx) => {
+              const escaped = encodeURIComponent(s);
+              return `<button type="button" class="inline-suggestion-chip" style="animation-delay:${sIdx * 80}ms;" onclick="window.submitPresetQuery(decodeURIComponent('${escaped}'))"><span class="chip-arrow">↳</span><span class="chip-text">${escapeHtml(s)}</span></button>`;
+            }).join('');
+            suggestionsWrap.innerHTML = chipsHtml;
+            bubble.appendChild(suggestionsWrap);
+          }
         }
       }
 
@@ -10243,16 +10721,11 @@ print("Execution status: OK (Exit Code 0)")`;
 
       frag.appendChild(row);
     });
-    chatThreadEl.appendChild(frag);
-    // Smoothly scroll and follow the latest message
+    chatThreadEl.replaceChildren(frag);
+    // Smoothly scroll with search-shell bottom clearance so answers are never covered
     if (!userScrolledUp) {
       requestAnimationFrame(() => {
-        const lastRow = chatThreadEl.lastElementChild;
-        if (lastRow) {
-          lastRow.scrollIntoView({ behavior: isGenerating ? 'auto' : 'smooth', block: 'end' });
-        } else {
-          window.scrollTo({ top: document.body.scrollHeight, behavior: isGenerating ? 'auto' : 'smooth' });
-        }
+        streamAutoScroll(isGenerating ? false : true);
       });
     }
 
@@ -10280,7 +10753,12 @@ print("Execution status: OK (Exit Code 0)")`;
     cancelBtn.type = 'button';
     cancelBtn.className = 'msg-edit-btn';
     cancelBtn.textContent = 'Cancel';
-    cancelBtn.addEventListener('click', () => renderThread(conv));
+    cancelBtn.addEventListener('click', () => {
+      area.remove();
+      editActions.remove();
+      textEl.style.display = '';
+      if(existingActions) existingActions.style.display = '';
+    });
 
     const saveBtn = document.createElement('button');
     saveBtn.type = 'button';
@@ -10289,6 +10767,11 @@ print("Execution status: OK (Exit Code 0)")`;
     saveBtn.addEventListener('click', () => {
       const newText = area.value.trim();
       if(!newText) return;
+      area.remove();
+      editActions.remove();
+      textEl.textContent = newText;
+      textEl.style.display = '';
+      if(existingActions) existingActions.style.display = '';
       editAndResend(conv, msg, newText);
     });
 
