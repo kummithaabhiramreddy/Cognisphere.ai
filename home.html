@@ -7866,14 +7866,14 @@
 
       const blockId = 'cb-' + Math.random().toString(36).slice(2, 9);
       const isRunnable = !isMermaidDiagram && !isExampleBlock && !isOutputBlock && (hasCodeKeywords || ['c','cpp','c++','python','py','javascript','js','java','go','rust','ruby','php','bash','sh'].includes(validLang));
-      const compilerBtnHTML = isRunnable ? `
+
       const compilerBtnHTML = isRunnable ? `
         <button type="button" class="live-compiler-toggle-btn" id="comp-btn-${blockId}" onclick="openCodeTermPanel(decodeURIComponent(this.dataset.code), '${validLang}')" data-code="${encodedCode}" title="Open Terminal & Compile">
           <span style="font-family:'JetBrains Mono',monospace;font-weight:700;font-size:0.8rem;color:#38bdf8;">&gt;_</span>
           <span>Terminal</span>
           <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="margin-left:2px;"><polyline points="18 15 12 21 6 15"></polyline></svg>
         </button>
-
+      ` : '';
       const rawCodeEscaped = code.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 
       // ── ALL code is rendered strictly in Code Cards ──
