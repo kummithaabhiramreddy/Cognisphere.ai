@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -4704,9 +4704,269 @@
     white-space: pre-wrap !important;
   }
 
+  /* ── BOTTOM SLIDE-UP POWERSHELL TERMINAL PANEL ── */
+  #powerShellPanel {
+    position: fixed !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    z-index: 99990 !important;
+    background: #080c14 !important;
+    border-top: 2px solid rgba(56,189,248,0.5) !important;
+    box-shadow: 0 -8px 40px rgba(0,0,0,0.9), 0 -2px 0 #38bdf8 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    transition: height 0.28s cubic-bezier(0.16,1,0.3,1), transform 0.28s cubic-bezier(0.16,1,0.3,1) !important;
+    height: 320px !important;
+    transform: translateY(100%) !important;
+  }
+  #powerShellPanel.ps-open {
+    transform: translateY(0%) !important;
+  }
+  #powerShellPanel.ps-maximized {
+    height: 80vh !important;
+  }
+  .ps-tab-bar {
+    display: flex !important;
+    align-items: center !important;
+    background: #050810 !important;
+    border-bottom: 1px solid rgba(255,255,255,0.08) !important;
+    padding: 0 10px !important;
+    gap: 0 !important;
+    flex-shrink: 0 !important;
+    user-select: none !important;
+  }
+  .ps-tab {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    padding: 6px 14px !important;
+    font-family: 'JetBrains Mono', monospace !important;
+    font-size: 0.72rem !important;
+    color: #94a3b8 !important;
+    border-bottom: 2px solid transparent !important;
+    cursor: pointer !important;
+    transition: color 0.15s !important;
+    white-space: nowrap !important;
+  }
+  .ps-tab.active {
+    color: #38bdf8 !important;
+    border-bottom-color: #38bdf8 !important;
+  }
+  .ps-tab-actions {
+    margin-left: auto !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 4px !important;
+  }
+  .ps-tab-icon-btn {
+    all: unset !important;
+    box-sizing: border-box !important;
+    cursor: pointer !important;
+    color: #64748b !important;
+    padding: 4px 6px !important;
+    border-radius: 4px !important;
+    font-size: 0.8rem !important;
+    transition: color 0.15s, background 0.15s !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+  .ps-tab-icon-btn:hover { color: #f1f5f9 !important; background: rgba(255,255,255,0.1) !important; }
+  #psOutput {
+    flex: 1 !important;
+    margin: 0 !important;
+    padding: 10px 14px !important;
+    font-family: 'Cascadia Code', 'JetBrains Mono', 'Consolas', monospace !important;
+    font-size: 0.82rem !important;
+    line-height: 1.55 !important;
+    color: #d4d4d4 !important;
+    background: transparent !important;
+    overflow-y: auto !important;
+    white-space: pre-wrap !important;
+    word-break: break-all !important;
+  }
+  .ps-input-row {
+    display: flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    padding: 6px 10px !important;
+    background: #04060c !important;
+    border-top: 1px solid rgba(255,255,255,0.07) !important;
+    flex-shrink: 0 !important;
+  }
+  .ps-prompt-label {
+    font-family: 'JetBrains Mono', monospace !important;
+    font-size: 0.78rem !important;
+    color: #38bdf8 !important;
+    white-space: nowrap !important;
+    font-weight: 700 !important;
+  }
+  #psInput {
+    flex: 1 !important;
+    background: transparent !important;
+    border: none !important;
+    outline: none !important;
+    color: #f1f5f9 !important;
+    font-family: 'Cascadia Code', 'JetBrains Mono', monospace !important;
+    font-size: 0.82rem !important;
+    caret-color: #38bdf8 !important;
+  }
+
+  /* ── FULL-SCREEN CODE TERMINAL PANEL (slide-up from bottom) ── */
+  #codeTermPanel {
+    position: fixed !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    z-index: 99991 !important;
+    background: #070a10 !important;
+    border-top: 2px solid rgba(0,255,170,0.55) !important;
+    box-shadow: 0 -8px 40px rgba(0,0,0,0.95), 0 -2px 0 #00ffaa !important;
+    display: flex !important;
+    flex-direction: column !important;
+    height: 88vh !important;
+    transform: translateY(100%) !important;
+    transition: transform 0.3s cubic-bezier(0.16,1,0.3,1) !important;
+  }
+  #codeTermPanel.ct-open {
+    transform: translateY(0%) !important;
+  }
+  .ct-header {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    padding: 10px 16px !important;
+    background: #0b111e !important;
+    border-bottom: 1px solid rgba(255,255,255,0.08) !important;
+    flex-shrink: 0 !important;
+  }
+  .ct-body {
+    flex: 1 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    min-height: 0 !important;
+    overflow: hidden !important;
+  }
+  /* ── LINE-NUMBERED CODE EDITOR ── */
+  .ct-editor-wrap {
+    flex: 1.2 !important;
+    display: flex !important;
+    min-height: 0 !important;
+    border-bottom: 1px solid rgba(255,255,255,0.08) !important;
+    background: #04060a !important;
+    position: relative !important;
+    overflow: hidden !important;
+  }
+  .ct-line-numbers {
+    padding: 12px 0 !important;
+    background: #060810 !important;
+    border-right: 1px solid rgba(255,255,255,0.07) !important;
+    font-family: 'JetBrains Mono', monospace !important;
+    font-size: 0.8rem !important;
+    line-height: 1.6 !important;
+    color: #3d4d61 !important;
+    text-align: right !important;
+    user-select: none !important;
+    min-width: 46px !important;
+    overflow: hidden !important;
+    flex-shrink: 0 !important;
+  }
+  .ct-line-numbers .ln {
+    display: block !important;
+    padding: 0 10px 0 6px !important;
+    cursor: default !important;
+  }
+  .ct-line-numbers .ln.error-ln {
+    color: #ff5555 !important;
+    background: rgba(255,85,85,0.12) !important;
+    font-weight: 700 !important;
+  }
+  .ct-code-editor {
+    flex: 1 !important;
+    background: transparent !important;
+    border: none !important;
+    outline: none !important;
+    color: #f1f5f9 !important;
+    font-family: 'JetBrains Mono', monospace !important;
+    font-size: 0.8rem !important;
+    line-height: 1.6 !important;
+    padding: 12px 14px !important;
+    resize: none !important;
+    tab-size: 4 !important;
+    overflow-y: auto !important;
+    white-space: pre !important;
+    overflow-wrap: normal !important;
+    overflow-x: auto !important;
+  }
+  .ct-code-editor:focus { outline: none !important; }
+  .ct-controls {
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    padding: 8px 14px !important;
+    background: #0d1626 !important;
+    border-bottom: 1px solid rgba(255,255,255,0.06) !important;
+    flex-wrap: wrap !important;
+    flex-shrink: 0 !important;
+  }
+  .ct-stdin-bar {
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    padding: 7px 14px !important;
+    background: #0a0f1a !important;
+    border-bottom: 1px solid rgba(255,255,255,0.07) !important;
+    flex-shrink: 0 !important;
+  }
+  .ct-output {
+    flex: 1 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    min-height: 0 !important;
+    background: #020408 !important;
+    overflow: hidden !important;
+  }
+  .ct-output-header {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    padding: 5px 12px !important;
+    background: #070b14 !important;
+    border-bottom: 1px solid rgba(255,255,255,0.05) !important;
+    font-family: 'JetBrains Mono', monospace !important;
+    font-size: 0.67rem !important;
+    color: #64748b !important;
+    flex-shrink: 0 !important;
+  }
+  #ctOutput {
+    flex: 1 !important;
+    margin: 0 !important;
+    padding: 10px 14px !important;
+    font-family: 'JetBrains Mono', monospace !important;
+    font-size: 0.78rem !important;
+    line-height: 1.55 !important;
+    color: #a7f3d0 !important;
+    overflow-y: auto !important;
+    white-space: pre-wrap !important;
+    background: transparent !important;
+  }
+  /* error line highlight in output */
+  .err-line-tag {
+    display: inline-block;
+    background: rgba(255,85,85,0.18);
+    color: #ff5555;
+    border-radius: 3px;
+    padding: 0 5px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    cursor: pointer;
+  }
+  .err-line-tag:hover { background: rgba(255,85,85,0.35); }
 
   /* ── PRO STUDIO LIVE SEARCHING & PIPELINE CARD ── */
   .studio-searching-card {
+
     margin: 8px 0 16px !important;
     padding: 16px 18px !important;
     border-radius: 14px !important;
@@ -5649,106 +5909,129 @@
   </div>
 </div>
 
-<!-- STANDALONE NEW TERMINAL & CLOUD COMPILER WORKBENCH MODAL -->
-<div class="modal-overlay" id="newTerminalModal" style="display:none; z-index:999999; align-items:center; justify-content:center;">
-  <div class="settings-modal-card download-card" style="max-width:980px; width:94vw; height:86vh; max-height:820px; display:flex; flex-direction:column; padding:0; overflow:hidden; background:#070a10; border:1px solid rgba(56,189,248,0.3); box-shadow:0 20px 60px rgba(0,0,0,0.85), 0 0 30px rgba(56,189,248,0.15); border-radius:14px;">
-    
-    <!-- Modal Top Header -->
-    <div style="display:flex; align-items:center; justify-content:space-between; padding:12px 18px; background:#0b111e; border-bottom:1px solid rgba(255,255,255,0.08); flex-shrink:0;">
-      <div style="display:flex; align-items:center; gap:12px;">
-        <div style="display:flex; gap:6px; align-items:center;">
-          <span style="color:#ff5f56; font-size:0.9rem;">●</span>
-          <span style="color:#ffbd2e; font-size:0.9rem;">●</span>
-          <span style="color:#27c93f; font-size:0.9rem;">●</span>
-        </div>
-        <div style="font-family:'JetBrains Mono',monospace; font-size:0.86rem; font-weight:700; color:#f1f5f9; display:flex; align-items:center; gap:8px;">
-          <span style="color:#38bdf8;">&gt;_</span> TERMINAL &amp; COMPILER WORKBENCH
-        </div>
-        <span id="newTermStatusBadge" class="terminal-status-badge" style="font-size:0.7rem; padding:2px 8px; border-radius:6px; background:rgba(0,255,170,0.12); color:#00ffaa; border:1px solid rgba(0,255,170,0.3);">✔ Ready</span>
-      </div>
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- POWERSHELL TERMINAL PANEL (bottom slide-up, VS Code style)     -->
+<!-- Opened by: "New Terminal" button in Settings / Account menu    -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div id="powerShellPanel">
+  <!-- Tab Bar -->
+  <div class="ps-tab-bar">
+    <div class="ps-tab active" id="psTab1">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" style="color:#38bdf8"><rect x="2" y="3" width="20" height="14" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><polyline points="8 21 12 17 16 21" stroke="currentColor" stroke-width="2" fill="none"/></svg>
+      <span>PowerShell</span>
+    </div>
+    <div class="ps-tab-actions">
+      <button class="ps-tab-icon-btn" title="New Terminal" onclick="addNewPsTab()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      </button>
+      <button class="ps-tab-icon-btn" title="Maximize" onclick="togglePsMaximize(this)">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>
+      </button>
+      <button class="ps-tab-icon-btn" title="Close Terminal" onclick="closePowerShellPanel()">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+  </div>
+  <!-- Output -->
+  <pre id="psOutput"><span style="color:#38bdf8;font-weight:700;">Windows PowerShell</span>
+<span style="color:#94a3b8;">Copyright (C) Microsoft Corporation. All rights reserved.</span>
 
-      <div style="display:flex; align-items:center; gap:12px;">
-        <!-- Language Selector -->
-        <div style="display:flex; align-items:center; gap:6px; font-family:'JetBrains Mono',monospace; font-size:0.75rem; color:#94a3b8;">
-          <span>Lang:</span>
-          <select id="newTermLangSelect" onchange="switchNewTerminalLanguage(this.value)" style="background:#161f30; color:#38bdf8; border:1px solid rgba(56,189,248,0.35); border-radius:6px; padding:4px 8px; font-family:'JetBrains Mono',monospace; font-size:0.75rem; font-weight:600; outline:none; cursor:pointer;">
-            <option value="c" selected>C (GCC 13.2)</option>
-            <option value="cpp">C++ (G++ 13.2)</option>
-            <option value="python">Python 3.11</option>
-            <option value="javascript">JavaScript (Node.js v24)</option>
-            <option value="java">Java 21</option>
-          </select>
-        </div>
+<span style="color:#64748b;">Type any command and press Enter to run. e.g: dir, node --version, python --version</span>
 
-        <button onclick="closeNewTerminalModal()" aria-label="Close Terminal" style="all:unset; cursor:pointer; color:#94a3b8; padding:4px 8px; border-radius:6px; transition:color 0.15s; display:flex; align-items:center; justify-content:center;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#94a3b8'">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-        </button>
+</pre>
+  <!-- Input row -->
+  <div class="ps-input-row">
+    <span class="ps-prompt-label" id="psPromptLabel">PS Cognisphere.ai&gt;</span>
+    <input type="text" id="psInput" placeholder="Enter command..." autocomplete="off" spellcheck="false"
+      onkeydown="handlePsInput(event)" />
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- CODE TERMINAL PANEL (full-screen slide-up, with line numbers)  -->
+<!-- Opened by: "Terminal" button on code blocks in chat            -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div id="codeTermPanel">
+  <!-- Header -->
+  <div class="ct-header">
+    <div style="display:flex;align-items:center;gap:10px;">
+      <div style="display:flex;gap:5px;align-items:center;">
+        <span style="color:#ff5f56;font-size:0.85rem;">●</span>
+        <span style="color:#ffbd2e;font-size:0.85rem;">●</span>
+        <span style="color:#27c93f;font-size:0.85rem;">●</span>
       </div>
+      <div style="font-family:'JetBrains Mono',monospace;font-size:0.85rem;font-weight:700;color:#f1f5f9;display:flex;align-items:center;gap:8px;">
+        <span style="color:#00ffaa;">&gt;_</span>
+        <span id="ctTitle">TERMINAL &amp; COMPILER</span>
+      </div>
+      <span id="ctStatusBadge" class="terminal-status-badge">⚡ Ready</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px;">
+      <div style="display:flex;align-items:center;gap:6px;font-family:'JetBrains Mono',monospace;font-size:0.74rem;color:#94a3b8;">
+        <span>Lang:</span>
+        <select id="ctLangSelect" onchange="ctSwitchLang(this.value)" style="background:#161f30;color:#38bdf8;border:1px solid rgba(56,189,248,0.35);border-radius:6px;padding:4px 8px;font-family:'JetBrains Mono',monospace;font-size:0.74rem;font-weight:600;outline:none;cursor:pointer;">
+          <option value="c">C (GCC)</option>
+          <option value="cpp">C++ (G++)</option>
+          <option value="python">Python 3</option>
+          <option value="javascript">JavaScript</option>
+          <option value="java">Java</option>
+        </select>
+      </div>
+      <button onclick="closeCodeTermPanel()" style="all:unset;cursor:pointer;color:#64748b;padding:4px 8px;border-radius:6px;transition:color 0.15s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#64748b'">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <div class="ct-body">
+    <!-- Action Controls -->
+    <div class="ct-controls">
+      <button type="button" class="term-action-btn term-compile-btn" id="ctCompileBtn" onclick="ctCompile()">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+        <span>Compile</span>
+      </button>
+      <button type="button" class="term-action-btn term-run-btn" id="ctRunBtn" onclick="ctRun()">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        <span>Run</span>
+      </button>
+      <button type="button" class="term-action-btn term-compile-run-btn" id="ctCompRunBtn" onclick="ctCompileAndRun()">
+        <span>⚡ Compile &amp; Run</span>
+      </button>
+      <button type="button" class="term-action-btn term-clear-btn" onclick="ctClear()">
+        <span>Clear</span>
+      </button>
     </div>
 
-    <!-- Controls Bar -->
-    <div style="display:flex; align-items:center; justify-content:space-between; padding:8px 18px; background:#0e1626; border-bottom:1px solid rgba(255,255,255,0.06); flex-wrap:wrap; gap:8px; flex-shrink:0;">
-      <div style="display:flex; align-items:center; gap:8px;">
-        <button type="button" class="term-action-btn term-compile-btn" id="newTermCompileBtn" onclick="compileStandaloneTerminal()" title="Compile code &amp; verify 0 errors">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
-          <span>Compile</span>
-        </button>
-
-        <button type="button" class="term-action-btn term-run-btn" id="newTermRunBtn" onclick="runStandaloneTerminal()" title="Run compiled program">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
-          <span>Run</span>
-        </button>
-
-        <button type="button" class="term-action-btn term-compile-run-btn" id="newTermCompileRunBtn" onclick="compileAndRunStandaloneTerminal()" title="Compile &amp; Run in one step">
-          <span>⚡ Compile &amp; Run</span>
-        </button>
-
-        <button type="button" class="term-action-btn term-clear-btn" onclick="clearStandaloneTerminal()" title="Clear terminal screen">
-          <span>Clear</span>
-        </button>
-      </div>
-
-      <div style="display:flex; align-items:center; gap:10px;">
-        <button type="button" class="term-action-btn term-reset-btn" onclick="resetNewTerminalCode()" title="Reset to template">
-          <span>↺ Reset Code</span>
-        </button>
-      </div>
+    <!-- Line-numbered Code Editor -->
+    <div class="ct-editor-wrap">
+      <div class="ct-line-numbers" id="ctLineNums"></div>
+      <textarea class="ct-code-editor" id="ctCodeEditor" spellcheck="false"
+        oninput="ctUpdateLineNumbers()"
+        onscroll="document.getElementById('ctLineNums').scrollTop=this.scrollTop"
+        onkeydown="if(event.key==='Tab'){event.preventDefault();const s=this.selectionStart;this.value=this.value.substring(0,s)+'    '+this.value.substring(this.selectionEnd);this.selectionStart=this.selectionEnd=s+4;}"></textarea>
     </div>
 
-    <!-- Main Body: Split view (Code Editor on Top, Interactive Terminal on Bottom) -->
-    <div style="flex:1; display:flex; flex-direction:column; min-height:0; overflow:hidden;">
-      <!-- Code Editor Panel -->
-      <div style="flex:1.1; display:flex; flex-direction:column; min-height:160px; border-bottom:1px solid rgba(255,255,255,0.08); background:#06080e;">
-        <div style="padding:6px 14px; background:#0b111e; font-size:0.7rem; font-family:'JetBrains Mono',monospace; color:#64748b; text-transform:uppercase; letter-spacing:0.06em; display:flex; justify-content:space-between; align-items:center;">
-          <span>Source Code Editor (Live Edit)</span>
-          <span style="color:#94a3b8; font-size:0.68rem;">UTF-8 • Tab: 4 spaces</span>
-        </div>
-        <textarea id="newTermCodeEditor" spellcheck="false" style="flex:1; width:100%; box-sizing:border-box; background:#04060a; color:#f1f5f9; font-family:'JetBrains Mono',monospace; font-size:0.82rem; line-height:1.6; padding:12px 14px; border:none; outline:none; resize:none; overflow-y:auto; tab-size:4;"></textarea>
-      </div>
+    <!-- Stdin Bar -->
+    <div class="ct-stdin-bar">
+      <span style="font-family:'JetBrains Mono',monospace;font-size:0.74rem;color:#00ffaa;font-weight:700;">&gt;</span>
+      <span style="font-family:'JetBrains Mono',monospace;font-size:0.74rem;color:#cbd5e1;white-space:nowrap;font-weight:600;">Runtime Input (stdin):</span>
+      <input type="text" id="ctStdin" placeholder="Enter runtime input for scanf / cin / input() (e.g. 4)..."
+        onkeydown="if(event.key==='Enter') ctRun()"
+        style="flex:1;background:#060912;border:1px solid rgba(255,255,255,0.14);border-radius:6px;color:#f8fafc;font-family:'JetBrains Mono',monospace;font-size:0.74rem;padding:5px 10px;outline:none;" />
+      <button type="button" onclick="ctRun()" style="all:unset;box-sizing:border-box;cursor:pointer;background:rgba(0,255,170,0.15);border:1px solid #00ffaa;color:#00ffaa;font-family:'JetBrains Mono',monospace;font-size:0.73rem;font-weight:700;padding:5px 12px;border-radius:6px;transition:all 0.15s;" onmouseover="this.style.background='rgba(0,255,170,0.28)'" onmouseout="this.style.background='rgba(0,255,170,0.15)'">Send &amp; Run ↵</button>
+    </div>
 
-      <!-- Interactive Runtime Input Bar -->
-      <div style="display:flex; align-items:center; gap:10px; padding:8px 14px; background:#0d1422; border-bottom:1px solid rgba(255,255,255,0.08); flex-shrink:0;">
-        <div style="display:flex; align-items:center; gap:6px; font-family:'JetBrains Mono',monospace; font-size:0.75rem; color:#cbd5e1; font-weight:600; white-space:nowrap;">
-          <span style="color:#00ffaa; font-weight:700;">&gt;</span>
-          <span>Stdin (Runtime Input):</span>
-        </div>
-        <input type="text" id="newTermStdinInput" placeholder="Enter runtime input for scanf / cin / input() (e.g. 4)..." onkeydown="if(event.key==='Enter') runStandaloneTerminal()" style="flex:1; background:#060912; border:1px solid rgba(255,255,255,0.14); border-radius:6px; color:#f8fafc; font-family:'JetBrains Mono',monospace; font-size:0.76rem; padding:6px 10px; outline:none;" />
-        <button type="button" onclick="runStandaloneTerminal()" style="all:unset; box-sizing:border-box; cursor:pointer; background:rgba(0,255,170,0.15); border:1px solid #00ffaa; color:#00ffaa; font-family:'JetBrains Mono',monospace; font-size:0.74rem; font-weight:700; padding:6px 14px; border-radius:6px; display:inline-flex; align-items:center; gap:5px; transition:all 0.15s ease;" onmouseover="this.style.background='rgba(0,255,170,0.25)'" onmouseout="this.style.background='rgba(0,255,170,0.15)'">
-          <span>Send &amp; Run ↵</span>
-        </button>
+    <!-- Output -->
+    <div class="ct-output">
+      <div class="ct-output-header">
+        <span>&gt;_ TERMINAL OUTPUT (STDOUT)</span>
+        <span id="ctOutputMeta" style="color:#00ffaa;font-weight:600;">Ready</span>
       </div>
-
-      <!-- Terminal Output Screen -->
-      <div style="flex:1; display:flex; flex-direction:column; min-height:120px; background:#020408;">
-        <div style="padding:6px 14px; background:#070b14; font-family:'JetBrains Mono',monospace; font-size:0.68rem; color:#64748b; letter-spacing:0.05em; display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(255,255,255,0.05);">
-          <span>&gt;_ TERMINAL CONSOLE (STDOUT)</span>
-          <span id="newTermOutputMeta" style="color:#00ffaa; font-weight:600;">GCC 13.2 • Ready</span>
-        </div>
-        <pre id="newTermOutput" style="flex:1; margin:0; padding:12px 14px; color:#a7f3d0; font-family:'JetBrains Mono',monospace; font-size:0.78rem; line-height:1.5; overflow-y:auto; white-space:pre-wrap; background:transparent;">$ Ready. Click [Compile] to verify 0 errors, or [Run] / [Compile &amp; Run] to execute.</pre>
-      </div>
+      <pre id="ctOutput">$ Ready. Click [Compile] or [&#9654; Run] to execute your code.</pre>
     </div>
   </div>
 </div>
+
 
 <aside class="sidebar" id="sidebar">
   <div class="sidebar-top">
@@ -7584,12 +7867,12 @@
       const blockId = 'cb-' + Math.random().toString(36).slice(2, 9);
       const isRunnable = !isMermaidDiagram && !isExampleBlock && !isOutputBlock && (hasCodeKeywords || ['c','cpp','c++','python','py','javascript','js','java','go','rust','ruby','php','bash','sh'].includes(validLang));
       const compilerBtnHTML = isRunnable ? `
-        <button type="button" class="live-compiler-toggle-btn" id="comp-btn-${blockId}" onclick="toggleInlineCompiler('${blockId}', '${validLang}')" title="Click to open Terminal, Compile & Run">
+      const compilerBtnHTML = isRunnable ? `
+        <button type="button" class="live-compiler-toggle-btn" id="comp-btn-${blockId}" onclick="openCodeTermPanel(decodeURIComponent(this.dataset.code), '${validLang}')" data-code="${encodedCode}" title="Open Terminal & Compile">
           <span style="font-family:'JetBrains Mono',monospace;font-weight:700;font-size:0.8rem;color:#38bdf8;">&gt;_</span>
           <span>Terminal</span>
-          <span class="comp-caret" id="comp-caret-${blockId}">▾</span>
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="margin-left:2px;"><polyline points="18 15 12 21 6 15"></polyline></svg>
         </button>
-      ` : '';
 
       const rawCodeEscaped = code.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 
@@ -9902,131 +10185,323 @@ public class Main {
   };
 
   /* ── STANDALONE NEW TERMINAL WORKBENCH ── */
-  window.openNewTerminalModal = function(initialLang = 'c') {
-    const modal = document.getElementById('newTerminalModal');
-    if (!modal) return;
-    modal.style.display = 'flex';
-    const sel = document.getElementById('newTermLangSelect');
-    if (sel) sel.value = initialLang;
-    window.switchNewTerminalLanguage(initialLang);
+  /* ════════════════════════════════════════════════════════════
+     NEW TERMINAL — POWERSHELL BOTTOM PANEL
+     Opens via: Settings "New Terminal" / Account menu
+  ════════════════════════════════════════════════════════════ */
+  window.openNewTerminalModal = function(initialLang) {
+    openPowerShellPanel();
   };
-
   window.closeNewTerminalModal = function() {
-    const modal = document.getElementById('newTerminalModal');
-    if (modal) modal.style.display = 'none';
+    closePowerShellPanel();
   };
 
-  window.switchNewTerminalLanguage = function(lang) {
-    const editor = document.getElementById('newTermCodeEditor');
-    const badge = document.getElementById('newTermStatusBadge');
-    const meta = document.getElementById('newTermOutputMeta');
-    const template = TERMINAL_TEMPLATES[lang] || TERMINAL_TEMPLATES.c;
-    if (editor) editor.value = template;
-    if (badge) {
-      badge.className = 'terminal-status-badge';
-      badge.textContent = '⚡ Ready';
+  let _psHistory = [];
+  let _psHistoryIdx = -1;
+
+  window.openPowerShellPanel = function() {
+    const panel = document.getElementById('powerShellPanel');
+    if (!panel) return;
+    panel.classList.add('ps-open');
+    const inp = document.getElementById('psInput');
+    if (inp) setTimeout(() => inp.focus(), 50);
+  };
+  window.closePowerShellPanel = function() {
+    const panel = document.getElementById('powerShellPanel');
+    if (panel) panel.classList.remove('ps-open');
+  };
+  window.togglePsMaximize = function(btn) {
+    const panel = document.getElementById('powerShellPanel');
+    if (!panel) return;
+    panel.classList.toggle('ps-maximized');
+    btn.title = panel.classList.contains('ps-maximized') ? 'Restore' : 'Maximize';
+  };
+  window.addNewPsTab = function() {
+    const out = document.getElementById('psOutput');
+    if (out) {
+      out.innerHTML += '\n<span style="color:#94a3b8;border-top:1px solid rgba(255,255,255,0.08);display:block;margin:6px 0;padding-top:6px;">── New PowerShell session ──</span>\n';
+      out.scrollTop = out.scrollHeight;
     }
-    if (meta) {
-      const names = { c: 'GCC 13.2', cpp: 'G++ 13.2', python: 'Python 3.11', javascript: 'Node.js v24', java: 'Java 21' };
-      meta.textContent = `${names[lang] || lang.toUpperCase()} • Ready`;
+  };
+
+  window.handlePsInput = async function(e) {
+    if (e.key === 'ArrowUp') {
+      _psHistoryIdx = Math.min(_psHistoryIdx + 1, _psHistory.length - 1);
+      e.target.value = _psHistory[_psHistoryIdx] || '';
+      e.preventDefault(); return;
+    }
+    if (e.key === 'ArrowDown') {
+      _psHistoryIdx = Math.max(_psHistoryIdx - 1, -1);
+      e.target.value = _psHistoryIdx >= 0 ? _psHistory[_psHistoryIdx] : '';
+      e.preventDefault(); return;
+    }
+    if (e.key !== 'Enter') return;
+    const inp = e.target;
+    const cmd = inp.value.trim();
+    if (!cmd) return;
+    _psHistory.unshift(cmd); _psHistoryIdx = -1;
+    inp.value = '';
+    inp.disabled = true;
+
+    const out = document.getElementById('psOutput');
+    const promptEl = document.getElementById('psPromptLabel');
+    const promptText = promptEl ? promptEl.textContent : 'PS>';
+    if (out) {
+      out.innerHTML += `\n<span style="color:#38bdf8;font-weight:700;">${escapeHtml(promptText)}</span> <span style="color:#f1f5f9;">${escapeHtml(cmd)}</span>\n<span style="color:#64748b;">Running...</span>`;
+      out.scrollTop = out.scrollHeight;
+    }
+
+    try {
+      const resp = await fetch('/api/shell', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ command: cmd })
+      });
+      const data = await resp.json();
+      const color = data.success ? '#d4d4d4' : '#ff5555';
+      // Remove the "Running..." line
+      if (out) {
+        const content = out.innerHTML;
+        out.innerHTML = content.replace(/<span style="color:#64748b;">Running...<\/span>/, '');
+        out.innerHTML += `<span style="color:${color};">${escapeHtml(data.output || '')}</span>\n`;
+        out.scrollTop = out.scrollHeight;
+      }
+    } catch(err) {
+      if (out) {
+        const content = out.innerHTML;
+        out.innerHTML = content.replace(/<span style="color:#64748b;">Running...<\/span>/, '');
+        out.innerHTML += `<span style="color:#ff5555;">⚠️ Error: ${escapeHtml(err.message)}</span>\n`;
+        out.scrollTop = out.scrollHeight;
+      }
+    } finally {
+      inp.disabled = false;
+      inp.focus();
     }
   };
 
-  window.resetNewTerminalCode = function() {
-    const sel = document.getElementById('newTermLangSelect');
-    const lang = sel ? sel.value : 'c';
-    window.switchNewTerminalLanguage(lang);
+  /* ════════════════════════════════════════════════════════════
+     CODE TERMINAL PANEL (slide-up full screen) — with line numbers
+     Opens via: "Terminal" button on code blocks
+  ════════════════════════════════════════════════════════════ */
+  const CT_TEMPLATES = {
+    c: '#include <stdio.h>\n\nint main() {\n    printf("Hello, World!\\n");\n    return 0;\n}\n',
+    cpp: '#include <iostream>\nusing namespace std;\n\nint main() {\n    cout << "Hello, World!" << endl;\n    return 0;\n}\n',
+    python: 'print("Hello, World!")\n',
+    javascript: 'console.log("Hello, World!");\n',
+    java: 'public class Main {\n    public static void main(String[] args) {\n        System.out.println("Hello, World!");\n    }\n}\n'
   };
 
-  window.compileStandaloneTerminal = async function() {
-    const editor = document.getElementById('newTermCodeEditor');
-    const sel = document.getElementById('newTermLangSelect');
-    const badge = document.getElementById('newTermStatusBadge');
-    const meta = document.getElementById('newTermOutputMeta');
-    const out = document.getElementById('newTermOutput');
-    const btn = document.getElementById('newTermCompileBtn');
+  window.openCodeTermPanel = function(encodedCode, lang) {
+    const panel = document.getElementById('codeTermPanel');
+    if (!panel) return;
+    // Decode code from the data-code attribute (URL-encoded)
+    let code = '';
+    try { code = decodeURIComponent(encodedCode); } catch(e) { code = encodedCode || CT_TEMPLATES.c; }
+    if (!code.trim()) code = CT_TEMPLATES[lang] || CT_TEMPLATES.c;
+
+    const editor = document.getElementById('ctCodeEditor');
+    if (editor) editor.value = code;
+
+    const sel = document.getElementById('ctLangSelect');
+    if (sel && lang) {
+      const v = lang === 'cpp' ? 'cpp' : lang === 'py' ? 'python' : lang === 'js' ? 'javascript' : lang;
+      sel.value = v || 'c';
+    }
+
+    const title = document.getElementById('ctTitle');
+    if (title && lang) title.textContent = `${lang.toUpperCase()} TERMINAL & COMPILER`;
+
+    const badge = document.getElementById('ctStatusBadge');
+    if (badge) { badge.className = 'terminal-status-badge'; badge.textContent = '⚡ Ready'; }
+
+    const out = document.getElementById('ctOutput');
+    if (out) out.innerHTML = '$ Ready. Click [Compile] or [▶ Run] to execute your code.';
+
+    ctUpdateLineNumbers();
+    panel.classList.add('ct-open');
+    if (editor) setTimeout(() => editor.focus(), 80);
+  };
+
+  window.closeCodeTermPanel = function() {
+    const panel = document.getElementById('codeTermPanel');
+    if (panel) panel.classList.remove('ct-open');
+  };
+
+  window.ctSwitchLang = function(lang) {
+    const editor = document.getElementById('ctCodeEditor');
+    if (editor && !editor.value.trim()) editor.value = CT_TEMPLATES[lang] || '';
+    ctUpdateLineNumbers();
+    const title = document.getElementById('ctTitle');
+    if (title) title.textContent = `${lang.toUpperCase()} TERMINAL & COMPILER`;
+  };
+
+  function ctGetErrorLines(outputText) {
+    // Extract line numbers from compiler errors like "main.c:5:3: error:"
+    const errorLines = new Set();
+    const re = /(?:main\.\w+|index\.\w+):(\d+):\d+:/g;
+    let m;
+    while ((m = re.exec(outputText)) !== null) {
+      errorLines.add(parseInt(m[1]));
+    }
+    return errorLines;
+  }
+
+  window.ctUpdateLineNumbers = function() {
+    const editor = document.getElementById('ctCodeEditor');
+    const numEl = document.getElementById('ctLineNums');
+    if (!editor || !numEl) return;
+    const lines = editor.value.split('\n');
+    const count = Math.max(lines.length, 1);
+    numEl.innerHTML = Array.from({length: count}, (_, i) =>
+      `<span class="ln" id="ctLn${i+1}">${i+1}</span>`
+    ).join('');
+    // Sync scroll
+    numEl.scrollTop = editor.scrollTop;
+  };
+
+  function ctHighlightErrorLines(errorLines) {
+    errorLines.forEach(n => {
+      const el = document.getElementById('ctLn' + n);
+      if (el) el.classList.add('error-ln');
+    });
+  }
+
+  function ctClearErrorLines() {
+    document.querySelectorAll('.ct-line-numbers .ln.error-ln').forEach(el => el.classList.remove('error-ln'));
+  }
+
+  function ctFormatErrorOutput(rawOutput, lang) {
+    // Highlight error line references in the output
+    return rawOutput.replace(/(?:main\.\w+|index\.\w+):(\d+):(\d+):/g,
+      (match, line, col) => `<span class="err-line-tag" onclick="ctScrollToLine(${line})" title="Click to jump to line ${line}">Line ${line}:${col}</span>`
+    );
+  }
+
+  window.ctScrollToLine = function(lineNum) {
+    const editor = document.getElementById('ctCodeEditor');
+    if (!editor) return;
+    const lines = editor.value.split('\n');
+    let pos = 0;
+    for (let i = 0; i < lineNum - 1 && i < lines.length; i++) pos += lines[i].length + 1;
+    editor.focus();
+    editor.setSelectionRange(pos, pos + (lines[lineNum-1] || '').length);
+    // Scroll editor to that line
+    const lineHeight = 16 * 1.6; // font-size * line-height
+    editor.scrollTop = (lineNum - 3) * lineHeight;
+  };
+
+  window.ctCompile = async function() {
+    const editor = document.getElementById('ctCodeEditor');
+    const sel = document.getElementById('ctLangSelect');
+    const badge = document.getElementById('ctStatusBadge');
+    const meta = document.getElementById('ctOutputMeta');
+    const out = document.getElementById('ctOutput');
+    const btn = document.getElementById('ctCompileBtn');
     if (!editor || !out) return;
 
     const code = editor.value;
     const lang = sel ? sel.value : 'c';
+    ctClearErrorLines();
 
-    if (btn) { btn.disabled = true; const span = btn.querySelector('span'); if(span) span.textContent = 'Compiling…'; }
+    if (btn) { btn.disabled = true; const s = btn.querySelector('span'); if(s) s.textContent = 'Compiling…'; }
     if (badge) { badge.className = 'terminal-status-badge'; badge.textContent = '⚡ Compiling…'; }
 
-    const compCmd = lang === 'cpp' ? 'g++ -O2 -Wall main.cpp -o main' : (lang === 'c' ? 'gcc -O2 -Wall main.c -o main' : (lang === 'python' ? 'python3 -m py_compile main.py' : `node --check index.js`));
-    out.innerHTML = `<span style="color:#38bdf8;">$ ${compCmd}</span>\n<span style="color:#94a3b8;">[Compiler]: Parsing AST and verifying syntax...\n[Compiler]: Checking symbol tables and type definitions...</span>`;
+    const compCmd = lang==='cpp' ? 'g++ -O2 -Wall main.cpp -o main' : lang==='c' ? 'gcc -O2 -Wall main.c -o main' : lang==='python' ? 'python3 -m py_compile main.py' : 'node --check index.js';
+    out.innerHTML = `<span style="color:#38bdf8;">$ ${compCmd}</span>\n<span style="color:#94a3b8;">[Compiler]: Parsing AST and verifying syntax...\n[Compiler]: Checking type annotations and symbol tables...</span>`;
 
     try {
       const resp = await fetch('/api/run-code', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ action: 'compile', code, language: lang })
       });
       const data = await resp.json();
-      const isSuccess = data.success !== false;
+      const ok = data.success !== false;
+      const errorLines = ctGetErrorLines(data.output || '');
 
-      if (badge) {
-        badge.className = `terminal-status-badge ${isSuccess ? 'success' : 'error'}`;
-        badge.textContent = isSuccess ? '✔ 0 Errors • Compiled' : '✖ Build Failed';
-      }
+      badge.className = `terminal-status-badge ${ok ? 'success' : 'error'}`;
+      badge.textContent = ok ? '✔ 0 Errors • Compiled' : `✖ ${errorLines.size} Error${errorLines.size!==1?'s':''}`;
       if (meta) meta.textContent = `${data.platform || lang.toUpperCase()} • ${data.time || '10ms'}`;
 
-      out.innerHTML = `<span style="color:#64748b;">$ ${compCmd}</span>\n<span style="color:${isSuccess ? '#34d399' : '#f87171'};font-weight:600;">${escapeHtml(data.output || '')}</span>\n\n<span style="color:${isSuccess ? '#00ffaa' : '#ff5555'};font-size:0.72rem;">[Build Status: ${isSuccess ? '0 Errors, 0 Warnings (Exit code 0)' : 'Failed with errors'}]</span>`;
+      if (!ok && errorLines.size > 0) ctHighlightErrorLines(errorLines);
+      const formattedOut = ctFormatErrorOutput(escapeHtml(data.output || ''), lang);
+      out.innerHTML = `<span style="color:#64748b;">$ ${compCmd}</span>\n<span style="color:${ok?'#34d399':'#f87171'};font-weight:600;">${formattedOut}</span>\n\n<span style="color:${ok?'#00ffaa':'#ff5555'};font-size:0.72rem;">[Build Status: ${ok?'0 Errors, 0 Warnings (Exit code 0)':'Failed — see highlighted line numbers above'}]</span>`;
     } catch(err) {
-      if (badge) { badge.className = 'terminal-status-badge error'; badge.textContent = '✖ Error'; }
-      out.innerHTML = `<span style="color:#f87171;">✖ Compilation Error: ${escapeHtml(err.message)}</span>`;
+      badge.className = 'terminal-status-badge error'; badge.textContent = '✖ Error';
+      out.innerHTML = `<span style="color:#f87171;">✖ Compiler Error: ${escapeHtml(err.message)}</span>`;
     } finally {
-      if (btn) { btn.disabled = false; const span = btn.querySelector('span'); if(span) span.textContent = 'Compile'; }
+      if (btn) { btn.disabled = false; const s = btn.querySelector('span'); if(s) s.textContent = 'Compile'; }
     }
   };
 
-  window.runStandaloneTerminal = async function() {
-    const editor = document.getElementById('newTermCodeEditor');
-    const sel = document.getElementById('newTermLangSelect');
-    const stdinEl = document.getElementById('newTermStdinInput');
-    const badge = document.getElementById('newTermStatusBadge');
-    const meta = document.getElementById('newTermOutputMeta');
-    const out = document.getElementById('newTermOutput');
-    const btn = document.getElementById('newTermRunBtn');
+  window.ctRun = async function() {
+    const editor = document.getElementById('ctCodeEditor');
+    const sel = document.getElementById('ctLangSelect');
+    const stdinEl = document.getElementById('ctStdin');
+    const badge = document.getElementById('ctStatusBadge');
+    const meta = document.getElementById('ctOutputMeta');
+    const out = document.getElementById('ctOutput');
+    const btn = document.getElementById('ctRunBtn');
     if (!editor || !out) return;
 
     const code = editor.value;
     const lang = sel ? sel.value : 'c';
     const stdin = stdinEl ? stdinEl.value.trim() : '';
+    ctClearErrorLines();
 
-    if (btn) { btn.disabled = true; const span = btn.querySelector('span'); if(span) span.textContent = 'Running…'; }
+    if (btn) { btn.disabled = true; const s = btn.querySelector('span'); if(s) s.textContent = 'Running…'; }
+    if (badge) { badge.className = 'terminal-status-badge'; badge.textContent = '⚡ Running…'; }
 
-    const runCmd = lang === 'javascript' ? 'node index.js' : (lang === 'python' ? 'python3 main.py' : `./main`);
-    out.innerHTML = `<span style="color:#38bdf8;">$ ${runCmd}</span>\n<span style="color:#94a3b8;">⚡ Executing program in isolated runtime sandbox...</span>`;
+    const runCmd = lang==='javascript' ? 'node index.js' : lang==='python' ? 'python3 main.py' : './main';
+    out.innerHTML = `<span style="color:#38bdf8;">$ ${runCmd}</span>\n<span style="color:#94a3b8;">⚡ Executing in isolated sandbox...</span>`;
 
     try {
       const resp = await fetch('/api/run-code', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ action: 'run', code, language: lang, input: stdin })
       });
       const data = await resp.json();
-      const isSuccess = data.success !== false;
+      const ok = data.success !== false;
 
+      badge.className = `terminal-status-badge ${ok ? 'success' : 'error'}`;
+      badge.textContent = ok ? '✔ Done (exit 0)' : '✖ Runtime Error';
       if (meta) meta.textContent = `${data.platform || lang.toUpperCase()} • ${data.time || '14ms'}`;
-      let stdinNote = stdin ? `<span style="color:#38bdf8;font-size:0.72rem;">[Runtime Stdin Provided]: "${escapeHtml(stdin)}"</span>\n` : '';
-      out.innerHTML = `<span style="color:#64748b;">$ ${runCmd}</span>\n${stdinNote}<span style="color:${isSuccess ? '#a7f3d0' : '#fca5a5'};font-weight:500;">${escapeHtml(data.output || '(No stdout returned)')}</span>\n\n<span style="color:${isSuccess ? '#00ffaa' : '#ff5555'};font-size:0.72rem;">[Process exited with status ${isSuccess ? '0 (SUCCESS)' : '1 (ERROR)'} in ${escapeHtml(data.time || '12ms')}]</span>`;
+
+      const stdinNote = stdin ? `<span style="color:#38bdf8;font-size:0.72rem;">[stdin]: "${escapeHtml(stdin)}"</span>\n` : '';
+      const errorLines = ok ? new Set() : ctGetErrorLines(data.output || '');
+      if (!ok && errorLines.size > 0) ctHighlightErrorLines(errorLines);
+      const formattedOut = ctFormatErrorOutput(escapeHtml(data.output || '(No output)'), lang);
+      out.innerHTML = `<span style="color:#64748b;">$ ${runCmd}</span>\n${stdinNote}<span style="color:${ok?'#a7f3d0':'#fca5a5'};font-weight:500;">${formattedOut}</span>\n\n<span style="color:${ok?'#00ffaa':'#ff5555'};font-size:0.72rem;">[Process exited with status ${ok?'0 (SUCCESS)':'1 (ERROR)'} in ${escapeHtml(data.time||'12ms')}]</span>`;
+      out.scrollTop = out.scrollHeight;
     } catch(err) {
       out.innerHTML = `<span style="color:#ff5555;">⚠️ Runtime Error: ${escapeHtml(err.message)}</span>`;
     } finally {
-      if (btn) { btn.disabled = false; const span = btn.querySelector('span'); if(span) span.textContent = 'Run'; }
+      if (btn) { btn.disabled = false; const s = btn.querySelector('span'); if(s) s.textContent = 'Run'; }
     }
   };
 
-  window.compileAndRunStandaloneTerminal = async function() {
-    await window.compileStandaloneTerminal();
-    await window.runStandaloneTerminal();
+  window.ctCompileAndRun = async function() {
+    await window.ctCompile();
+    const badge = document.getElementById('ctStatusBadge');
+    if (badge && badge.classList.contains('error')) return; // stop on compile error
+    await window.ctRun();
   };
 
-  window.clearStandaloneTerminal = function() {
-    const out = document.getElementById('newTermOutput');
-    if (out) out.innerHTML = `<span style="color:#64748b;">$ Terminal console cleared. Ready.</span>`;
+  window.ctClear = function() {
+    const out = document.getElementById('ctOutput');
+    if (out) out.innerHTML = '$ Terminal cleared. Ready.';
+    ctClearErrorLines();
   };
+
+  // Legacy stubs (keep old calls working)
+  window.compileStandaloneTerminal = window.ctCompile;
+  window.runStandaloneTerminal = window.ctRun;
+  window.clearStandaloneTerminal = window.ctClear;
+  window.compileAndRunStandaloneTerminal = window.ctCompileAndRun;
+  window.switchNewTerminalLanguage = function(lang) { ctSwitchLang(lang); };
+  window.resetNewTerminalCode = function() {};
+
+
+
 
 
 

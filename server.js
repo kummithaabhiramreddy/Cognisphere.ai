@@ -310,6 +310,37 @@ if __name__ == '__main__':
   }
 });
 
+// ── POWERSHELL TERMINAL ENDPOINT ──
+// Allows the browser "New Terminal" panel to run real PowerShell commands
+app.post('/api/shell', async (req, res) => {
+  const { command } = req.body || {};
+  if (!command || typeof command !== 'string') {
+    return res.status(400).json({ success: false, output: 'No command provided' });
+  }
+  // Block dangerous commands
+  const dangerous = /rm\s+-rf|format\s+|del\s+\/[sf]|shutdown|reboot|mkfs|dd\s+if|:(){ :|:& };:|> \/dev\/sd/i;
+  if (dangerous.test(command)) {
+    return res.json({ success: false, output: '⛔ Command blocked for security reasons.' });
+  }
+
+  const { exec } = require('child_process');
+  const startTime = Date.now();
+  const cwd = path.join(__dirname);
+
+  // Run via PowerShell
+  const psCmd = `powershell.exe -NoProfile -NonInteractive -Command "${command.replace(/"/g, '\\"')}"`;
+  exec(psCmd, { cwd, timeout: 15000, maxBuffer: 1024 * 512 }, (err, stdout, stderr) => {
+    const elapsed = Date.now() - startTime;
+    const output = (stdout || '') + (stderr ? '\n' + stderr : '');
+    res.json({
+      success: !err || err.code === 0,
+      output: output.trim() || (err ? err.message : '(no output)'),
+      exitCode: err ? (err.code || 1) : 0,
+      time: `${elapsed}ms`
+    });
+  });
+});
+
 app.use(express.static(path.join(__dirname)));
 
 const dbConn = process.env.DATABASE_URL || '';
