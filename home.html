@@ -14172,7 +14172,7 @@
     // ====== CITATION PILL & HIGH-LEVEL LIVE BROWSER LAUNCHER ======
     function buildInlineCitationPill(articles) {
       if (!articles || !articles.length) return '';
-      
+
       // Filter valid articles and prioritize high-relevance official & educational sources
       const validArticles = articles.filter(a => a && a.url && a.url.startsWith('http'));
       if (!validArticles.length) return '';
@@ -14190,7 +14190,7 @@
             if (host.includes('nature.com') || host.includes('sciencedirect.com') || host.includes('ieee.org')) score += 35;
             // Penalize obscure or duplicate PMC IDs for general topics
             if (fullUrl.includes('/pmc/articles/')) score -= 20;
-          } catch(e) {}
+          } catch (e) { }
           return score;
         };
         return getScore(b) - getScore(a);
@@ -20812,7 +20812,7 @@ d----        13-09-2026     10:30                api
 
   <script>
     // Universal Direct Browser URL Opener (Opens in actual browser tab cleanly)
-    window.openLiveBrowser = function(url) {
+    window.openLiveBrowser = function (url) {
       if (!url) return;
       if (!url.startsWith('http://') && !url.startsWith('https://')) {
         url = 'https://' + url;
