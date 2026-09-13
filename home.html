@@ -6211,6 +6211,101 @@
       color: #ffffff;
     }
 
+    /* ====== ANTIGRAVITY-STYLE VISUAL WEB SNAPSHOT ARTIFACT CARD ====== */
+    .web-snapshot-card {
+      margin: 12px 0 16px 0;
+      background: linear-gradient(145deg, #0b0f17 0%, #121824 100%);
+      border: 1px solid rgba(224, 112, 64, 0.35);
+      border-radius: 14px;
+      padding: 14px 18px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(56, 189, 248, 0.12);
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      font-family: 'Inter', sans-serif;
+    }
+
+    .web-snapshot-card:hover {
+      border-color: rgba(224, 112, 64, 0.65);
+      box-shadow: 0 12px 32px rgba(224, 112, 64, 0.2), 0 0 0 1px rgba(56, 189, 248, 0.25);
+      transform: translateY(-2px);
+    }
+
+    .web-snapshot-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 10px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      flex-wrap: wrap;
+    }
+
+    .web-snapshot-badge-group {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .web-snapshot-ssl {
+      font-size: 0.68rem;
+      font-weight: 700;
+      color: #34d399;
+      background: rgba(52, 211, 153, 0.12);
+      border: 1px solid rgba(52, 211, 153, 0.25);
+      border-radius: 6px;
+      padding: 2px 7px;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .web-snapshot-domain {
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: #38bdf8;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .web-snapshot-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 5px 12px;
+      background: rgba(224, 112, 64, 0.18);
+      border: 1px solid rgba(224, 112, 64, 0.45);
+      border-radius: 8px;
+      color: #ffffff;
+      font-size: 0.74rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      text-decoration: none;
+    }
+
+    .web-snapshot-btn:hover {
+      background: rgba(224, 112, 64, 0.35);
+      border-color: rgba(224, 112, 64, 0.75);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(224, 112, 64, 0.3);
+    }
+
+    .web-snapshot-title {
+      font-size: 0.98rem;
+      font-weight: 700;
+      color: #ffffff;
+      margin-bottom: 6px;
+      line-height: 1.4;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .web-snapshot-summary {
+      font-size: 0.84rem;
+      color: #94a3b8;
+      line-height: 1.6;
+    }
+
     /* ====== VIDEO PLAYER MODAL ====== */
     #videoModal {
       position: fixed;
