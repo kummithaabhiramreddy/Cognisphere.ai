@@ -40,7 +40,7 @@ app.get('/api/health', (req, res) => {
 function analyzeCSyntax(code, lang = 'c') {
   const errors = [];
   const lines = code.split('\n');
-  
+
   // 1. Bracket / Brace / Parenthesis matching with line tracking
   const stack = [];
   for (let i = 0; i < lines.length; i++) {
@@ -92,15 +92,15 @@ function analyzeCSyntax(code, lang = 'c') {
     if (stripped.endsWith('{') || stripped.endsWith('}') || stripped.endsWith(';') || stripped.endsWith(':')) continue;
     if (/^(if|else|for|while|do|switch|case|default)\b/i.test(stripped)) continue;
     if (/^(int|void|float|double|char|long|short|auto|bool|size_t)\s+[a-zA-Z0-9_]+\s*\([^)]*\)\s*$/i.test(stripped)) continue;
-    
+
     // Check if next line continues statement or starts block
     const nextLine = (lines[i + 1] || '').trim();
     if (nextLine.startsWith('{') || nextLine.startsWith('||') || nextLine.startsWith('&&') || nextLine.startsWith('+') || nextLine.startsWith('?')) continue;
 
     if (/\b(printf|scanf|cin|cout|return|malloc|free|break|continue)\b/.test(stripped) ||
-        /^[a-zA-Z_][a-zA-Z0-9_]*\s*=[^;]+$/.test(stripped) ||
-        /^(int|float|double|char|long|bool|auto|size_t)\s+[a-zA-Z_][a-zA-Z0-9_]*(\s*=\s*[^;]+)?$/.test(stripped) ||
-        /^[a-zA-Z_][a-zA-Z0-9_]*\s*\([^;]*\)$/.test(stripped)) {
+      /^[a-zA-Z_][a-zA-Z0-9_]*\s*=[^;]+$/.test(stripped) ||
+      /^(int|float|double|char|long|bool|auto|size_t)\s+[a-zA-Z_][a-zA-Z0-9_]*(\s*=\s*[^;]+)?$/.test(stripped) ||
+      /^[a-zA-Z_][a-zA-Z0-9_]*\s*\([^;]*\)$/.test(stripped)) {
       errors.push({
         line: i + 1,
         col: rawLine.length + 1,
@@ -176,7 +176,7 @@ app.post('/api/run-code', async (req, res) => {
 
     const scratchDir = path.join(os.tmpdir(), 'cognisphere_scratch');
     if (!fs.existsSync(scratchDir)) {
-      try { fs.mkdirSync(scratchDir, { recursive: true }); } catch(e){}
+      try { fs.mkdirSync(scratchDir, { recursive: true }); } catch (e) { }
     }
 
     // ── ACTION 1: COMPILE (Real-time Syntax & AST Verification) ──
@@ -185,11 +185,11 @@ app.post('/api/run-code', async (req, res) => {
 
       // Python Compilation / Bytecode Check
       if (lang === 'python') {
-        const tmpFile = path.join(scratchDir, `comp_${Date.now()}_${Math.random().toString(36).slice(2,6)}.py`);
+        const tmpFile = path.join(scratchDir, `comp_${Date.now()}_${Math.random().toString(36).slice(2, 6)}.py`);
         try {
           fs.writeFileSync(tmpFile, code, 'utf8');
           execFileSync('python', ['-m', 'py_compile', tmpFile], { stdio: 'pipe' });
-          try { if (fs.existsSync(tmpFile)) fs.unlinkSync(tmpFile); } catch(e){}
+          try { if (fs.existsSync(tmpFile)) fs.unlinkSync(tmpFile); } catch (e) { }
           return res.json({
             success: true,
             action: 'compile',
@@ -199,8 +199,8 @@ app.post('/api/run-code', async (req, res) => {
             time: `${elapsed + 8}ms`,
             exitCode: 0
           });
-        } catch(err) {
-          try { if (fs.existsSync(tmpFile)) fs.unlinkSync(tmpFile); } catch(e){}
+        } catch (err) {
+          try { if (fs.existsSync(tmpFile)) fs.unlinkSync(tmpFile); } catch (e) { }
           const errText = (err.stderr ? err.stderr.toString() : (err.stdout ? err.stdout.toString() : err.message));
           const cleanErr = errText.replace(new RegExp(tmpFile.replace(/\\/g, '\\\\'), 'g'), 'main.py');
           return res.json({
@@ -217,11 +217,11 @@ app.post('/api/run-code', async (req, res) => {
 
       // JavaScript Syntax Check
       if (lang === 'javascript') {
-        const tmpFile = path.join(scratchDir, `comp_${Date.now()}_${Math.random().toString(36).slice(2,6)}.js`);
+        const tmpFile = path.join(scratchDir, `comp_${Date.now()}_${Math.random().toString(36).slice(2, 6)}.js`);
         try {
           fs.writeFileSync(tmpFile, code, 'utf8');
           execFileSync('node', ['--check', tmpFile], { stdio: 'pipe' });
-          try { if (fs.existsSync(tmpFile)) fs.unlinkSync(tmpFile); } catch(e){}
+          try { if (fs.existsSync(tmpFile)) fs.unlinkSync(tmpFile); } catch (e) { }
           return res.json({
             success: true,
             action: 'compile',
@@ -231,8 +231,8 @@ app.post('/api/run-code', async (req, res) => {
             time: `${elapsed + 8}ms`,
             exitCode: 0
           });
-        } catch(err) {
-          try { if (fs.existsSync(tmpFile)) fs.unlinkSync(tmpFile); } catch(e){}
+        } catch (err) {
+          try { if (fs.existsSync(tmpFile)) fs.unlinkSync(tmpFile); } catch (e) { }
           const errText = (err.stderr ? err.stderr.toString() : (err.stdout ? err.stdout.toString() : err.message));
           const cleanErr = errText.replace(new RegExp(tmpFile.replace(/\\/g, '\\\\'), 'g'), 'index.js');
           return res.json({
@@ -286,7 +286,7 @@ app.post('/api/run-code', async (req, res) => {
           maxBuffer: 1024 * 512,
           env: { ...process.env, PYTHONIOENCODING: 'utf-8', PYTHONUTF8: '1' }
         }, (err, stdout, stderr) => {
-          try { if (fs.existsSync(tmpFile)) fs.unlinkSync(tmpFile); } catch(e){}
+          try { if (fs.existsSync(tmpFile)) fs.unlinkSync(tmpFile); } catch (e) { }
           const elapsed = (Date.now() - startTime);
           const combinedOut = (stdout || '') + (stderr ? (stdout ? '\n' : '') + stderr : '');
           return res.json({
@@ -302,8 +302,8 @@ app.post('/api/run-code', async (req, res) => {
           child.stdin.end();
         }
         return;
-      } catch(err) {
-        try { if (fs.existsSync(tmpFile)) fs.unlinkSync(tmpFile); } catch(e){}
+      } catch (err) {
+        try { if (fs.existsSync(tmpFile)) fs.unlinkSync(tmpFile); } catch (e) { }
         const elapsed = (Date.now() - startTime);
         return res.json({ success: false, platform: 'Python 3.11 Runtime', output: err.message, time: `${elapsed}ms`, exitCode: 1 });
       }
@@ -315,7 +315,7 @@ app.post('/api/run-code', async (req, res) => {
       try {
         fs.writeFileSync(tmpFile, code, 'utf8');
         const child = execFile('node', [tmpFile], { timeout: 7000, maxBuffer: 1024 * 512 }, (err, stdout, stderr) => {
-          try { if (fs.existsSync(tmpFile)) fs.unlinkSync(tmpFile); } catch(e){}
+          try { if (fs.existsSync(tmpFile)) fs.unlinkSync(tmpFile); } catch (e) { }
           const elapsed = (Date.now() - startTime);
           const combinedOut = (stdout || '') + (stderr ? (stdout ? '\n' : '') + stderr : '');
           return res.json({
@@ -331,8 +331,8 @@ app.post('/api/run-code', async (req, res) => {
           child.stdin.end();
         }
         return;
-      } catch(err) {
-        try { if (fs.existsSync(tmpFile)) fs.unlinkSync(tmpFile); } catch(e){}
+      } catch (err) {
+        try { if (fs.existsSync(tmpFile)) fs.unlinkSync(tmpFile); } catch (e) { }
         const elapsed = (Date.now() - startTime);
         return res.json({ success: false, platform: 'Node.js Runtime', output: err.message, time: `${elapsed}ms`, exitCode: 1 });
       }
@@ -352,152 +352,13 @@ app.post('/api/run-code', async (req, res) => {
       });
     }
 
-    const pyRunner = path.join(scratchDir, `c_runner_${Date.now()}_${Math.random().toString(36).slice(2,6)}.py`);
-    const pyScript = `import sys, math, re
-
-def _printf(fmt, *args):
-    if not args:
-        sys.stdout.write(fmt.replace('\\\\n', '\\n').replace('\\\\t', '\\t'))
-    else:
-        py_fmt = fmt.replace('%i', '%d').replace('%ld', '%d').replace('%lf', '%f')
-        py_fmt = py_fmt.replace('\\\\n', '\\n').replace('\\\\t', '\\t')
-        try:
-            sys.stdout.write(py_fmt % tuple(args))
-        except Exception:
-            sys.stdout.write(py_fmt)
-
-def transpile_and_run():
-    c_source = sys.stdin.read()
-    stdin_data = sys.argv[1] if len(sys.argv) > 1 else ''
-
-    # Direct algorithm implementations for search & sort
-    if 'linearSearch' in c_source or 'linear_search' in c_source:
-        target_m = re.search(r'int\\s+x\\s*=\\s*(\\d+)', c_source)
-        target = int(stdin_data) if stdin_data and stdin_data.isdigit() else (int(target_m.group(1)) if target_m else 10)
-        arr_m = re.search(r'int\\s+arr\\[\\]\\s*=\\s*\\{([^\\}]+)\\}', c_source)
-        arr = [int(n.strip()) for n in arr_m.group(1).split(',') if n.strip().lstrip('-').isdigit()] if arr_m else [2, 3, 4, 10, 40]
-        for i, val in enumerate(arr):
-            if val == target:
-                print(f"Element is present at index {i}")
-                return
-        print("Element is not present in array")
-        return
-
-    if 'binarySearch' in c_source or 'binary_search' in c_source:
-        target_m = re.search(r'int\\s+x\\s*=\\s*(\\d+)', c_source)
-        target = int(stdin_data) if stdin_data and stdin_data.isdigit() else (int(target_m.group(1)) if target_m else 10)
-        arr_m = re.search(r'int\\s+arr\\[\\]\\s*=\\s*\\{([^\\}]+)\\}', c_source)
-        arr = [int(n.strip()) for n in arr_m.group(1).split(',') if n.strip().lstrip('-').isdigit()] if arr_m else [2, 3, 4, 10, 40]
-        l, r = 0, len(arr) - 1
-        while l <= r:
-            mid = l + (r - l) // 2
-            if arr[mid] == target:
-                print(f"Element is present at index {mid}")
-                return
-            elif arr[mid] < target:
-                l = mid + 1
-            else:
-                r = mid - 1
-        print("Element is not present in array")
-        return
-
-    # Dynamic translation to Python
-    lines = c_source.split('\\n')
-    py_lines = []
-    indent = 0
-    control_keywords = {'if', 'else', 'for', 'while', 'switch', 'case', 'default'}
-
-    for raw in lines:
-        line = raw.strip()
-        if not line or line.startswith('//') or line.startswith('#') or line.startswith('/*') or line.startswith('*'):
-            continue
-        while line.startswith('}'):
-            indent = max(0, indent - 1)
-            line = line[1:].strip()
-        if not line:
-            continue
-        has_open_brace = line.endswith('{')
-        if has_open_brace:
-            line = line[:-1].strip()
-        line = re.sub(r';\\s*$', '', line)
-        line = re.sub(r'^(int|float|double|char|long|short|void|unsigned|bool|auto|size_t)\\s+', '', line)
-        line = re.sub(r'\\b(int|float|double|char|long|short|void|unsigned|bool)\\s+([a-zA-Z0-9_]+)', r'\\2', line)
-        line = re.sub(r'\\bprintf\\s*\\(', '_printf(', line)
-        line = line.replace('&&', ' and ').replace('||', ' or ').replace('!', ' not ')
-        line = line.replace('true', 'True').replace('false', 'False').replace('NULL', 'None')
-        line = re.sub(r'([a-zA-Z0-9_]+)\\+\\+', r'\\1 += 1', line)
-        line = re.sub(r'([a-zA-Z0-9_]+)--', r'\\1 -= 1', line)
-
-        m_for = re.match(r'for\\s*\\(\\s*([a-zA-Z0-9_]+)\\s*=\\s*([^;]+);\\s*\\1\\s*<\\s*([^;]+);\\s*.*?\\)\\s*$', line)
-        if m_for:
-            var, start_v, end_v = m_for.group(1), m_for.group(2).strip(), m_for.group(3).strip()
-            py_lines.append("    " * indent + f"for {var} in range({start_v}, {end_v}):")
-            indent += 1
-            continue
-
-        m_ctrl = re.match(r'^(if|while)\\s*\\((.*)\\)$', line)
-        if m_ctrl:
-            py_lines.append("    " * indent + f"{m_ctrl.group(1)} {m_ctrl.group(2)}:")
-            indent += 1
-            continue
-
-        m_elif = re.match(r'^else\\s+if\\s*\\((.*)\\)$', line)
-        if m_elif:
-            indent = max(0, indent - 1)
-            py_lines.append("    " * indent + f"elif {m_elif.group(1)}:")
-            indent += 1
-            continue
-
-        if line == 'else':
-            indent = max(0, indent - 1)
-            py_lines.append("    " * indent + "else:")
-            indent += 1
-            continue
-
-        m_func = re.match(r'^([a-zA-Z0-9_]+)\\s*\\((.*?)\\)$', line)
-        if m_func and m_func.group(1) not in control_keywords and (has_open_brace or m_func.group(1) == 'main'):
-            fname = m_func.group(1)
-            params = m_func.group(2)
-            clean_params = re.sub(r'\\b(int|float|double|char|long|short|void|unsigned|bool)\\s+', '', params)
-            if fname == 'main':
-                py_lines.append("    " * indent + "def main():")
-            else:
-                py_lines.append("    " * indent + f"def {fname}({clean_params}):")
-            indent += 1
-            continue
-
-        if line:
-            py_lines.append("    " * indent + line)
-            if has_open_brace:
-                indent += 1
-
-    py_lines.append("\\nif __name__ == '__main__':\\n    try:\\n        main()\\n    except Exception as _e:\\n        pass\\n")
-    exec_code = '\\n'.join(py_lines)
-    try:
-        exec(exec_code, {'_printf': _printf, 'sys': sys, 'math': math, 're': re})
-    except Exception as ex:
-        # Fallback to simple printf extraction
-        printfs = re.findall(r'printf\\s*\\(\\s*"([^"]+)"(?:\\s*,\\s*([^\\)]+))?\\s*\\);', c_source)
-        if printfs:
-            for fmt, args in printfs:
-                clean_fmt = fmt.encode().decode('unicode_escape')
-                if not args:
-                    sys.stdout.write(clean_fmt)
-                else:
-                    out_val = stdin_data if stdin_data else '0'
-                    sys.stdout.write(clean_fmt.replace('%d', out_val).replace('%s', out_val))
-            print()
-        else:
-            print("Program completed successfully with exit code 0")
-
-if __name__ == '__main__':
-    transpile_and_run()
-`;
-
+    const transpilerPath = path.join(__dirname, 'c_transpiler_engine.py');
     try {
-      fs.writeFileSync(pyRunner, pyScript, 'utf8');
-      const child = execFile('python', [pyRunner, input || ''], { timeout: 7000 }, (err, stdout, stderr) => {
-        try { if (fs.existsSync(pyRunner)) fs.unlinkSync(pyRunner); } catch(e){}
+      const child = execFile('python', [transpilerPath, input || ''], {
+        timeout: 7000,
+        maxBuffer: 1024 * 512,
+        env: { ...process.env, PYTHONIOENCODING: 'utf-8', PYTHONUTF8: '1' }
+      }, (err, stdout, stderr) => {
         const elapsed = (Date.now() - startTime);
         const combinedOut = (stdout || '') + (stderr ? (stdout ? '\n' : '') + stderr : '');
         return res.json({
@@ -512,18 +373,17 @@ if __name__ == '__main__':
         child.stdin.write(code);
         child.stdin.end();
       }
-    } catch(err) {
-      try { if (fs.existsSync(pyRunner)) fs.unlinkSync(pyRunner); } catch(e){}
+    } catch (err) {
       const elapsed = (Date.now() - startTime);
       return res.json({
-        success: true,
+        success: false,
         platform: `${lang.toUpperCase()} Sandbox Engine`,
-        output: 'Program executed successfully with exit code 0',
+        output: `Runtime Execution Error: ${err.message}`,
         time: `${elapsed + 10}ms`,
-        exitCode: 0
+        exitCode: 1
       });
     }
-  } catch(topErr) {
+  } catch (topErr) {
     console.error('Unhandled run-code error:', topErr);
     res.json({
       success: false,
@@ -531,6 +391,75 @@ if __name__ == '__main__':
       output: `Internal Execution Error: ${topErr.message}`,
       time: '10ms',
       exitCode: 1
+    });
+  }
+});
+
+// ── LIVE IN-APP BROWSER / AUTONOMOUS URL VIEWER PROXY ENDPOINT ──
+app.all('/api/browse-url', async (req, res) => {
+  try {
+    const targetUrl = (req.query.url || req.body?.url || '').trim();
+    if (!targetUrl) {
+      return res.status(400).json({ success: false, error: 'No URL provided' });
+    }
+
+    let parsedUrl;
+    try {
+      parsedUrl = new URL(targetUrl.startsWith('http') ? targetUrl : `https://${targetUrl}`);
+    } catch (e) {
+      return res.status(400).json({ success: false, error: 'Invalid URL format' });
+    }
+
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 10000);
+
+    const response = await fetch(parsedUrl.href, {
+      signal: controller.signal,
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+        'Accept-Language': 'en-US,en;q=0.9'
+      }
+    });
+    clearTimeout(timeout);
+
+    const contentType = response.headers.get('content-type') || '';
+    const rawHtml = await response.text();
+
+    let title = parsedUrl.hostname;
+    const titleMatch = rawHtml.match(/<title[^>]*>([^<]+)<\/title>/i);
+    if (titleMatch) title = titleMatch[1].trim();
+
+    // Inject base tag for relative assets & strip frame-busting scripts
+    let sanitizedHtml = rawHtml
+      .replace(/<head([^>]*)>/i, `<head$1>\n<base href="${parsedUrl.origin}/">\n`)
+      .replace(/<script[^>]*>(?:[\s\S]*?)(?:top\.location|window\.top\.location|parent\.location)(?:[\s\S]*?)<\/script>/gi, '')
+      .replace(/target="_top"/gi, 'target="_self"')
+      .replace(/target="_parent"/gi, 'target="_self"');
+
+    const cleanText = rawHtml
+      .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, ' ')
+      .replace(/<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi, ' ')
+      .replace(/<[^>]+>/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim()
+      .slice(0, 4000);
+
+    res.json({
+      success: true,
+      url: parsedUrl.href,
+      domain: parsedUrl.hostname,
+      title: title,
+      html: sanitizedHtml,
+      text: cleanText,
+      contentType: contentType,
+      favicon: `https://www.google.com/s2/favicons?domain=${encodeURIComponent(parsedUrl.hostname)}&sz=64`
+    });
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      error: `Failed to fetch web URL: ${err.message}`,
+      url: req.query.url || req.body?.url
     });
   }
 });
@@ -569,7 +498,7 @@ app.post('/api/shell', async (req, res) => {
         time: `${elapsed}ms`
       });
     });
-  } catch(err) {
+  } catch (err) {
     res.json({
       success: false,
       output: `Execution error: ${err.message}`,
@@ -581,11 +510,12 @@ app.post('/api/shell', async (req, res) => {
 
 app.use(express.static(path.join(__dirname)));
 
-const dbConn = process.env.DATABASE_URL || '';
+const NEON_DB_FALLBACK = 'postgresql://neondb_owner:npg_pt9BPqMUzm7V@ep-purple-dream-atlcv0hx-pooler.c-9.us-east-1.aws.neon.tech/neondb?sslmode=require';
+const dbConn = process.env.DATABASE_URL || NEON_DB_FALLBACK;
 const isNeon = dbConn.includes('neon.tech') || dbConn.includes('sslmode=require') || !!process.env.VERCEL;
 
 const pool = new Pool({
-  connectionString: dbConn || 'postgresql://placeholder:placeholder@localhost:5432/cognisphere',
+  connectionString: dbConn,
   ssl: isNeon ? { rejectUnauthorized: false } : false
 });
 
@@ -595,10 +525,6 @@ pool.on('error', (err) => {
 
 let dbInitialized = false;
 async function initializeDb() {
-  if (!dbConn) {
-    console.warn('DATABASE_URL environment variable is missing on Vercel — DB running in graceful fallback mode.');
-    return;
-  }
   if (dbInitialized) return;
   try {
     await pool.query(`
@@ -981,7 +907,7 @@ app.get('/api/stats', async (req, res) => {
     };
 
     const queryHistory = buildSeries(hourlyQ.rows);
-    const userHistory  = buildSeries(hourlyU.rows);
+    const userHistory = buildSeries(hourlyU.rows);
 
     // If no recent activity (all zeros), use historical distribution from total data
     // This makes the graph look meaningful even when no one queried in last 12h
@@ -1003,19 +929,19 @@ app.get('/api/stats', async (req, res) => {
       avg_response_ms: 340,
       db_status: 'Operational',
       // Live graph data
-      graph_left:  normalizedQ,  // load spike line (left half, red)
+      graph_left: normalizedQ,  // load spike line (left half, red)
       graph_right: normalizedU,  // autoscaling bars (right half, neon green)
       peak_load_pct: Math.round((Math.max(...queryHistory) / Math.max(maxQ, 1)) * 120) || 120,
       raw_queries_today: queries,
       raw_users_total: users
     });
-  } catch(err) {
+  } catch (err) {
     console.error('Stats error:', err.message);
     // Fallback
     res.json({
       queries_processed: 0, active_users: 0, uptime_percent: 99.97,
       avg_response_ms: 340, db_status: 'Degraded',
-      graph_left:  [0.35, 0.45, 0.38, 0.5, 0.4, 0.88, 0.42, 0.38, 0.48, 0.35, 0.4, 0.36],
+      graph_left: [0.35, 0.45, 0.38, 0.5, 0.4, 0.88, 0.42, 0.38, 0.48, 0.35, 0.4, 0.36],
       graph_right: [0.45, 0.55, 0.7, 0.58, 0.85, 0.95, 0.72, 0.6, 0.48, 0.42, 0.5, 0.38],
       peak_load_pct: 120,
       raw_queries_today: 0,
@@ -1045,7 +971,7 @@ app.post('/api/academic-profile', async (req, res) => {
          preferred_language = EXCLUDED.preferred_language,
          updated_at = CURRENT_TIMESTAMP
        RETURNING *`,
-      [user_id, user_email||'', state, board||'', current_class, stream||'', completedJson, preferred_language||'English']
+      [user_id, user_email || '', state, board || '', current_class, stream || '', completedJson, preferred_language || 'English']
     );
     res.json({ success: true, profile: result.rows[0] });
   } catch (err) {
@@ -1073,22 +999,22 @@ app.get('/api/academic-profile/:user_id', async (req, res) => {
 // ─── CLASS SUGGESTIONS: Dynamic next-class engine ────────────────────
 const CURRICULUM_ENGINE = {
   boards: {
-    'Telangana':       'BSETS (TS SSC / TSBIE)',
-    'Andhra Pradesh':  'BSEAP (AP SSC / APBIE)',
-    'Maharashtra':     'Maharashtra State Board (SSC / HSC)',
-    'Karnataka':       'KSEEB (SSLC / PUC)',
-    'Tamil Nadu':      'Tamil Nadu State Board (SSLC / HSC)',
-    'Kerala':          'SCERT Kerala (SSLC / HSE)',
-    'Uttar Pradesh':   'UPMSP (UP Board)',
-    'Rajasthan':       'RBSE (Rajasthan Board)',
-    'Gujarat':         'GSEB (Gujarat Board)',
-    'West Bengal':     'WBBSE / WBCHSE',
-    'Bihar':           'BSEB (Bihar Board)',
-    'Delhi':           'CBSE / DSSSB',
-    'Madhya Pradesh':  'MPBSE (MP Board)',
-    'Odisha':          'BSE Odisha / CHSE Odisha',
-    'Punjab':          'PSEB (Punjab Board)',
-    'Haryana':         'HBSE (Haryana Board)'
+    'Telangana': 'BSETS (TS SSC / TSBIE)',
+    'Andhra Pradesh': 'BSEAP (AP SSC / APBIE)',
+    'Maharashtra': 'Maharashtra State Board (SSC / HSC)',
+    'Karnataka': 'KSEEB (SSLC / PUC)',
+    'Tamil Nadu': 'Tamil Nadu State Board (SSLC / HSC)',
+    'Kerala': 'SCERT Kerala (SSLC / HSE)',
+    'Uttar Pradesh': 'UPMSP (UP Board)',
+    'Rajasthan': 'RBSE (Rajasthan Board)',
+    'Gujarat': 'GSEB (Gujarat Board)',
+    'West Bengal': 'WBBSE / WBCHSE',
+    'Bihar': 'BSEB (Bihar Board)',
+    'Delhi': 'CBSE / DSSSB',
+    'Madhya Pradesh': 'MPBSE (MP Board)',
+    'Odisha': 'BSE Odisha / CHSE Odisha',
+    'Punjab': 'PSEB (Punjab Board)',
+    'Haryana': 'HBSE (Haryana Board)'
   },
   progressionMap: {
     '1': '2', '2': '3', '3': '4', '4': '5', '5': '6',
@@ -1174,7 +1100,7 @@ const CURRICULUM_ENGINE = {
       }
     },
     'Telangana': {
-      '9':  ['Telugu', 'English', 'Mathematics', 'Physical Science', 'Biological Science', 'Social Studies', 'Hindi'],
+      '9': ['Telugu', 'English', 'Mathematics', 'Physical Science', 'Biological Science', 'Social Studies', 'Hindi'],
       '10': ['Telugu', 'English', 'Mathematics', 'Physical Science', 'Biological Science', 'Social Studies', 'Hindi'],
       'Intermediate Year 1': {
         'MPC': ['Mathematics 1A', 'Mathematics 1B', 'Physics', 'Chemistry', 'English', 'Telugu / Hindi'],
@@ -1192,7 +1118,7 @@ const CURRICULUM_ENGINE = {
       }
     },
     'Andhra Pradesh': {
-      '9':  ['Telugu', 'English', 'Mathematics', 'Physical Science', 'Biological Science', 'Social Studies', 'Hindi'],
+      '9': ['Telugu', 'English', 'Mathematics', 'Physical Science', 'Biological Science', 'Social Studies', 'Hindi'],
       '10': ['Telugu', 'English', 'Mathematics', 'Physical Science', 'Biological Science', 'Social Studies', 'Hindi'],
       'Intermediate Year 1': {
         'MPC': ['Mathematics 1A', 'Mathematics 1B', 'Physics', 'Chemistry', 'English', 'Telugu / Hindi'],
@@ -1208,7 +1134,7 @@ const CURRICULUM_ENGINE = {
       }
     },
     'Maharashtra': {
-      '9':  ['Marathi', 'English', 'Mathematics', 'Science & Technology', 'History & Political Science', 'Geography', 'Hindi'],
+      '9': ['Marathi', 'English', 'Mathematics', 'Science & Technology', 'History & Political Science', 'Geography', 'Hindi'],
       '10': ['Marathi', 'English', 'Mathematics', 'Science & Technology Part 1', 'Science & Technology Part 2', 'History & Political Science', 'Geography', 'Hindi'],
       'Intermediate Year 1': {
         'Science': ['Physics', 'Chemistry', 'Mathematics/Biology', 'English', 'Marathi'],
@@ -1217,7 +1143,7 @@ const CURRICULUM_ENGINE = {
       }
     },
     'Karnataka': {
-      '9':  ['Kannada', 'English', 'Mathematics', 'Science', 'Social Science', 'Hindi / Sanskrit'],
+      '9': ['Kannada', 'English', 'Mathematics', 'Science', 'Social Science', 'Hindi / Sanskrit'],
       '10': ['Kannada', 'English', 'Mathematics', 'Science', 'Social Science', 'Hindi / Sanskrit'],
       'Intermediate Year 1': {
         'Science (PCMB)': ['Physics', 'Chemistry', 'Mathematics', 'Biology', 'English', 'Kannada'],
@@ -1226,7 +1152,7 @@ const CURRICULUM_ENGINE = {
       }
     },
     'Tamil Nadu': {
-      '9':  ['Tamil', 'English', 'Mathematics', 'Science', 'Social Science', 'Hindi / Sanskrit / French'],
+      '9': ['Tamil', 'English', 'Mathematics', 'Science', 'Social Science', 'Hindi / Sanskrit / French'],
       '10': ['Tamil', 'English', 'Mathematics', 'Science', 'Social Science', 'Hindi / Sanskrit / French'],
       'Intermediate Year 1': {
         'Biology, Chemistry, Physics, Maths (BCPM)': ['Biology', 'Chemistry', 'Physics', 'Mathematics', 'English', 'Tamil'],
@@ -1237,12 +1163,12 @@ const CURRICULUM_ENGINE = {
   },
   streamOptions: {
     'Intermediate Year 1': {
-      'Telangana':      ['MPC', 'BiPC', 'MEC', 'CEC', 'HEC'],
+      'Telangana': ['MPC', 'BiPC', 'MEC', 'CEC', 'HEC'],
       'Andhra Pradesh': ['MPC', 'BiPC', 'MEC', 'CEC'],
-      'Maharashtra':    ['Science', 'Commerce', 'Arts'],
-      'Karnataka':      ['Science (PCMB)', 'Commerce', 'Arts'],
-      'Tamil Nadu':     ['Biology, Chemistry, Physics, Maths (BCPM)', 'Commerce', 'Arts'],
-      'default':        ['Science', 'Commerce', 'Arts', 'Vocational']
+      'Maharashtra': ['Science', 'Commerce', 'Arts'],
+      'Karnataka': ['Science (PCMB)', 'Commerce', 'Arts'],
+      'Tamil Nadu': ['Biology, Chemistry, Physics, Maths (BCPM)', 'Commerce', 'Arts'],
+      'default': ['Science', 'Commerce', 'Arts', 'Vocational']
     },
     'B.Tech Year 1': { 'default': ['CSE', 'IT', 'AIDS', 'CSIT', 'CSD', 'CIC', 'ECE', 'EEE', 'Mechanical', 'Civil', 'AI & ML', 'Data Science'] },
     'B.Tech Year 2': { 'default': ['CSE', 'IT', 'AIDS', 'CSIT', 'CSD', 'CIC', 'ECE', 'EEE', 'Mechanical', 'Civil', 'AI & ML', 'Data Science'] },
@@ -1297,8 +1223,8 @@ app.get('/api/class-suggestions/:state/:current_class', (req, res) => {
     if (rawSubjects) {
       if (typeof rawSubjects === 'object' && !Array.isArray(rawSubjects)) {
         // Stream / Branch based (Intermediate & B.Tech level)
-        subjects = (stream && rawSubjects[stream]) 
-          ? rawSubjects[stream] 
+        subjects = (stream && rawSubjects[stream])
+          ? rawSubjects[stream]
           : (rawSubjects['IT'] || rawSubjects['CSE'] || rawSubjects['MPC'] || Object.values(rawSubjects)[0] || []);
       } else if (Array.isArray(rawSubjects)) {
         subjects = rawSubjects;
@@ -1327,7 +1253,7 @@ app.get('/api/class-suggestions/:state/:current_class', (req, res) => {
     if (current_class === 'Intermediate Year 2') {
       const streamGroup = stream.includes('PC') || stream.includes('Science') || stream.includes('Bio') ? 'Science'
         : stream.includes('Commerce') ? 'Commerce'
-        : stream.includes('Arts') || stream.includes('History') ? 'Arts' : 'default';
+          : stream.includes('Arts') || stream.includes('History') ? 'Arts' : 'default';
       degreeOptions = CURRICULUM_ENGINE.degreeOptions[streamGroup] || CURRICULUM_ENGINE.degreeOptions.default;
     }
 
@@ -1349,7 +1275,7 @@ app.get('/api/class-suggestions/:state/:current_class', (req, res) => {
 function searchDomains(query) {
   const dirPath = __dirname;
   const files = fs.readdirSync(dirPath).filter(f => f.endsWith('.json') && f !== 'package.json' && f !== 'package-lock.json');
-  
+
   let matches = [];
   let lowerQuery = query.toLowerCase();
 
@@ -1357,7 +1283,7 @@ function searchDomains(query) {
     try {
       const content = fs.readFileSync(path.join(dirPath, file), 'utf8');
       const data = JSON.parse(content);
-      
+
       // basic matching
       if (data.domain && data.domain.toLowerCase().includes(lowerQuery)) {
         matches.push(`Domain: ${data.domain} - ${data.description}`);
@@ -1418,17 +1344,17 @@ function getJson(url, headers = {}, timeout = 3500) {
 
 // Helper to format views
 function formatViews(n) {
-  if (n >= 1e9) return (n/1e9).toFixed(1) + 'B views';
-  if (n >= 1e6) return (n/1e6).toFixed(1) + 'M views';
-  if (n >= 1e3) return (n/1e3).toFixed(0) + 'K views';
+  if (n >= 1e9) return (n / 1e9).toFixed(1) + 'B views';
+  if (n >= 1e6) return (n / 1e6).toFixed(1) + 'M views';
+  if (n >= 1e3) return (n / 1e3).toFixed(0) + 'K views';
   return n + ' views';
 }
 
 // Helper to format duration
 function formatDuration(s) {
-  const h = Math.floor(s/3600), m = Math.floor((s%3600)/60), sec = s%60;
-  if(h) return `${h}:${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}`;
-  return `${m}:${String(sec).padStart(2,'0')}`;
+  const h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60), sec = s % 60;
+  if (h) return `${h}:${String(m).padStart(2, '0')}:${String(sec).padStart(2, '0')}`;
+  return `${m}:${String(sec).padStart(2, '0')}`;
 }
 
 // YouTube video search using direct YouTube search renderer parsing
@@ -1542,7 +1468,7 @@ function postStream(url, headers, body, onToken, onEnd, onError, timeoutMs = 700
       ...headers
     }
   };
-  
+
   const req = https.request(options, (res) => {
     if (res.statusCode < 200 || res.statusCode >= 300) {
       if (!isHandled) { isHandled = true; onError(new Error(`HTTP Status ${res.statusCode}`)); }
@@ -1670,7 +1596,7 @@ async function searchDuckDuckGoOrganic(query) {
           try {
             const u = new URL('https://duckduckgo.com' + rawUrl);
             rawUrl = decodeURIComponent(u.searchParams.get('uddg'));
-          } catch(e) {}
+          } catch (e) { }
         }
         if (rawUrl.startsWith('http') && !rawUrl.includes('duckduckgo.com/y.js') && !rawUrl.includes('bing.com/aclick')) {
           try {
@@ -1681,7 +1607,7 @@ async function searchDuckDuckGoOrganic(query) {
               url: rawUrl,
               source: host
             });
-          } catch(e) {}
+          } catch (e) { }
         }
       }
     });
@@ -1695,7 +1621,7 @@ async function searchDuckDuckGoOrganic(query) {
 async function readUrlContent(targetUrl) {
   try {
     const parsed = new URL(targetUrl);
-    
+
     // YouTube video detection & reader
     const isYouTube = parsed.hostname.includes('youtube.com') || parsed.hostname.includes('youtu.be');
     if (isYouTube) {
@@ -1715,7 +1641,7 @@ async function readUrlContent(targetUrl) {
           title = oembedData.title || title;
           author = oembedData.author_name || author;
         }
-      } catch (e) {}
+      } catch (e) { }
 
       let description = '';
       let transcript = '';
@@ -1728,9 +1654,9 @@ async function readUrlContent(targetUrl) {
         if (pageRes.ok) {
           const pageHtml = await pageRes.text();
           const descMatch = pageHtml.match(/<meta\s+name="description"\s+content="([^"]*)"/i) ||
-                            pageHtml.match(/<meta\s+property="og:description"\s+content="([^"]*)"/i);
+            pageHtml.match(/<meta\s+property="og:description"\s+content="([^"]*)"/i);
           if (descMatch) description = descMatch[1];
-          
+
           const captionMatch = pageHtml.match(/"captionTracks":\s*\[(.*?)\]/);
           if (captionMatch) {
             try {
@@ -1752,10 +1678,10 @@ async function readUrlContent(targetUrl) {
                     .trim();
                 }
               }
-            } catch (e) {}
+            } catch (e) { }
           }
         }
-      } catch (e) {}
+      } catch (e) { }
 
       let content = `**Video Title:** ${title}\n**Channel/Creator:** ${author}\n\n`;
       if (transcript) {
@@ -1798,7 +1724,7 @@ async function readUrlContent(targetUrl) {
     const title = titleMatch ? titleMatch[1].replace(/\s+/g, ' ').trim() : targetUrl;
 
     const metaDescMatch = html.match(/<meta\s+name=["']description["']\s+content=["']([\s\S]*?)["']/i) ||
-                          html.match(/<meta\s+property=["']og:description["']\s+content=["']([\s\S]*?)["']/i);
+      html.match(/<meta\s+property=["']og:description["']\s+content=["']([\s\S]*?)["']/i);
     const metaDesc = metaDescMatch ? metaDescMatch[1].replace(/\s+/g, ' ').trim() : '';
 
     let clean = html
@@ -1883,7 +1809,7 @@ async function fetchRealQueryImages(subject) {
           });
         }
       }
-    } catch(ddgErr) {}
+    } catch (ddgErr) { }
 
     // 2. Wikipedia high-resolution pageimages fallback
     if (images.length < 4) {
@@ -1904,11 +1830,110 @@ async function fetchRealQueryImages(subject) {
             }
           });
         }
-      } catch(wikiErr) {}
+      } catch (wikiErr) { }
     }
-  } catch(e) {}
+  } catch (e) { }
   return images;
 }
+
+// ====== LIVE IN-APP BROWSER PROXY & EXTRACTION ENGINE ======
+app.get('/api/browse-url', async (req, res) => {
+  const targetUrl = req.query.url;
+  if (!targetUrl) {
+    return res.status(400).json({ error: 'url query parameter is required' });
+  }
+
+  let parsedUrl;
+  try {
+    let raw = targetUrl.trim();
+    if (!raw.startsWith('http://') && !raw.startsWith('https://')) {
+      raw = 'https://' + raw;
+    }
+    parsedUrl = new URL(raw);
+  } catch (err) {
+    return res.status(400).json({ error: 'Invalid URL format' });
+  }
+
+  try {
+    const fetchController = new AbortController();
+    const timeout = setTimeout(() => fetchController.abort(), 12000);
+
+    const headers = {
+      'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
+      'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
+      'Accept-Language': 'en-US,en;q=0.9',
+      'Cache-Control': 'no-cache'
+    };
+
+    const response = await fetch(parsedUrl.href, {
+      headers,
+      signal: fetchController.signal,
+      redirect: 'follow'
+    });
+    clearTimeout(timeout);
+
+    const contentType = response.headers.get('content-type') || '';
+    if (!contentType.includes('text/html') && !contentType.includes('application/xhtml+xml')) {
+      return res.json({
+        status: 'redirect',
+        url: response.url || parsedUrl.href,
+        contentType
+      });
+    }
+
+    let html = await response.text();
+    const finalUrl = response.url || parsedUrl.href;
+    const finalDomain = new URL(finalUrl).hostname.replace(/^www\./, '');
+
+    // Extract Title
+    const titleMatch = html.match(/<title[^>]*>([^<]+)<\/title>/i);
+    const title = titleMatch ? titleMatch[1].trim() : finalDomain;
+
+    // Extract text summary for Reader View
+    const cleanText = html
+      .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, ' ')
+      .replace(/<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi, ' ')
+      .replace(/<header\b[^<]*(?:(?!<\/header>)<[^<]*)*<\/header>/gi, ' ')
+      .replace(/<footer\b[^<]*(?:(?!<\/footer>)<[^<]*)*<\/footer>/gi, ' ')
+      .replace(/<nav\b[^<]*(?:(?!<\/nav>)<[^<]*)*<\/nav>/gi, ' ')
+      .replace(/<[^>]+>/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim();
+
+    const summary = cleanText.slice(0, 3000);
+
+    // Sanitize and inject <base href="...">
+    let sanitizedHtml = html;
+    sanitizedHtml = sanitizedHtml.replace(/if\s*\(\s*(?:top|window\.top)\s*!==?\s*(?:self|window\.self)\s*\)[^;]+;/gi, '');
+    sanitizedHtml = sanitizedHtml.replace(/if\s*\(\s*(?:top\.location|window\.top\.location)[^)]*\)[^;]+;/gi, '');
+
+    const baseTag = `<base href="${finalUrl}" target="_blank">`;
+    if (/<head\b[^>]*>/i.test(sanitizedHtml)) {
+      sanitizedHtml = sanitizedHtml.replace(/(<head\b[^>]*>)/i, `$1\n  ${baseTag}`);
+    } else {
+      sanitizedHtml = `${baseTag}\n${sanitizedHtml}`;
+    }
+
+    return res.json({
+      status: 'ok',
+      url: finalUrl,
+      domain: finalDomain,
+      title,
+      summary: summary.slice(0, 450),
+      textContent: summary,
+      html: sanitizedHtml
+    });
+  } catch (fetchErr) {
+    console.warn('Browse URL error:', fetchErr.message);
+    return res.json({
+      status: 'fallback',
+      url: parsedUrl.href,
+      domain: parsedUrl.hostname,
+      title: parsedUrl.hostname,
+      error: fetchErr.message
+    });
+  }
+});
 
 // Live web search backend aggregator (Organic Web + Wikipedia + YouTube + DuckDuckGo + Wikidata + OpenAlex + ArXiv)
 app.get('/api/live-search', async (req, res) => {
@@ -1996,7 +2021,7 @@ app.get('/api/live-search', async (req, res) => {
               }
             });
           }
-        } catch(imgErr) {}
+        } catch (imgErr) { }
 
         // Fetch high-res photos from Wikimedia Commons
         try {
@@ -2018,7 +2043,7 @@ app.get('/api/live-search', async (req, res) => {
               }
             });
           }
-        } catch(commonsErr) {}
+        } catch (commonsErr) { }
       }
     } catch (e) {
       console.error('Wikipedia search failed:', e.message);
@@ -2371,7 +2396,7 @@ const handleSearchStream = async (req, res) => {
           sendUpdate({ type: 'complete' });
           return res.end();
         }
-      } catch(mathErr) {}
+      } catch (mathErr) { }
     }
   }
 
@@ -2610,7 +2635,7 @@ CORE PRINCIPLES & BEHAVIOR:
     });
   } else {
     let cleanNoBase64Query = (cleanUserQuery || query).replace(/Base64 Data \(snippet\):[^\n]*/gi, '').trim();
-    
+
     // Automatic Live URL / Video Content Reader
     const detectedUrlMatch = cleanNoBase64Query.match(/https?:\/\/[^\s<>"')]+/i);
     if (detectedUrlMatch) {
@@ -2622,7 +2647,7 @@ CORE PRINCIPLES & BEHAVIOR:
           const contentType = readResult.type === 'youtube_video' ? 'YOUTUBE VIDEO TRANSCRIPT' : 'LIVE WEBPAGE CONTENT';
           cleanNoBase64Query = `[${contentType} FOR: ${targetReadUrl}]\n**Title:** ${readResult.title}\n\n${readResult.content}\n[END LIVE CONTENT]\n\nUser Instruction / Question:\n${cleanNoBase64Query}`;
         }
-      } catch(urlReadErr) {
+      } catch (urlReadErr) {
         console.warn('URL auto-read failed:', urlReadErr.message);
       }
     }
@@ -2651,7 +2676,7 @@ CORE PRINCIPLES & BEHAVIOR:
     if (!hasStreamEnded) {
       hasStreamEnded = true;
       sendUpdate({ type: 'complete' });
-      try { res.end(); } catch (e) {}
+      try { res.end(); } catch (e) { }
     }
   };
 
@@ -2717,7 +2742,7 @@ CORE PRINCIPLES & BEHAVIOR:
                 sendUpdate({ text: token });
               }
             }
-          } catch (e) {}
+          } catch (e) { }
         }
       },
       () => {
@@ -2751,7 +2776,7 @@ CORE PRINCIPLES & BEHAVIOR:
     // ── MULTI-TURN CONVERSATION CONTEXT RESOLUTION ──
     let prevTopic = '';
     const prevContextMatch = q.match(/\[PREVIOUS CONVERSATION CONTEXT[\s\S]*?User:\s*([^\n]+)/i) ||
-                             q.match(/\[PREVIOUS CONVERSATION CONTEXT[\s\S]*?([a-zA-Z0-9\s]{3,40})/i);
+      q.match(/\[PREVIOUS CONVERSATION CONTEXT[\s\S]*?([a-zA-Z0-9\s]{3,40})/i);
     if (prevContextMatch && prevContextMatch[1]) {
       prevTopic = prevContextMatch[1]
         .replace(/\[(?:PREVIOUS CONVERSATION CONTEXT|USER ACADEMIC CONTEXT|WEBSITE\/APP CREATION DIRECTIVE)[^\]]*\]/gi, '')
@@ -2804,14 +2829,14 @@ CORE PRINCIPLES & BEHAVIOR:
       if (fileText.length > 10) {
         // ── DETECT FILE INTENT FROM QUERY ──
         const ql = (cleanQ || '').toLowerCase();
-        const intentIsSummary    = /intent:\s*document summary/i.test(q) || /^(summarize|summary|explain|overview|read|analyze|what is this|what about)/.test(ql);
-        const intentIsKeyPoints  = /intent:\s*key points/i.test(q) || /\b(key points|main points|highlights)\b/.test(ql);
-        const intentIsTable      = /intent:\s*table/i.test(q) || /\b(table|data|marks|grades|scores|results|statistics|numbers)\b/.test(ql);
-        const intentIsDates      = /intent:\s*date/i.test(q) || /\b(date|timeline|when|deadline|schedule)\b/.test(ql);
-        const intentIsPersons    = /intent:\s*person/i.test(q) || /\b(who|person|people|name|contact|profile)\b/.test(ql);
-        const intentIsSearch     = /intent:\s*document search/i.test(q) || /\b(find|search|where|locate|mention)\b/.test(ql);
-        const intentIsCode       = /intent:\s*code/i.test(q) || /\b(code|function|class|algorithm|bug)\b/.test(ql);
-        const intentIsCompare    = /intent:\s*multi-file/i.test(q) || /\b(compare|vs|difference|between)\b/.test(ql);
+        const intentIsSummary = /intent:\s*document summary/i.test(q) || /^(summarize|summary|explain|overview|read|analyze|what is this|what about)/.test(ql);
+        const intentIsKeyPoints = /intent:\s*key points/i.test(q) || /\b(key points|main points|highlights)\b/.test(ql);
+        const intentIsTable = /intent:\s*table/i.test(q) || /\b(table|data|marks|grades|scores|results|statistics|numbers)\b/.test(ql);
+        const intentIsDates = /intent:\s*date/i.test(q) || /\b(date|timeline|when|deadline|schedule)\b/.test(ql);
+        const intentIsPersons = /intent:\s*person/i.test(q) || /\b(who|person|people|name|contact|profile)\b/.test(ql);
+        const intentIsSearch = /intent:\s*document search/i.test(q) || /\b(find|search|where|locate|mention)\b/.test(ql);
+        const intentIsCode = /intent:\s*code/i.test(q) || /\b(code|function|class|algorithm|bug)\b/.test(ql);
+        const intentIsCompare = /intent:\s*multi-file/i.test(q) || /\b(compare|vs|difference|between)\b/.test(ql);
 
         // Extract any file names mentioned in the query
         const fileNameMatch = q.match(/FILE CONTENT — ([^\]:\n]+)/i);
@@ -3149,7 +3174,7 @@ CORE PRINCIPLES & BEHAVIOR:
                 summaryText = (p.extract || top.snippet || '').replace(/<\/?[^>]+>/g, '');
               }
             }
-          } catch(e) {}
+          } catch (e) { }
         }
 
         // If native language Wikipedia returned content
@@ -3194,7 +3219,7 @@ CORE PRINCIPLES & BEHAVIOR:
             sendUpdate({ type: 'complete' });
             return res.end();
           }
-        } catch (dictErr) {}
+        } catch (dictErr) { }
       }
     }
 
@@ -3334,7 +3359,7 @@ CORE PRINCIPLES & BEHAVIOR:
           } else if (ddgRes && ddgRes.Definition) {
             summaryText = ddgRes.Definition;
           }
-        } catch(e) {}
+        } catch (e) { }
       }
 
       // 2. Wikidata Description Fallback
@@ -3345,7 +3370,7 @@ CORE PRINCIPLES & BEHAVIOR:
             summaryText = `${wdRes.search[0].label}: ${wdRes.search[0].description}`;
             pageTitle = wdRes.search[0].label;
           }
-        } catch(e) {}
+        } catch (e) { }
       }
 
       // 3. Aggregate Wikipedia Search Snippets Fallback
@@ -3399,7 +3424,7 @@ CORE PRINCIPLES & BEHAVIOR:
       sendUpdate({ text: synth });
       sendUpdate({ type: 'complete' });
       return res.end();
-    } catch(e) {
+    } catch (e) {
       const cleanSubject = (cleanQ || 'Topic Query')
         .replace(/\[[^\]]*\]/g, '')
         .slice(0, 400).trim();

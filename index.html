@@ -724,9 +724,145 @@
     box-shadow: 0 20px 45px rgba(0, 0, 0, 0.85), 0 0 32px rgba(0, 255, 170, 0.22), 0 0 20px rgba(217, 119, 87, 0.18) !important;
   }
 
-  @keyframes pulse-dot {
-    0%, 100% { opacity: 1; transform: scale(1); }
-    50% { opacity: 0.4; transform: scale(1.3); }
+  /* ── FRONTIER MODEL MATRIX ── */
+  .models-matrix-section {
+    max-width: 1080px; margin: 55px auto 40px; padding: 0 20px;
+  }
+  .models-grid-matrix {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 16px; margin-top: 24px;
+  }
+  .model-matrix-card {
+    background: rgba(13, 16, 22, 0.78);
+    border: 1px solid rgba(255, 255, 255, 0.09);
+    border-radius: 14px; padding: 18px 20px;
+    cursor: pointer; transition: all 0.25s ease;
+    display: flex; flex-direction: column; gap: 10px;
+  }
+  .model-matrix-card:hover {
+    border-color: rgba(0, 255, 170, 0.45);
+    background: rgba(16, 22, 30, 0.92);
+    transform: translateY(-3px);
+  }
+  .mm-top {
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .mm-badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 3px 9px; border-radius: 6px; font-size: 0.72rem; font-weight: 700;
+    font-family: 'JetBrains Mono', monospace; border: 1px solid transparent;
+  }
+  .mm-latency {
+    font-size: 0.72rem; color: var(--neon); font-family: 'JetBrains Mono', monospace; font-weight: 600;
+  }
+  .mm-title {
+    font-size: 1.05rem; font-weight: 700; color: #fff;
+  }
+  .mm-desc {
+    font-size: 0.82rem; color: var(--muted); line-height: 1.5; flex: 1;
+  }
+  .mm-meta {
+    display: flex; justify-content: space-between; font-size: 0.72rem; color: #64748b;
+    border-top: 1px solid rgba(255, 255, 255, 0.06); padding-top: 8px; margin-top: 4px;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .mm-meta strong { color: #cbd5e1; }
+  .pulse-dot-green {
+    width: 6px; height: 6px; border-radius: 50%; background: #00ffaa;
+    display: inline-block; animation: pulse-dot 1.5s infinite;
+  }
+
+  /* ── AUTO-SCROLLING SHOWCASE CAROUSEL ── */
+  .carousel-section-wrap {
+    max-width: 1080px; margin: 60px auto 45px; padding: 0 20px; overflow: hidden;
+  }
+  .carousel-viewport {
+    width: 100%; overflow: hidden; border-radius: 16px; position: relative; padding: 8px 0;
+  }
+  .carousel-track {
+    display: flex; gap: 18px; transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+    will-change: transform;
+  }
+  .carousel-card {
+    flex: 0 0 calc(50% - 9px); min-width: 290px;
+    background: rgba(13, 17, 24, 0.88);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px; padding: 20px;
+    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.6);
+    display: flex; flex-direction: column; justify-content: space-between;
+  }
+  @media(max-width: 768px) {
+    .carousel-card { flex: 0 0 100%; }
+  }
+  .cc-header {
+    display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;
+  }
+  .cc-badge {
+    font-family: 'JetBrains Mono', monospace; font-size: 0.68rem; font-weight: 700;
+    padding: 3px 8px; border-radius: 6px;
+  }
+  .cc-footer {
+    margin-top: 14px; text-align: right;
+  }
+  .cc-action-btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    text-decoration: none; color: var(--neon); font-size: 0.82rem; font-weight: 700;
+    font-family: 'Inter', sans-serif; transition: color 0.15s, transform 0.15s;
+  }
+  .cc-action-btn:hover { color: #fff; transform: translateX(3px); }
+  .carousel-controls-bar {
+    display: flex; align-items: center; justify-content: center; gap: 16px; margin-top: 18px;
+  }
+  .carousel-arrow-btn {
+    all: unset; cursor: pointer; width: 34px; height: 34px; border-radius: 50%;
+    background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.15);
+    color: #fff; font-size: 1.2rem; display: flex; align-items: center; justify-content: center;
+    transition: all 0.15s; user-select: none;
+  }
+  .carousel-arrow-btn:hover {
+    background: var(--neon); color: #000; border-color: var(--neon);
+  }
+  .carousel-dots {
+    display: flex; gap: 8px; align-items: center;
+  }
+  .c-dot {
+    width: 8px; height: 8px; border-radius: 50%; background: rgba(255, 255, 255, 0.25);
+    cursor: pointer; transition: all 0.2s;
+  }
+  .c-dot.active {
+    width: 22px; border-radius: 10px; background: var(--neon);
+    box-shadow: 0 0 10px rgba(0, 255, 170, 0.5);
+  }
+
+  /* ── STEP INDICATORS FOR CODE ARCHITECT ── */
+  .showcase-steps {
+    display: flex; align-items: center; justify-content: center;
+    max-width: 440px; margin: 0 auto 12px;
+  }
+  .showcase-step-dot {
+    width: 32px; height: 32px; border-radius: 50%;
+    background: rgba(255, 255, 255, 0.06); border: 1.5px solid rgba(255, 255, 255, 0.18);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.8rem; font-weight: 700; font-family: 'JetBrains Mono', monospace;
+    color: #94a3b8; cursor: pointer; transition: all 0.25s ease;
+  }
+  .showcase-step-dot.active {
+    background: var(--gold); border-color: #f6ad55; color: #0a0c10;
+    box-shadow: 0 0 16px rgba(217, 119, 87, 0.6);
+  }
+  .showcase-step-line {
+    flex: 1; height: 2px; background: rgba(255, 255, 255, 0.12);
+    transition: background 0.3s ease;
+  }
+  .showcase-step-line.active {
+    background: var(--gold);
+  }
+  .showcase-step-labels {
+    display: flex; justify-content: space-between; max-width: 460px;
+    margin: 0 auto 20px; font-size: 0.74rem; color: #64748b; font-weight: 600;
+  }
+  .showcase-step-label.active {
+    color: var(--gold); font-weight: 700;
   }
 
   /* Mobile responsiveness fixes */
@@ -741,6 +877,7 @@
     .perf-top { flex-direction: column; }
     .graph-badge-left, .graph-badge-right { font-size: 0.64rem; padding: 6px 8px; }
     .social-grid { grid-template-columns: 1fr; }
+    .models-grid-matrix { grid-template-columns: 1fr; }
   }
 </style>
 </head>
@@ -889,27 +1026,293 @@
   </div>
 </div>
 
-<!-- FEATURES -->
-<div class="features-wrap">
-  <div class="section-tag">Capabilities</div>
-  <div class="section-head">Built for Autonomous Execution</div>
+<!-- ═══ FRONTIER AI MODEL MATRIX (DYNAMIC ACTIVE MODELS) ═══ -->
+<div class="models-matrix-section" id="modelsMatrixSection">
+  <div class="section-tag" style="color:var(--neon); border-color:rgba(0,255,170,0.3); background:rgba(0,255,170,0.08);">✦ Frontier AI Intelligence</div>
+  <div class="section-head">Dynamically Orchestrated Frontier Models</div>
+  <div class="section-sub" style="color:var(--muted); max-width:680px; margin:0 auto 36px; text-align:center; font-size:0.95rem; line-height:1.6;">
+    Cognisphere AI automatically dispatches every query, code compilation, and reasoning task to the highest-performing frontier model in real time.
+  </div>
 
-  <div class="grid-3">
-    <div class="feat-card">
-      <span class="feat-icon">⚡</span>
-      <div class="feat-title">Global Live Search</div>
-      <div class="feat-desc">Multi-source web extraction, arXiv preprints, YouTube videos, and academic journals synthesized in seconds.</div>
+  <div class="models-grid-matrix">
+    <!-- Model 1: GPT-OSS 120B -->
+    <div class="model-matrix-card tilt-card-3d" onclick="selectLandingModel('openai/gpt-oss-120b')">
+      <div class="mm-top">
+        <div class="mm-badge" style="background:rgba(0,255,170,0.12); color:#00ffaa; border-color:rgba(0,255,170,0.3);">
+          <span class="pulse-dot-green"></span> Live 120B MoE
+        </div>
+        <div class="mm-latency">⚡ 340ms</div>
+      </div>
+      <div class="mm-title">OpenAI GPT-OSS 120B</div>
+      <div class="mm-desc">Deep logical deduction, autonomous multi-step reasoning, and complex architectural synthesis.</div>
+      <div class="mm-meta">
+        <span>Context: <strong>128K</strong></span>
+        <span>Role: <strong>Deep Logic</strong></span>
+      </div>
     </div>
-    <div class="feat-card">
-      <span class="feat-icon">🌐</span>
-      <div class="feat-title">Web Dev Studio</div>
-      <div class="feat-desc">Autonomous HTML/CSS/JS web application generation with live code editor, preview, and ZIP package export.</div>
+
+    <!-- Model 2: Qwen 3.8 27B -->
+    <div class="model-matrix-card tilt-card-3d" onclick="selectLandingModel('qwen/qwen3.8-27b')">
+      <div class="mm-top">
+        <div class="mm-badge" style="background:rgba(56,189,248,0.12); color:#38bdf8; border-color:rgba(56,189,248,0.3);">
+          <span class="pulse-dot-green" style="background:#38bdf8;"></span> Live SOTA Coder
+        </div>
+        <div class="mm-latency">⚡ 210ms</div>
+      </div>
+      <div class="mm-title">Qwen 3.8 27B Coder</div>
+      <div class="mm-desc">Autonomous code generation, real-time syntax checking, and multi-file software engineering.</div>
+      <div class="mm-meta">
+        <span>Context: <strong>128K</strong></span>
+        <span>Role: <strong>Software & Math</strong></span>
+      </div>
     </div>
-    <div class="feat-card">
-      <span class="feat-icon">📱</span>
-      <div class="feat-title">App Builder Studio</div>
-      <div class="feat-desc">Mobile &amp; desktop project creation in Flutter, React Native, Kotlin &amp; Swift with step-by-step build timeline.</div>
+
+    <!-- Model 3: Groq Compound -->
+    <div class="model-matrix-card tilt-card-3d" onclick="selectLandingModel('groq/compound')">
+      <div class="mm-top">
+        <div class="mm-badge" style="background:rgba(217,119,87,0.15); color:#d97757; border-color:rgba(217,119,87,0.35);">
+          <span class="pulse-dot-green" style="background:#d97757;"></span> Compound Autonomous
+        </div>
+        <div class="mm-latency">⚡ 180ms</div>
+      </div>
+      <div class="mm-title">Groq Compound Multi-Agent</div>
+      <div class="mm-desc">Autonomous multi-agent system combining web synthesis, code execution, and fact validation.</div>
+      <div class="mm-meta">
+        <span>Context: <strong>128K</strong></span>
+        <span>Role: <strong>Autonomous System</strong></span>
+      </div>
     </div>
+
+    <!-- Model 4: DeepSeek R1 -->
+    <div class="model-matrix-card tilt-card-3d" onclick="selectLandingModel('deepseek-r1')">
+      <div class="mm-top">
+        <div class="mm-badge" style="background:rgba(168,85,247,0.12); color:#c084fc; border-color:rgba(168,85,247,0.3);">
+          <span class="pulse-dot-green" style="background:#c084fc;"></span> Frontier CoT
+        </div>
+        <div class="mm-latency">⚡ 390ms</div>
+      </div>
+      <div class="mm-title">DeepSeek R1 Reasoning</div>
+      <div class="mm-desc">High-rigor chain-of-thought verification for scientific research, mathematics, and formal proofs.</div>
+      <div class="mm-meta">
+        <span>Context: <strong>64K</strong></span>
+        <span>Role: <strong>Scientific CoT</strong></span>
+      </div>
+    </div>
+
+    <!-- Model 5: Llama 3.3 70B -->
+    <div class="model-matrix-card tilt-card-3d" onclick="selectLandingModel('llama-3.3-70b')">
+      <div class="mm-top">
+        <div class="mm-badge" style="background:rgba(59,130,246,0.12); color:#60a5fa; border-color:rgba(59,130,246,0.3);">
+          <span class="pulse-dot-green" style="background:#60a5fa;"></span> Meta 70B Flagship
+        </div>
+        <div class="mm-latency">⚡ 260ms</div>
+      </div>
+      <div class="mm-title">Llama 3.3 70B Versatile</div>
+      <div class="mm-desc">Multilingual synthesis, high-throughput document processing, and nuanced conversational intelligence.</div>
+      <div class="mm-meta">
+        <span>Context: <strong>128K</strong></span>
+        <span>Role: <strong>Versatile Global</strong></span>
+      </div>
+    </div>
+
+    <!-- Model 6: Groq Compound Mini -->
+    <div class="model-matrix-card tilt-card-3d" onclick="selectLandingModel('groq/compound-mini')">
+      <div class="mm-top">
+        <div class="mm-badge" style="background:rgba(234,179,8,0.12); color:#facc15; border-color:rgba(234,179,8,0.3);">
+          <span class="pulse-dot-green" style="background:#facc15;"></span> Sub-Second Speed
+        </div>
+        <div class="mm-latency">⚡ 90ms</div>
+      </div>
+      <div class="mm-title">Groq Compound Mini</div>
+      <div class="mm-desc">Instantaneous answer streaming, high-speed terminal auto-completion, and live queries.</div>
+      <div class="mm-meta">
+        <span>Context: <strong>128K</strong></span>
+        <span>Role: <strong>Instant Search</strong></span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ AUTO-SCROLLING PREMIUM PROJECT SHOWCASE CAROUSEL ═══ -->
+<div class="carousel-section-wrap" id="projectShowcaseSection">
+  <div class="section-tag" style="color:var(--gold); border-color:rgba(217,119,87,0.3); background:rgba(217,119,87,0.08);">✦ Live Generation Showcase</div>
+  <div class="section-head">Auto-Streaming Project Demos</div>
+  <div class="section-sub" style="color:var(--muted); max-width:680px; margin:0 auto 30px; text-align:center; font-size:0.95rem; line-height:1.6;">
+    Watch Cognisphere AI synthesize full-stack websites, live compilers, cross-platform apps, and scientific papers automatically.
+  </div>
+
+  <!-- Carousel Viewport & Track -->
+  <div class="carousel-viewport" id="carouselViewport">
+    <div class="carousel-track" id="carouselTrack">
+      <!-- Card 1: Web Dev Studio -->
+      <div class="carousel-card tilt-card-3d">
+        <div class="cc-header">
+          <div style="display:flex; align-items:center; gap:8px;">
+            <span style="font-size:1.1rem;">🌐</span>
+            <span style="font-weight:700; color:#fff; font-size:0.9rem;">Autonomous Web Dev Studio</span>
+          </div>
+          <span class="cc-badge" style="color:#00ffaa; background:rgba(0,255,170,0.1); border:1px solid rgba(0,255,170,0.25);">LIVE PREVIEW</span>
+        </div>
+        <div class="cc-body-preview" style="background:#090d12; border:1px solid rgba(255,255,255,0.08); border-radius:10px; padding:12px; margin:10px 0;">
+          <div style="display:flex; align-items:center; gap:6px; margin-bottom:8px; border-bottom:1px solid rgba(255,255,255,0.06); padding-bottom:6px;">
+            <span style="width:8px; height:8px; border-radius:50%; background:#ff5f56; display:inline-block;"></span>
+            <span style="width:8px; height:8px; border-radius:50%; background:#ffbd2e; display:inline-block;"></span>
+            <span style="width:8px; height:8px; border-radius:50%; background:#27c93f; display:inline-block;"></span>
+            <span style="font-family:'JetBrains Mono',monospace; font-size:0.7rem; color:#64748b; margin-left:6px;">index.html · 3D Solar Orbit Simulator</span>
+          </div>
+          <div style="font-family:'JetBrains Mono',monospace; font-size:0.75rem; color:#38bdf8; line-height:1.5;">
+            &lt;canvas id="solarCanvas"&gt;&lt;/canvas&gt;<br>
+            <span style="color:#94a3b8;">// Real-time WebGL orbit rendering with lighting &amp; textures</span><br>
+            <span style="color:#34d399;">✔ Build: 100% Validated • 0 Errors • Instant 1-Click ZIP</span>
+          </div>
+        </div>
+        <div class="cc-footer">
+          <a href="home.html?mode=webdev" class="cc-action-btn">Launch Web Dev Studio →</a>
+        </div>
+      </div>
+
+      <!-- Card 2: Interactive Compiler -->
+      <div class="carousel-card tilt-card-3d">
+        <div class="cc-header">
+          <div style="display:flex; align-items:center; gap:8px;">
+            <span style="font-size:1.1rem;">⚙️</span>
+            <span style="font-weight:700; color:#fff; font-size:0.9rem;">Multi-Language Interactive Compiler</span>
+          </div>
+          <span class="cc-badge" style="color:#38bdf8; background:rgba(56,189,248,0.1); border:1px solid rgba(56,189,248,0.25);">GCC 13.2</span>
+        </div>
+        <div class="cc-body-preview" style="background:#050810; border:1px solid rgba(255,255,255,0.08); border-radius:10px; padding:12px; margin:10px 0;">
+          <div style="font-family:'JetBrains Mono',monospace; font-size:0.74rem; color:#e2e8f0; line-height:1.5;">
+            <span style="color:#94a3b8;">$ gcc -O2 -Wall main.c -o main &amp;&amp; ./main</span><br>
+            <span style="color:#4ade80; font-weight:600;">[Process completed in 14ms with exit code 0]</span><br>
+            <span style="color:#f0f6fc;">✔ Live Recompilation on every edit with real-time stdout</span>
+          </div>
+        </div>
+        <div class="cc-footer">
+          <a href="home.html?mode=code" class="cc-action-btn">Open Live Terminal →</a>
+        </div>
+      </div>
+
+      <!-- Card 3: Cross-Platform App Builder -->
+      <div class="carousel-card tilt-card-3d">
+        <div class="cc-header">
+          <div style="display:flex; align-items:center; gap:8px;">
+            <span style="font-size:1.1rem;">📱</span>
+            <span style="font-weight:700; color:#fff; font-size:0.9rem;">Autonomous Mobile App Builder</span>
+          </div>
+          <span class="cc-badge" style="color:#d97757; background:rgba(217,119,87,0.1); border:1px solid rgba(217,119,87,0.25);">FLUTTER &amp; REACT NATIVE</span>
+        </div>
+        <div class="cc-body-preview" style="background:#0a0d14; border:1px solid rgba(255,255,255,0.08); border-radius:10px; padding:12px; margin:10px 0;">
+          <div style="font-family:'Inter',sans-serif; font-size:0.78rem; color:#cbd5e1; line-height:1.5;">
+            • Instant scaffold for iOS, Android, macOS &amp; Windows.<br>
+            • Automated state management, REST API endpoints, &amp; dark mode UI.<br>
+            <span style="color:#00ffaa; font-weight:600;">⚡ Production ready APK &amp; IPA bundles in seconds.</span>
+          </div>
+        </div>
+        <div class="cc-footer">
+          <a href="home.html?mode=appbuilder" class="cc-action-btn">Build Mobile App →</a>
+        </div>
+      </div>
+
+      <!-- Card 4: Scientific & Medical Research -->
+      <div class="carousel-card tilt-card-3d">
+        <div class="cc-header">
+          <div style="display:flex; align-items:center; gap:8px;">
+            <span style="font-size:1.1rem;">🧬</span>
+            <span style="font-weight:700; color:#fff; font-size:0.9rem;">Deep Science &amp; Academic Synthesis</span>
+          </div>
+          <span class="cc-badge" style="color:#a855f7; background:rgba(168,85,247,0.1); border:1px solid rgba(168,85,247,0.25);">PUBMED &amp; ARXIV</span>
+        </div>
+        <div class="cc-body-preview" style="background:#0c0a14; border:1px solid rgba(255,255,255,0.08); border-radius:10px; padding:12px; margin:10px 0;">
+          <div style="font-family:'Inter',sans-serif; font-size:0.78rem; color:#cbd5e1; line-height:1.5;">
+            • Multi-paper consensus extraction with direct DOI links.<br>
+            • CRISPR gene editing, AlphaFold structural confidence, &amp; chemical formulas.<br>
+            <span style="color:#c084fc; font-weight:600;">✦ Verified citations across 200M+ peer-reviewed papers.</span>
+          </div>
+        </div>
+        <div class="cc-footer">
+          <a href="home.html?mode=science" class="cc-action-btn">Explore Science Engine →</a>
+        </div>
+      </div>
+
+      <!-- Card 5: Real-Time Neon DB Cloud -->
+      <div class="carousel-card tilt-card-3d">
+        <div class="cc-header">
+          <div style="display:flex; align-items:center; gap:8px;">
+            <span style="font-size:1.1rem;">⚡</span>
+            <span style="font-weight:700; color:#fff; font-size:0.9rem;">Neon PostgreSQL Cloud Sync</span>
+          </div>
+          <span class="cc-badge" style="color:#22c55e; background:rgba(34,197,94,0.1); border:1px solid rgba(34,197,94,0.25);">CONNECTED</span>
+        </div>
+        <div class="cc-body-preview" style="background:#06100c; border:1px solid rgba(0,255,170,0.15); border-radius:10px; padding:12px; margin:10px 0;">
+          <div style="font-family:'JetBrains Mono',monospace; font-size:0.75rem; color:#e2e8f0; line-height:1.5;">
+            <span style="color:#00ffaa;">✔ Neon PostgreSQL Serverless Engine Active</span><br>
+            <span style="color:#94a3b8;">• Instant user session auth &amp; conversation history persistence</span><br>
+            <span style="color:#d97757;">• Sub-millisecond latency connection pooler</span>
+          </div>
+        </div>
+        <div class="cc-footer">
+          <a href="home.html" class="cc-action-btn">Open Workspace →</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Carousel Controls -->
+  <div class="carousel-controls-bar">
+    <button type="button" class="carousel-arrow-btn" onclick="prevCarouselSlide()" title="Previous slide">‹</button>
+    <div class="carousel-dots" id="carouselDots">
+      <span class="c-dot active" onclick="goToCarouselSlide(0)"></span>
+      <span class="c-dot" onclick="goToCarouselSlide(1)"></span>
+      <span class="c-dot" onclick="goToCarouselSlide(2)"></span>
+      <span class="c-dot" onclick="goToCarouselSlide(3)"></span>
+      <span class="c-dot" onclick="goToCarouselSlide(4)"></span>
+    </div>
+    <button type="button" class="carousel-arrow-btn" onclick="nextCarouselSlide()" title="Next slide">›</button>
+  </div>
+</div>
+
+<!-- ═══ CODE ARCHITECT WORKFLOW (DYNAMIC INTERACTIVE MODE) ═══ -->
+<div class="showcase-section" id="codeArchitectLandingSection" style="max-width:1040px; margin:50px auto 60px; padding:0 20px;">
+  <div class="showcase-header" style="text-align:center; margin-bottom:28px;">
+    <div class="showcase-eyebrow" style="font-family:'JetBrains Mono',monospace; font-size:0.75rem; color:#d97757; text-transform:uppercase; letter-spacing:0.14em; margin-bottom:8px;">✦ Code Architect Mode</div>
+    <h2 style="font-family:'Spectral',Georgia,serif; font-size:clamp(1.8rem,4vw,2.5rem); font-weight:800; color:#fff; margin-bottom:10px;">How Cognisphere Builds Your Website</h2>
+    <div class="showcase-sub" style="color:var(--muted); font-size:0.95rem; max-width:620px; margin:0 auto; line-height:1.5;">
+      From your raw idea to a live interactive website — watch every step of the AI-powered building process.
+    </div>
+  </div>
+
+  <!-- Step Indicators -->
+  <div class="showcase-steps" id="landingShowcaseSteps">
+    <div class="showcase-step-dot active" data-step="0" onclick="showLandingStep(0)">1</div>
+    <div class="showcase-step-line" id="landingLine0"></div>
+    <div class="showcase-step-dot" data-step="1" onclick="showLandingStep(1)">2</div>
+    <div class="showcase-step-line" id="landingLine1"></div>
+    <div class="showcase-step-dot" data-step="2" onclick="showLandingStep(2)">3</div>
+    <div class="showcase-step-line" id="landingLine2"></div>
+    <div class="showcase-step-dot" data-step="3" onclick="showLandingStep(3)">4</div>
+    <div class="showcase-step-line" id="landingLine3"></div>
+    <div class="showcase-step-dot" data-step="4" onclick="showLandingStep(4)">5</div>
+  </div>
+
+  <!-- Step Labels -->
+  <div class="showcase-step-labels" id="landingShowcaseLabels">
+    <div class="showcase-step-label active">Ask</div>
+    <div class="showcase-step-label">Understand</div>
+    <div class="showcase-step-label">Build</div>
+    <div class="showcase-step-label">Preview</div>
+    <div class="showcase-step-label">Deploy</div>
+  </div>
+
+  <!-- Interactive Demo Card -->
+  <div id="landingShowcaseDemoCard" style="background:#0d1117; border:1px solid rgba(56,189,248,0.3); border-radius:16px; padding:24px; box-shadow:0 16px 50px rgba(0,0,0,0.8); margin:20px auto 28px; max-width:780px;">
+    <!-- Rendered dynamically by script -->
+  </div>
+
+  <!-- CTA Button -->
+  <div style="text-align:center; margin-top:20px;">
+    <a href="home.html?mode=code" class="btn-hero-primary" style="text-decoration:none; display:inline-flex; align-items:center; gap:8px;">
+      <span>💻</span> Try Code Architect Now →
+    </a>
   </div>
 </div>
 
@@ -2352,6 +2755,180 @@
       if (ghBtn) ghBtn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0112 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/></svg> Continue with GitHub';
     }
   }, false);
+
+  // ═══════════════════════════════════════════════════════════════════
+  // ── DYNAMIC FRONTIER MODEL SELECTION & OMNIBAR BINDING ──
+  // ═══════════════════════════════════════════════════════════════════
+  window.selectLandingModel = function(modelId) {
+    const sInp = document.getElementById('landingSearchInput');
+    if (sInp) {
+      sInp.focus();
+      sInp.placeholder = `Ask Cognisphere AI using ${modelId}…`;
+      const omni = document.querySelector('.landing-omnibar-box');
+      if (omni) {
+        omni.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        omni.style.borderColor = 'rgba(0, 255, 170, 0.9)';
+        setTimeout(() => { omni.style.borderColor = ''; }, 1200);
+      }
+    }
+  };
+
+  // ═══════════════════════════════════════════════════════════════════
+  // ── AUTO-SCROLLING PREMIUM PROJECT SHOWCASE CAROUSEL ──
+  // ═══════════════════════════════════════════════════════════════════
+  let _carouselCurrentIdx = 0;
+  const _carouselTotalCards = 5;
+  let _carouselAutoTimer = null;
+
+  function updateCarouselUI() {
+    const track = document.getElementById('carouselTrack');
+    const dots = document.querySelectorAll('.c-dot');
+    if (!track) return;
+
+    const isMobile = window.innerWidth <= 768;
+    const cardWidthPercent = isMobile ? 100 : 50;
+    const gapOffset = isMobile ? 0 : (_carouselCurrentIdx * 9);
+    track.style.transform = `translateX(-${_carouselCurrentIdx * cardWidthPercent}%)`;
+
+    dots.forEach((dot, idx) => {
+      dot.classList.toggle('active', idx === _carouselCurrentIdx);
+    });
+  }
+
+  window.goToCarouselSlide = function(idx) {
+    _carouselCurrentIdx = (idx + _carouselTotalCards) % _carouselTotalCards;
+    updateCarouselUI();
+  };
+
+  window.nextCarouselSlide = function() {
+    _carouselCurrentIdx = (_carouselCurrentIdx + 1) % _carouselTotalCards;
+    updateCarouselUI();
+  };
+
+  window.prevCarouselSlide = function() {
+    _carouselCurrentIdx = (_carouselCurrentIdx - 1 + _carouselTotalCards) % _carouselTotalCards;
+    updateCarouselUI();
+  };
+
+  function startCarouselAutoPlay() {
+    if (_carouselAutoTimer) clearInterval(_carouselAutoTimer);
+    _carouselAutoTimer = setInterval(() => {
+      nextCarouselSlide();
+    }, 3200);
+  }
+
+  function stopCarouselAutoPlay() {
+    if (_carouselAutoTimer) clearInterval(_carouselAutoTimer);
+  }
+
+  const vp = document.getElementById('carouselViewport');
+  if (vp) {
+    vp.addEventListener('mouseenter', stopCarouselAutoPlay);
+    vp.addEventListener('mouseleave', startCarouselAutoPlay);
+    vp.addEventListener('touchstart', stopCarouselAutoPlay, { passive: true });
+    vp.addEventListener('touchend', startCarouselAutoPlay, { passive: true });
+  }
+  startCarouselAutoPlay();
+
+  // ═══════════════════════════════════════════════════════════════════
+  // ── INTERACTIVE CODE ARCHITECT STEP DEMO ON LANDING ──
+  // ═══════════════════════════════════════════════════════════════════
+  const _landingStepData = [
+    {
+      step: 1,
+      title: "Step 1 — Describe Your Vision",
+      badge: "PROMPT SYNTHESIS",
+      content: `
+        <div style="font-family:'Inter',sans-serif; color:#94a3b8; font-size:0.85rem; margin-bottom:12px;">Type what you want in plain natural language — from SaaS dashboards to 3D portfolio websites.</div>
+        <div style="background:#161b22; border:1px solid rgba(255,255,255,0.1); border-radius:10px; padding:12px 14px; font-family:'JetBrains Mono',monospace; font-size:0.78rem; color:#f0f6fc;">
+          <span style="color:#00ffaa;">User:</span> "Build an interactive 3D solar system explorer with planetary physics, lighting controls, and clean glassmorphism UI."
+        </div>
+      `
+    },
+    {
+      step: 2,
+      title: "Step 2 — Decompose Architecture",
+      badge: "AUTONOMOUS REASONING",
+      content: `
+        <div style="font-family:'Inter',sans-serif; color:#94a3b8; font-size:0.85rem; margin-bottom:12px;">Cognisphere's frontier models decompose layout, modules, scripts, and responsive breakpoints.</div>
+        <div style="display:flex; flex-wrap:wrap; gap:8px;">
+          <span style="padding:4px 10px; border-radius:6px; background:rgba(0,255,170,0.1); border:1px solid rgba(0,255,170,0.25); color:#00ffaa; font-size:0.75rem; font-weight:600;">✔ Three.js 3D WebGL Canvas</span>
+          <span style="padding:4px 10px; border-radius:6px; background:rgba(56,189,248,0.1); border:1px solid rgba(56,189,248,0.25); color:#38bdf8; font-size:0.75rem; font-weight:600;">✔ Orbital Trajectory Math</span>
+          <span style="padding:4px 10px; border-radius:6px; background:rgba(217,119,87,0.1); border:1px solid rgba(217,119,87,0.25); color:#d97757; font-size:0.75rem; font-weight:600;">✔ Glassmorphism UI HUD</span>
+          <span style="padding:4px 10px; border-radius:6px; background:rgba(168,85,247,0.1); border:1px solid rgba(168,85,247,0.25); color:#c084fc; font-size:0.75rem; font-weight:600;">✔ Mobile Touch Orbit Controls</span>
+        </div>
+      `
+    },
+    {
+      step: 3,
+      title: "Step 3 — Multi-File Code Synthesis",
+      badge: "LIVE GENERATION",
+      content: `
+        <div style="font-family:'Inter',sans-serif; color:#94a3b8; font-size:0.85rem; margin-bottom:12px;">Generates clean production code with zero placeholders or missing functions.</div>
+        <div style="background:#050810; border:1px solid rgba(255,255,255,0.08); border-radius:10px; padding:12px; font-family:'JetBrains Mono',monospace; font-size:0.74rem; color:#cbd5e1; line-height:1.5;">
+          <span style="color:#ff7b72;">const</span> scene = <span style="color:#79c0ff;">new</span> THREE.Scene();<br>
+          <span style="color:#ff7b72;">const</span> sun = <span style="color:#79c0ff;">new</span> THREE.Mesh(geometry, sunMat);<br>
+          <span style="color:#7ee787;">animateOrbits</span>(); <span style="color:#8b949e;">// Real-time planetary rotation loop</span>
+        </div>
+      `
+    },
+    {
+      step: 4,
+      title: "Step 4 — Live Interactive Preview",
+      badge: "REAL-TIME SANDBOX",
+      content: `
+        <div style="font-family:'Inter',sans-serif; color:#94a3b8; font-size:0.85rem; margin-bottom:12px;">Preview in desktop, tablet, and mobile views directly in your browser with real-time hot reloading.</div>
+        <div style="background:#090d12; border:1px solid rgba(56,189,248,0.3); border-radius:10px; padding:14px; text-align:center;">
+          <span style="font-size:1.8rem; display:block; margin-bottom:6px;">🪐</span>
+          <span style="color:#38bdf8; font-weight:700; font-size:0.85rem;">Solar System 3D Sandbox Active (60 FPS)</span>
+        </div>
+      `
+    },
+    {
+      step: 5,
+      title: "Step 5 — 1-Click Download & Deploy",
+      badge: "PRODUCTION DEPLOY",
+      content: `
+        <div style="font-family:'Inter',sans-serif; color:#94a3b8; font-size:0.85rem; margin-bottom:14px;">One click to download complete code packages or deploy directly anywhere.</div>
+        <div style="display:flex; gap:10px; flex-wrap:wrap;">
+          <span style="padding:8px 16px; border-radius:8px; background:#161b22; border:1px solid rgba(255,255,255,0.15); color:#fff; font-size:0.8rem; font-weight:700;">▲ Vercel</span>
+          <span style="padding:8px 16px; border-radius:8px; background:#161b22; border:1px solid rgba(255,255,255,0.15); color:#fff; font-size:0.8rem; font-weight:700;">◆ Netlify</span>
+          <span style="padding:8px 16px; border-radius:8px; background:#161b22; border:1px solid rgba(255,255,255,0.15); color:#fff; font-size:0.8rem; font-weight:700;">⬡ GitHub Pages</span>
+          <span style="padding:8px 16px; border-radius:8px; background:rgba(0,255,170,0.15); border:1px solid rgba(0,255,170,0.35); color:#00ffaa; font-size:0.8rem; font-weight:700;">📥 Download ZIP</span>
+        </div>
+      `
+    }
+  ];
+
+  window.showLandingStep = function(stepIdx) {
+    const data = _landingStepData[stepIdx];
+    if (!data) return;
+
+    // Update dots & lines
+    for (let i = 0; i < 5; i++) {
+      const dot = document.querySelector(`.showcase-step-dot[data-step="${i}"]`);
+      if (dot) dot.classList.toggle('active', i === stepIdx);
+      const line = document.getElementById(`landingLine${i}`);
+      if (line) line.classList.toggle('active', i < stepIdx);
+    }
+    const labels = document.querySelectorAll('#landingShowcaseLabels .showcase-step-label');
+    labels.forEach((lbl, idx) => {
+      lbl.classList.toggle('active', idx === stepIdx);
+    });
+
+    const card = document.getElementById('landingShowcaseDemoCard');
+    if (card) {
+      card.innerHTML = `
+        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:12px;">
+          <h3 style="font-size:1.1rem; font-weight:700; color:#fff; margin:0;">${data.title}</h3>
+          <span style="font-family:'JetBrains Mono',monospace; font-size:0.68rem; font-weight:700; padding:3px 8px; border-radius:6px; background:rgba(217,119,87,0.15); border:1px solid rgba(217,119,87,0.35); color:#d97757;">${data.badge}</span>
+        </div>
+        ${data.content}
+      `;
+    }
+  };
+
+  showLandingStep(0);
 </script>
 </body>
 </html>
