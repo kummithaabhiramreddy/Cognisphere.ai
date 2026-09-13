@@ -8338,13 +8338,8 @@
       ` : '';
       const rawCodeEscaped = code.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 
-      // ── ALL code is rendered strictly in Code Cards with Line Numbers on Every Line ──
+      // ── Clean Code Card Rendering without line numbering in message card ──
       const cleanHighlighted = highlighted.replace(/\r\n/g, '\n').replace(/\r/g, '\n').replace(/\n+$/, '');
-      const rawLines = cleanHighlighted.split('\n');
-      const linesHTML = rawLines.map((lineContent, idx) => {
-        const lineNum = idx + 1;
-        return `<div class="code-line-row" style="display:flex;align-items:flex-start;min-height:1.6em;line-height:1.6;"><span class="code-line-num" style="user-select:none;-webkit-user-select:none;display:inline-block;min-width:38px;padding-right:14px;text-align:right;color:#4b5563;font-size:0.75rem;font-family:'JetBrains Mono',monospace;flex-shrink:0;border-right:1px solid #262c36;margin-right:14px;line-height:1.6;">${lineNum}</span><span class="code-line-content" style="flex:1;white-space:pre;word-break:normal;overflow-wrap:normal;line-height:1.6;">${lineContent || ' '}</span></div>\n`;
-      }).join('');
 
       return `<div class="code-card-wrap" style="margin:16px 0;border-radius:12px;background:#0d0d0d;border:1px solid #2d3139;overflow:hidden;width:100%;box-sizing:border-box;font-family:'Inter',sans-serif;box-shadow:0 8px 30px rgba(0,0,0,0.5);">
   <div style="display:flex;flex-direction:row;align-items:center;justify-content:space-between;padding:10px 16px;background:#161b22;border-bottom:1px solid #2d3139;flex-wrap:wrap;gap:8px;">
@@ -8358,7 +8353,7 @@
       </button>
     </div>
   </div>
-  <pre style="margin:0;padding:14px 16px;overflow-x:auto;overflow-y:visible;background:#0d0d0d;font-family:'JetBrains Mono',monospace;font-size:0.82rem;line-height:1.6;white-space:pre;word-break:normal;overflow-wrap:normal;scrollbar-width:thin;scrollbar-color:#3d444d #0d0d0d;"><code class="language-${validLang}" style="background:transparent;color:#e6edf3;font-family:inherit;font-size:inherit;display:block;">${linesHTML}</code></pre>
+  <pre style="margin:0;padding:14px 16px;overflow-x:auto;overflow-y:visible;background:#0d0d0d;font-family:'JetBrains Mono',monospace;font-size:0.84rem;line-height:1.6;white-space:pre;word-break:normal;overflow-wrap:normal;scrollbar-width:thin;scrollbar-color:#3d444d #0d0d0d;"><code class="language-${validLang}" style="background:transparent;color:#e6edf3;font-family:inherit;font-size:inherit;display:block;">${cleanHighlighted}</code></pre>
 </div>`;
     };
 
