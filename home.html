@@ -251,6 +251,10 @@
   #liveCodePreviewModal.open { opacity: 1 !important; pointer-events: auto !important; }
   #liveCodePreviewModal .cloud-preview-card { transform: scale(0.97); transition: transform 0.2s; }
   #liveCodePreviewModal.open .cloud-preview-card { transform: scale(1); }
+  #codeTerminalModal { position: fixed !important; inset: 0 !important; z-index: 10005 !important; display: none; align-items: center !important; justify-content: center !important; padding: 16px !important; background: rgba(0,0,0,0.85) !important; backdrop-filter: blur(10px) !important; opacity: 0; pointer-events: none; transition: opacity 0.2s ease, transform 0.2s ease; }
+  #codeTerminalModal.open { display: flex !important; opacity: 1 !important; pointer-events: auto !important; }
+  #codeTerminalModal .code-terminal-modal-card { transform: scale(0.97); transition: transform 0.2s ease; }
+  #codeTerminalModal.open .code-terminal-modal-card { transform: scale(1); }
   .download-card { width: 100%; max-width: 420px; background: var(--bg-lift); border: 1px solid var(--border-m); border-radius: 16px; padding: 22px; transform: scale(.96); transition: transform .2s; }
   .modal-overlay.open .download-card { transform: scale(1); }
   .download-card-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
@@ -2563,6 +2567,94 @@
    }
    .open-videos-page-btn:hover {
      background: rgba(217,119,87,0.2);
+   }
+
+   /* ====== CHAT CITATION PILL & RELATED SOURCE URL (ChatGPT Style) ====== */
+   .chat-citation-pill {
+     display: inline-flex;
+     align-items: center;
+     gap: 5px;
+     vertical-align: middle;
+     margin-left: 6px;
+     padding: 2px 8px 2px 5px;
+     background: rgba(255, 255, 255, 0.08);
+     border: 1px solid rgba(255, 255, 255, 0.16);
+     border-radius: 12px;
+     font-size: 0.74rem;
+     color: var(--text-secondary, #cbd5e1);
+     text-decoration: none;
+     cursor: pointer;
+     transition: all 0.15s ease;
+     user-select: none;
+     -webkit-user-select: none;
+     line-height: 1.4;
+   }
+   .chat-citation-pill:hover {
+     background: rgba(255, 255, 255, 0.16);
+     border-color: rgba(255, 255, 255, 0.3);
+     color: #ffffff;
+     transform: translateY(-1px);
+     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+   }
+   .citation-pill-icon {
+     width: 13px;
+     height: 13px;
+     border-radius: 3px;
+     object-fit: contain;
+     flex-shrink: 0;
+   }
+   .citation-pill-name {
+     font-weight: 500;
+     max-width: 140px;
+     overflow: hidden;
+     text-overflow: ellipsis;
+     white-space: nowrap;
+   }
+   .citation-pill-count {
+     font-weight: 600;
+     font-size: 0.7rem;
+     color: var(--gold, #f59e0b);
+     opacity: 0.9;
+   }
+   .chat-related-url-row {
+     margin-top: 10px;
+     margin-bottom: 12px;
+     display: flex;
+     flex-direction: column;
+     gap: 6px;
+   }
+   .chat-related-url-link {
+     display: inline-flex;
+     align-items: center;
+     gap: 5px;
+     color: var(--text-primary, #e2e8f0);
+     font-size: 0.96rem;
+     font-weight: 500;
+     text-decoration: none;
+     transition: color 0.15s ease;
+     cursor: pointer;
+     width: fit-content;
+   }
+   .chat-related-url-link u {
+     text-decoration: underline;
+     text-underline-offset: 4px;
+     text-decoration-style: dotted;
+     text-decoration-color: rgba(255, 255, 255, 0.4);
+     transition: text-decoration-color 0.15s ease;
+   }
+   .chat-related-url-link:hover u {
+     text-decoration-style: solid;
+     text-decoration-color: var(--gold, #f59e0b);
+     color: #ffffff;
+   }
+   .chat-related-url-link .url-arrow {
+     font-size: 0.88rem;
+     color: var(--text-muted, #94a3b8);
+     transition: transform 0.15s ease, color 0.15s ease;
+   }
+   .chat-related-url-link:hover .url-arrow {
+     color: var(--gold, #f59e0b);
+     transform: translate(1px, -1px);
    }
    /* ====== VIDEO PLAYER MODAL ====== */
   #videoModal{
@@ -6445,6 +6537,69 @@
   </div>
 </div>
 
+<!-- Dedicated Full-Screen Code Terminal & Compiler Modal on Screen -->
+<div class="modal-overlay" id="codeTerminalModal" style="position:fixed;inset:0;z-index:10005;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,0.85);backdrop-filter:blur(10px);padding:20px;">
+  <div class="code-terminal-modal-card" style="width:100%;max-width:1040px;height:86vh;background:#0d1117;border:1px solid rgba(56,189,248,0.35);border-radius:16px;box-shadow:0 24px 90px rgba(0,0,0,0.9);display:flex;flex-direction:column;overflow:hidden;">
+    <!-- Modal Header -->
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 18px;background:#161b22;border-bottom:1px solid #30363d;flex-shrink:0;">
+      <div style="display:flex;align-items:center;gap:12px;">
+        <div style="display:flex;gap:6px;">
+          <span style="display:inline-block;width:11px;height:11px;border-radius:50%;background:#ff5f56;"></span>
+          <span style="display:inline-block;width:11px;height:11px;border-radius:50%;background:#ffbd2e;"></span>
+          <span style="display:inline-block;width:11px;height:11px;border-radius:50%;background:#27c93f;"></span>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span style="font-family:'JetBrains Mono',monospace;font-weight:700;font-size:0.9rem;color:#38bdf8;">&gt;_</span>
+          <span id="modalTerminalTitle" style="font-family:'Inter',sans-serif;font-weight:700;font-size:0.92rem;color:#f0f6fc;">Interactive Code Terminal &amp; Compiler</span>
+          <span id="modalTerminalLangBadge" style="padding:2px 8px;border-radius:6px;background:rgba(56,189,248,0.15);border:1px solid rgba(56,189,248,0.3);color:#38bdf8;font-family:'JetBrains Mono',monospace;font-size:0.72rem;font-weight:700;">CODE</span>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;">
+        <span id="modalTerminalStatus" style="font-family:'Inter',sans-serif;font-size:0.75rem;padding:3px 10px;border-radius:6px;background:rgba(0,255,170,0.12);color:#00ffaa;border:1px solid rgba(0,255,170,0.25);">⚡ Ready</span>
+        <button type="button" id="modalCompileBtn" onclick="compileModalTerminalCode()" style="all:unset;box-sizing:border-box;display:inline-flex;align-items:center;gap:6px;cursor:pointer;background:#21262d;border:1px solid #30363d;color:#c9d1d9;font-family:'Inter',sans-serif;font-size:0.78rem;font-weight:600;padding:6px 13px;border-radius:6px;transition:all 0.15s;" onmouseover="this.style.background='#30363d';" onmouseout="this.style.background='#21262d';">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+          <span>Compile</span>
+        </button>
+        <button type="button" id="modalRunBtn" onclick="runModalTerminalCode()" style="all:unset;box-sizing:border-box;display:inline-flex;align-items:center;gap:6px;cursor:pointer;background:linear-gradient(135deg,#059669,#10b981);border:1px solid #34d399;color:#fff;font-family:'Inter',sans-serif;font-size:0.78rem;font-weight:700;padding:6px 16px;border-radius:6px;box-shadow:0 0 14px rgba(16,185,129,0.35);transition:all 0.15s;" onmouseover="this.style.opacity='0.9';" onmouseout="this.style.opacity='1';">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+          <span>Run</span>
+        </button>
+        <button type="button" onclick="closeCodeTerminalModal()" style="all:unset;box-sizing:border-box;cursor:pointer;color:#8b949e;font-size:1.15rem;padding:4px 8px;border-radius:6px;transition:all 0.15s;" title="Close Window" onmouseover="this.style.color='#f87171';" onmouseout="this.style.color='#8b949e';">✕</button>
+      </div>
+    </div>
+    <!-- Modal Split Body -->
+    <div style="display:grid;grid-template-columns:1.15fr 0.85fr;flex:1;min-height:0;overflow:hidden;">
+      <!-- Left: Editor Pane -->
+      <div style="display:flex;flex-direction:column;border-right:1px solid #30363d;background:#0d1117;min-height:0;">
+        <div style="padding:8px 14px;background:#161b22;border-bottom:1px solid #21262d;display:flex;align-items:center;justify-content:space-between;font-size:0.72rem;color:#8b949e;font-family:'JetBrains Mono',monospace;">
+          <span>📝 Source Code (Live Editable in Workspace)</span>
+          <span id="modalEditorStats">UTF-8</span>
+        </div>
+        <div style="flex:1;display:flex;background:#050810;min-height:0;overflow:hidden;position:relative;">
+          <div id="modalGutter" style="user-select:none;-webkit-user-select:none;padding:12px 8px 12px 10px;text-align:right;color:#475569;font-family:'JetBrains Mono',monospace;font-size:0.78rem;line-height:1.6;background:#030508;border-right:1px solid rgba(255,255,255,0.06);white-space:pre;overflow:hidden;min-width:38px;"></div>
+          <textarea id="modalCodeEditor" spellcheck="false" oninput="syncModalEditorGutter()" onscroll="syncModalEditorScroll()" style="flex:1;background:transparent;border:none;outline:none;padding:12px 14px;color:#e6edf3;font-family:'JetBrains Mono',monospace;font-size:0.78rem;line-height:1.6;resize:none;overflow:auto;white-space:pre;tab-size:4;"></textarea>
+        </div>
+        <!-- Stdin input bar -->
+        <div style="padding:8px 14px;background:#161b22;border-top:1px solid #21262d;display:flex;align-items:center;gap:8px;">
+          <span style="font-size:0.72rem;color:#38bdf8;font-family:'JetBrains Mono',monospace;white-space:nowrap;font-weight:600;">Input (stdin):</span>
+          <input type="text" id="modalStdinInput" placeholder="Optional input arguments or lines (e.g. for scanf / cin / input())..." onkeydown="if(event.key==='Enter') runModalTerminalCode()" style="flex:1;background:#0d1117;border:1px solid #30363d;border-radius:6px;padding:5px 10px;font-size:0.75rem;color:#f0f6fc;font-family:'JetBrains Mono',monospace;outline:none;" />
+        </div>
+      </div>
+      <!-- Right: Terminal Console Output -->
+      <div style="display:flex;flex-direction:column;background:#090d12;min-height:0;">
+        <div style="padding:8px 14px;background:#161b22;border-bottom:1px solid #21262d;display:flex;align-items:center;justify-content:space-between;font-size:0.72rem;color:#8b949e;font-family:'JetBrains Mono',monospace;">
+          <div style="display:flex;align-items:center;gap:6px;">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.5"><polyline points="4 17 10 11 4 5"></polyline><line x1="12" y1="19" x2="20" y2="19"></line></svg>
+            <span style="color:#c9d1d9;font-weight:600;">Interactive Terminal Console</span>
+          </div>
+          <button type="button" onclick="clearModalTerminalOutput()" style="all:unset;cursor:pointer;color:#8b949e;font-size:0.7rem;padding:3px 8px;border-radius:4px;border:1px solid rgba(255,255,255,0.1);" onmouseover="this.style.color='#f0f6fc';this.style.borderColor='rgba(255,255,255,0.3)';" onmouseout="this.style.color='#8b949e';this.style.borderColor='rgba(255,255,255,0.1)';">Clear Output</button>
+        </div>
+        <pre id="modalTerminalOutput" style="flex:1;margin:0;padding:16px;background:#050810;color:#e2e8f0;font-family:'JetBrains Mono',monospace;font-size:0.8rem;line-height:1.55;overflow:auto;white-space:pre-wrap;word-break:break-all;"></pre>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- Image / video / file preview modal -->
 <div class="modal-overlay" id="mediaModal">
   <div class="download-card" id="mediaModalCard" style="max-width:560px; padding:0; overflow:hidden;">
@@ -6762,9 +6917,9 @@
   const LOGO_SVG = COGNISPHERE_LOGO_SVG;
 
   // ---------- Conversation data (no static/fake seed data — starts empty) ----------
-  // ── CONVERSATION PERSISTENCE (like ChatGPT/Claude) ──────────────────────────────────────────
+  // ── CONVERSATION PERSISTENCE (like ChatGPT/Claude with Full Length & IndexedDB backup) ──
   const MAX_STORED_CONVS = 120;      // keep last 120 conversations
-  const MAX_MSG_TEXT_LEN = 15000;    // trim huge AI responses before storing
+  const MAX_MSG_TEXT_LEN = 100000;   // keep up to 100,000 characters without truncation
 
   function getConvStorageKey() {
     try {
@@ -6776,22 +6931,48 @@
     }
   }
 
+  function saveToIDB(convs) {
+    if (!window.indexedDB) return;
+    try {
+      const req = indexedDB.open('cognisphere_db', 1);
+      req.onupgradeneeded = (e) => {
+        const db = e.target.result;
+        if (!db.objectStoreNames.contains('convs')) {
+          db.createObjectStore('convs', { keyPath: 'id' });
+        }
+      };
+      req.onsuccess = (e) => {
+        const db = e.target.result;
+        if (!db.objectStoreNames.contains('convs')) return;
+        const tx = db.transaction('convs', 'readwrite');
+        const store = tx.objectStore('convs');
+        (convs || []).forEach(c => {
+          try { store.put(c); } catch(err) {}
+        });
+      };
+    } catch(e) {}
+  }
+
   function saveConversations() {
     try {
       if (currentConversationId) {
         localStorage.setItem('cognisphere_active_conv_id', currentConversationId);
       }
-      // Strip blobs / large base64 before persisting to avoid quota errors
-      const toStore = conversations.slice(-MAX_STORED_CONVS).map(conv => ({
+      // Strip oversized blobs/base64 (> 50KB) before saving to localStorage to prevent quota errors
+      // Keep newest conversations (at index 0+)
+      const toStore = conversations.slice(0, MAX_STORED_CONVS).map(conv => ({
         ...conv,
+        createdAt: conv.createdAt || Date.now(),
         messages: (conv.messages || []).map(m => ({
           id: m.id, role: m.role, query: m.query, tool: m.tool,
-          isHtml: m.isHtml,
+          model: m.model || undefined,
+          isHtml: Boolean(m.isHtml),
+          rawMarkdown: m.rawMarkdown || undefined,
+          _webSourcesHtml: m._webSourcesHtml || undefined,
           text: (m.text || '').length > MAX_MSG_TEXT_LEN
-            ? (m.text || '').slice(0, MAX_MSG_TEXT_LEN) + '\n\n[...truncated...]'
+            ? (m.text || '').slice(0, MAX_MSG_TEXT_LEN)
             : (m.text || ''),
-          sources: m.sources ? m.sources.slice(0, 6) : null,
-          // Persist attachments with image metadata & base64 preview data
+          sources: m.sources ? m.sources.slice(0, 8) : null,
           attachments: (m.attachments || []).map(a => ({
             label: a.label,
             kind: a.kind,
@@ -6800,23 +6981,33 @@
             isVideo: Boolean(a.isVideo),
             isPdf: Boolean(a.isPdf),
             mimeType: a.mimeType || (a.file ? a.file.type : undefined),
-            dataUrl: (a.dataUrl && a.dataUrl.length < 600000) ? a.dataUrl : (a.url && a.url.startsWith('data:') ? a.url : undefined),
+            dataUrl: (a.dataUrl && a.dataUrl.length < 50000) ? a.dataUrl : (a.url && a.url.startsWith('data:') && a.url.length < 50000 ? a.url : undefined),
             textContent: (a.textContent && a.textContent.length < 4096) ? a.textContent : undefined,
           }))
         }))
       }));
       localStorage.setItem(getConvStorageKey(), JSON.stringify(toStore));
+      saveToIDB(conversations);
     } catch(e) {
-      // Quota exceeded — trim older conversations and retry
+      // Quota exceeded in localStorage — keep newest 25 conversations with full message text
       try {
-        const trimmed = conversations.slice(-30).map(c => ({
-          ...c, messages: (c.messages || []).slice(-20).map(m => ({
-            id: m.id, role: m.role, query: m.query, isHtml: m.isHtml,
-            text: (m.text || '').slice(0, 3000)
+        const trimmed = conversations.slice(0, 25).map(c => ({
+          ...c,
+          createdAt: c.createdAt || Date.now(),
+          messages: (c.messages || []).slice(-20).map(m => ({
+            id: m.id, role: m.role, query: m.query,
+            model: m.model || undefined,
+            isHtml: Boolean(m.isHtml),
+            rawMarkdown: m.rawMarkdown || undefined,
+            _webSourcesHtml: m._webSourcesHtml || undefined,
+            text: (m.text || '').slice(0, 40000)
           }))
         }));
         localStorage.setItem(getConvStorageKey(), JSON.stringify(trimmed));
-      } catch(e2) { /* silently fail */ }
+        saveToIDB(conversations);
+      } catch(e2) {
+        saveToIDB(conversations);
+      }
     }
   }
 
@@ -6826,17 +7017,61 @@
       if (!raw) return [];
       const parsed = JSON.parse(raw);
       if (!Array.isArray(parsed)) return [];
-      // Restore conversations — mark them as loaded from storage
       return parsed.map(c => ({
         ...c,
         fromStorage: true,
         messages: (c.messages || []).map(m => ({
           ...m,
-          pending: false, status: null  // never restore pending state
+          pending: false, status: null
         }))
       }));
     } catch(e) { return []; }
   }
+
+  function restoreFromIDB() {
+    if (!window.indexedDB) return;
+    try {
+      const req = indexedDB.open('cognisphere_db', 1);
+      req.onsuccess = (e) => {
+        const db = e.target.result;
+        if (!db.objectStoreNames.contains('convs')) return;
+        const tx = db.transaction('convs', 'readonly');
+        const store = tx.objectStore('convs');
+        const getAll = store.getAll();
+        getAll.onsuccess = () => {
+          const idbConvs = getAll.result || [];
+          if (idbConvs.length > 0) {
+            let changed = false;
+            idbConvs.forEach(ic => {
+              const localIdx = conversations.findIndex(c => c.id === ic.id);
+              if (localIdx === -1) {
+                conversations.push(ic);
+                changed = true;
+              } else if (ic.messages && ic.messages.length >= (conversations[localIdx].messages || []).length) {
+                const idbLen = ic.messages.reduce((sum, m) => sum + (m.text || '').length, 0);
+                const locLen = (conversations[localIdx].messages || []).reduce((sum, m) => sum + (m.text || '').length, 0);
+                if (idbLen > locLen) {
+                  conversations[localIdx] = ic;
+                  changed = true;
+                }
+              }
+            });
+            if (changed) {
+              renderHistory();
+              const current = conversations.find(c => c.id === currentConversationId);
+              if (current) {
+                renderThread(current);
+                setTimeout(() => {
+                  window.scrollTo({ top: document.body.scrollHeight, behavior: 'auto' });
+                }, 80);
+              }
+            }
+          }
+        };
+      };
+    } catch(e) {}
+  }
+  setTimeout(restoreFromIDB, 300);
 
   let conversations = loadConversations(); // { id, title, messages, createdAt }
   let currentConversationId = null;
@@ -7402,7 +7637,9 @@
     }
   }
 
-  setTimeout(applyModelUI, 60);
+  setTimeout(applyModelUI, 30);
+  window.addEventListener('DOMContentLoaded', applyModelUI);
+  window.addEventListener('load', applyModelUI);
 
   const modeLabels = {
     standard: 'Main Agent',
@@ -7484,11 +7721,9 @@
 
   function applyAppModeUI() {
     const promptInput = document.getElementById('askInput');
-    const labelSpan = document.getElementById('currentModeLabel');
 
-    if (labelSpan) {
-      labelSpan.textContent = modeLabels[currentAppMode] || 'Main Agent';
-    }
+    // Keep model selector UI permanently in sync with active Cognisphere model across refreshes
+    applyModelUI();
 
     document.querySelectorAll('.mode-card-item').forEach(item => {
       const m = item.getAttribute('data-mode');
@@ -7633,6 +7868,226 @@
     }
   };
 
+  // ── DEDICATED CODE TERMINAL & COMPILER WORKSPACE MODAL (On Screen) ──
+  function syncModalEditorGutter() {
+    const editor = document.getElementById('modalCodeEditor');
+    const gutter = document.getElementById('modalGutter');
+    if (!editor || !gutter) return;
+    const lineCount = (editor.value.split('\n')).length;
+    gutter.textContent = Array.from({ length: lineCount }, (_, i) => i + 1).join('\n');
+  }
+  window.syncModalEditorGutter = syncModalEditorGutter;
+
+  function syncModalEditorScroll() {
+    const editor = document.getElementById('modalCodeEditor');
+    const gutter = document.getElementById('modalGutter');
+    if (editor && gutter) gutter.scrollTop = editor.scrollTop;
+  }
+  window.syncModalEditorScroll = syncModalEditorScroll;
+
+  window.openCodeTerminalModal = function(encodedCode, lang) {
+    const modal = document.getElementById('codeTerminalModal');
+    if (!modal) return;
+    let code = '';
+    try {
+      code = decodeURIComponent(encodedCode || '');
+    } catch(e) {
+      code = encodedCode || '';
+    }
+    const cleanLang = (lang || 'python').toLowerCase();
+    
+    const titleEl = document.getElementById('modalTerminalTitle');
+    const badgeEl = document.getElementById('modalTerminalLangBadge');
+    const statusEl = document.getElementById('modalTerminalStatus');
+    const editorEl = document.getElementById('modalCodeEditor');
+    const termOut = document.getElementById('modalTerminalOutput');
+    const stdinEl = document.getElementById('modalStdinInput');
+
+    if (titleEl) titleEl.textContent = `${cleanLang.toUpperCase()} Terminal & Compiler`;
+    if (badgeEl) badgeEl.textContent = cleanLang.toUpperCase();
+    if (statusEl) {
+      statusEl.textContent = '⚡ Ready';
+      statusEl.style.color = '#00ffaa';
+      statusEl.style.borderColor = 'rgba(0,255,170,0.25)';
+      statusEl.style.background = 'rgba(0,255,170,0.12)';
+    }
+    if (editorEl) editorEl.value = code;
+    if (stdinEl) stdinEl.value = '';
+    modal._currentLang = cleanLang;
+
+    syncModalEditorGutter();
+
+    const compCmd = cleanLang === 'c' ? 'gcc main.c -o main && ./main' :
+                    (cleanLang === 'cpp' || cleanLang === 'c++' ? 'g++ main.cpp -o main && ./main' :
+                    (cleanLang === 'python' || cleanLang === 'py' ? 'python3 main.py' :
+                    (cleanLang === 'java' ? 'javac Main.java && java Main' : `node index.js`)));
+    if (termOut) {
+      termOut.innerHTML = `<span style="color:#38bdf8;">$ ${compCmd}</span>\n<span style="color:#64748b;">[Terminal Ready] Press 'Run' to execute or 'Compile' to check syntax.</span>`;
+    }
+
+    modal.classList.add('open');
+    modal.style.display = 'flex';
+    modal.style.opacity = '1';
+    modal.style.pointerEvents = 'auto';
+    document.body.style.overflow = 'hidden';
+
+    // Auto-run on initial open so user sees output right away
+    setTimeout(() => {
+      window.runModalTerminalCode();
+    }, 150);
+  };
+
+  window.closeCodeTerminalModal = function() {
+    const modal = document.getElementById('codeTerminalModal');
+    if (modal) {
+      modal.classList.remove('open');
+      modal.style.display = 'none';
+      modal.style.opacity = '';
+      modal.style.pointerEvents = '';
+    }
+    document.body.style.overflow = '';
+  };
+
+  window.runModalTerminalCode = async function() {
+    const modal = document.getElementById('codeTerminalModal');
+    const editor = document.getElementById('modalCodeEditor');
+    const stdinEl = document.getElementById('modalStdinInput');
+    const termOut = document.getElementById('modalTerminalOutput');
+    const statusBadge = document.getElementById('modalTerminalStatus');
+    const runBtn = document.getElementById('modalRunBtn');
+    if (!editor || !termOut) return;
+
+    const code = editor.value;
+    const lang = (modal && modal._currentLang) ? modal._currentLang : 'python';
+    const stdin = stdinEl ? stdinEl.value : '';
+
+    if (runBtn) {
+      runBtn.disabled = true;
+      runBtn.innerHTML = '<span style="animation:spin 1s linear infinite;display:inline-block;">⚡</span><span>Running…</span>';
+    }
+    if (statusBadge) {
+      statusBadge.textContent = '⏳ Executing…';
+      statusBadge.style.color = '#38bdf8';
+    }
+
+    const compCmd = lang === 'c' ? 'gcc main.c -o main && ./main' :
+                    (lang === 'cpp' || lang === 'c++' ? 'g++ main.cpp -o main && ./main' :
+                    (lang === 'python' || lang === 'py' ? 'python3 main.py' :
+                    (lang === 'java' ? 'javac Main.java && java Main' : `node index.js`)));
+
+    termOut.innerHTML = `<span style="color:#38bdf8;">$ ${compCmd}</span>\n<span style="color:#94a3b8;">[Compiler]: Spawning environment and executing code...</span>\n`;
+
+    try {
+      const data = await executeCodeUniversal('run', code, lang, stdin);
+      const isSuccess = data.success !== false;
+
+      if (statusBadge) {
+        statusBadge.textContent = isSuccess ? '✔ Completed' : '✖ Error';
+        statusBadge.style.color = isSuccess ? '#00ffaa' : '#f87171';
+      }
+
+      termOut.innerHTML = `<span style="color:#38bdf8;">$ ${compCmd}</span>\n` +
+        `<span style="color:${isSuccess ? '#4ade80' : '#f87171'};font-weight:600;">${escapeHtml(data.output || '')}</span>\n\n` +
+        `<span style="color:#64748b;font-size:0.72rem;">[Process completed in ${data.time || '14ms'} with exit code ${data.exitCode ?? (isSuccess ? 0 : 1)} (${data.platform || 'Engine'})]</span>`;
+    } catch(err) {
+      if (statusBadge) {
+        statusBadge.textContent = '✖ Failed';
+        statusBadge.style.color = '#f87171';
+      }
+      termOut.innerHTML += `\n<span style="color:#f87171;">✖ Execution Exception: ${escapeHtml(err.message)}</span>`;
+    } finally {
+      if (runBtn) {
+        runBtn.disabled = false;
+        runBtn.innerHTML = '<svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg><span>Run</span>';
+      }
+      termOut.scrollTop = termOut.scrollHeight;
+    }
+  };
+
+  window.compileModalTerminalCode = async function() {
+    const modal = document.getElementById('codeTerminalModal');
+    const editor = document.getElementById('modalCodeEditor');
+    const termOut = document.getElementById('modalTerminalOutput');
+    const statusBadge = document.getElementById('modalTerminalStatus');
+    const compileBtn = document.getElementById('modalCompileBtn');
+    if (!editor || !termOut) return;
+
+    const code = editor.value;
+    const lang = (modal && modal._currentLang) ? modal._currentLang : 'c';
+
+    if (compileBtn) {
+      compileBtn.disabled = true;
+      compileBtn.innerHTML = '<span>⚡ Compiling…</span>';
+    }
+    if (statusBadge) {
+      statusBadge.textContent = '⚡ Compiling…';
+      statusBadge.style.color = '#38bdf8';
+    }
+
+    const compCmd = lang === 'c' ? 'gcc -Wall -O2 main.c -o main' :
+                    (lang === 'cpp' || lang === 'c++' ? 'g++ -Wall -O2 main.cpp -o main' :
+                    (lang === 'python' || lang === 'py' ? 'python3 -m py_compile main.py' : `node --check index.js`));
+
+    termOut.innerHTML = `<span style="color:#38bdf8;">$ ${compCmd}</span>\n<span style="color:#94a3b8;">[Compiler]: Parsing AST and verifying syntax...</span>\n`;
+
+    try {
+      const data = await executeCodeUniversal('compile', code, lang, '');
+      const isSuccess = data.success !== false;
+
+      if (statusBadge) {
+        statusBadge.textContent = isSuccess ? '✔ 0 Errors' : '✖ Build Failed';
+        statusBadge.style.color = isSuccess ? '#00ffaa' : '#f87171';
+      }
+
+      termOut.innerHTML = `<span style="color:#38bdf8;">$ ${compCmd}</span>\n` +
+        `<span style="color:${isSuccess ? '#34d399' : '#f87171'};font-weight:600;">${escapeHtml(data.output || '')}</span>\n\n` +
+        `<span style="color:${isSuccess ? '#00ffaa' : '#ff5555'};font-size:0.72rem;">[Build Status: ${isSuccess ? '0 Errors, 0 Warnings (Exit code 0)' : 'Failed with errors'}]</span>`;
+    } catch(err) {
+      if (statusBadge) {
+        statusBadge.textContent = '✖ Error';
+        statusBadge.style.color = '#f87171';
+      }
+      termOut.innerHTML += `\n<span style="color:#f87171;">✖ Compilation Error: ${escapeHtml(err.message)}</span>`;
+    } finally {
+      if (compileBtn) {
+        compileBtn.disabled = false;
+        compileBtn.innerHTML = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg><span>Compile</span>';
+      }
+      termOut.scrollTop = termOut.scrollHeight;
+    }
+  };
+
+  window.clearModalTerminalOutput = function() {
+    const termOut = document.getElementById('modalTerminalOutput');
+    if (termOut) termOut.innerHTML = '<span style="color:#64748b;">[Terminal Output Cleared]</span>';
+  };
+
+  // Delegated click listener for all Terminal buttons across the entire page (handles nested spans/icons flawlessly)
+  document.addEventListener('click', function(e) {
+    const btn = e.target.closest('.live-compiler-toggle-btn');
+    if (btn) {
+      e.preventDefault();
+      e.stopPropagation();
+      const code = btn.getAttribute('data-code') || '';
+      const lang = btn.getAttribute('data-lang') || 'c';
+      if (typeof window.openCodeTerminalModal === 'function') {
+        window.openCodeTerminalModal(code, lang);
+      }
+    }
+  });
+
+  // Close modal when clicking dark backdrop or ESC key
+  document.addEventListener('click', function(e) {
+    const modal = document.getElementById('codeTerminalModal');
+    if (modal && e.target === modal) closeCodeTerminalModal();
+  });
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+      const modal = document.getElementById('codeTerminalModal');
+      if (modal && (modal.style.display === 'flex' || modal.classList.contains('open'))) closeCodeTerminalModal();
+    }
+  });
+
   // ---------- Format Code Block Header with Program Name & DS Classification ----------
   function formatCodeBlockHeader(lang, code) {
     const icon = lang === 'python' ? '🐍' : lang === 'html' || lang === 'markup' ? '🌐' : lang === 'css' ? '🎨' : lang === 'javascript' || lang === 'js' ? '📜' : lang === 'cpp' ? '⚡' : lang === 'java' ? '☕' : '💻';
@@ -7731,7 +8186,7 @@
       const url = (href || '').trim();
       const label = (text || title || url).trim();
       if (!url) return label;
-      return `<a href="${url}" target="_blank" rel="noopener noreferrer" class="custom-url-chip" style="display:inline-flex;align-items:center;gap:5px;background:rgba(217,119,87,0.12);border:1px solid rgba(217,119,87,0.3);color:#e88868;padding:3px 10px;border-radius:8px;font-size:0.85rem;font-weight:500;text-decoration:none;transition:all 0.15s ease;" onmouseover="this.style.background='rgba(217,119,87,0.22)';" onmouseout="this.style.background='rgba(217,119,87,0.12)';">🔗 ${label} ↗</a>`;
+      return `<a href="${url}" target="_blank" rel="noopener noreferrer" class="chat-related-url-link" style="margin:2px 0;"><u>${escapeHtml(label)}</u> <span class="url-arrow">↗</span></a>`;
     };
     renderer.code = function(code, language) {
       // Handle both marked v4 (code, language) and v5+ (token object) calling convention
@@ -7764,14 +8219,13 @@
                 </button>
               </div>
             </div>
-            <div class="diagram-card-body" id="${uniqId}-body" style="padding:20px 16px;min-height:100px;background:#0d0d0d;">
-              <div id="${uniqId}" class="mermaid" style="display:none;">${code}</div>
-              <div id="${uniqId}-render" style="width:100%;text-align:center;overflow-x:auto;"></div>
+            <div class="diagram-card-body" id="${uniqId}" style="padding:16px;background:#050810;overflow:auto;display:flex;justify-content:center;">
+              <pre class="mermaid" style="background:transparent;margin:0;">${colorizeMermaidCode(code)}</pre>
             </div>
           </div>
         `;
       }
-      
+
       const validLang = (language && Prism.languages[language]) ? language : 'clike';
       let highlighted = '';
       try {
@@ -7794,7 +8248,6 @@
         const cleanExample = trimmedCode;
         const encodedExample = encodeURIComponent(cleanExample);
 
-        // Render line-by-line: INPUT/OUTPUT/EXPLANATION as pill rows, others as plain text
         const exLines = cleanExample.split('\n');
         let bodyHTML = '';
         for (const rawLine of exLines) {
@@ -7822,7 +8275,7 @@
           <div class="example-card-wrap">
             <div class="example-card-header">
               <div class="example-card-title">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15" style="color:#a78bfa;flex-shrink:0;">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14">
                   <circle cx="12" cy="12" r="10"></circle>
                   <line x1="12" y1="8" x2="12" y2="12"></line>
                   <line x1="12" y1="16" x2="12.01" y2="16"></line>
@@ -7874,24 +8327,24 @@
 
       const blockId = 'cb-' + Math.random().toString(36).slice(2, 9);
       const isRunnable = !isMermaidDiagram && !isExampleBlock && !isOutputBlock && (hasCodeKeywords || ['c','cpp','c++','python','py','javascript','js','java','go','rust','ruby','php','bash','sh'].includes(validLang));
+      const safeCodeAttr = encodeURIComponent(code).replace(/'/g, '%27');
 
       const compilerBtnHTML = isRunnable ? `
-        <button type="button" class="live-compiler-toggle-btn" id="comp-btn-${blockId}" onclick="toggleInlineCompiler('${blockId}', '${validLang}')" title="Click to open Terminal in this card">
-          <span style="font-family:'JetBrains Mono',monospace;font-weight:700;font-size:0.8rem;color:#38bdf8;">&gt;_</span>
-          <span>Terminal</span>
-          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="margin-left:2px;"><polyline points="6 9 12 15 18 9"></polyline></svg>
+        <button type="button" class="live-compiler-toggle-btn" id="comp-btn-${blockId}" data-code="${safeCodeAttr}" data-lang="${validLang}" onclick="openCodeTerminalModal(this.getAttribute('data-code'), this.getAttribute('data-lang'))" title="Click to open Code Terminal on screen">
+          <span style="font-family:'JetBrains Mono',monospace;font-weight:700;font-size:0.8rem;color:#38bdf8;pointer-events:none;">&gt;_</span>
+          <span style="pointer-events:none;">Terminal</span>
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="margin-left:2px;pointer-events:none;"><polyline points="6 9 12 15 18 9"></polyline></svg>
         </button>
       ` : '';
       const rawCodeEscaped = code.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 
       // ── ALL code is rendered strictly in Code Cards with Line Numbers on Every Line ──
-      const rawLines = highlighted.split('\n');
+      const cleanHighlighted = highlighted.replace(/\r\n/g, '\n').replace(/\r/g, '\n').replace(/\n+$/, '');
+      const rawLines = cleanHighlighted.split('\n');
       const linesHTML = rawLines.map((lineContent, idx) => {
         const lineNum = idx + 1;
-        return `<div class="code-line-row" style="display:flex;align-items:flex-start;min-height:1.6em;line-height:1.6;"><span class="code-line-num" style="user-select:none;-webkit-user-select:none;display:inline-block;min-width:38px;padding-right:14px;text-align:right;color:#4b5563;font-size:0.75rem;font-family:'JetBrains Mono',monospace;flex-shrink:0;border-right:1px solid #262c36;margin-right:14px;line-height:1.6;">${lineNum}</span><span class="code-line-content" style="flex:1;white-space:pre;word-break:normal;overflow-wrap:normal;line-height:1.6;">${lineContent || ' '}</span></div>`;
+        return `<div class="code-line-row" style="display:flex;align-items:flex-start;min-height:1.6em;line-height:1.6;"><span class="code-line-num" style="user-select:none;-webkit-user-select:none;display:inline-block;min-width:38px;padding-right:14px;text-align:right;color:#4b5563;font-size:0.75rem;font-family:'JetBrains Mono',monospace;flex-shrink:0;border-right:1px solid #262c36;margin-right:14px;line-height:1.6;">${lineNum}</span><span class="code-line-content" style="flex:1;white-space:pre;word-break:normal;overflow-wrap:normal;line-height:1.6;">${lineContent || ' '}</span></div>\n`;
       }).join('');
-
-      const initialEditorGutter = code.split('\n').map((_, i) => i + 1).join('\n');
 
       return `<div class="code-card-wrap" style="margin:16px 0;border-radius:12px;background:#0d0d0d;border:1px solid #2d3139;overflow:hidden;width:100%;box-sizing:border-box;font-family:'Inter',sans-serif;box-shadow:0 8px 30px rgba(0,0,0,0.5);">
   <div style="display:flex;flex-direction:row;align-items:center;justify-content:space-between;padding:10px 16px;background:#161b22;border-bottom:1px solid #2d3139;flex-wrap:wrap;gap:8px;">
@@ -7899,67 +8352,14 @@
     <div style="display:flex;align-items:center;gap:8px;">
       ${previewBtnHTML}
       ${compilerBtnHTML}
-      <button onclick="copyFileCard(this,'${encodedCode}')" title="Copy" style="all:unset;box-sizing:border-box;display:inline-flex;align-items:center;gap:5px;cursor:pointer;color:#8b949e;font-size:0.75rem;font-weight:500;font-family:'Inter',sans-serif;padding:3px 8px;border-radius:6px;border:1px solid #30363d;background:#21262d;transition:color 0.15s;">
+      <button onclick="copyFileCard(this,'${safeCodeAttr}')" title="Copy" style="all:unset;box-sizing:border-box;display:inline-flex;align-items:center;gap:5px;cursor:pointer;color:#8b949e;font-size:0.75rem;font-weight:500;font-family:'Inter',sans-serif;padding:3px 8px;border-radius:6px;border:1px solid #30363d;background:#21262d;transition:color 0.15s;">
         <span style="white-space:nowrap;font-size:0.75rem;">Copy</span>
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:12px;height:12px;flex-shrink:0;"><rect x="9" y="9" width="13" height="13" rx="2"></rect><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"></path></svg>
       </button>
     </div>
   </div>
   <pre style="margin:0;padding:14px 16px;overflow-x:auto;overflow-y:visible;background:#0d0d0d;font-family:'JetBrains Mono',monospace;font-size:0.82rem;line-height:1.6;white-space:pre;word-break:normal;overflow-wrap:normal;scrollbar-width:thin;scrollbar-color:#3d444d #0d0d0d;"><code class="language-${validLang}" style="background:transparent;color:#e6edf3;font-family:inherit;font-size:inherit;display:block;">${linesHTML}</code></pre>
-
-  <!-- INLINE LIVE TERMINAL & COMPILER WORKBENCH (COLLAPSIBLE - IN SAME CARD) -->
-  <div class="inline-live-compiler-wrap" id="inline-compiler-${blockId}" style="display: none;">
-    <div class="inline-compiler-top-bar">
-      <div class="inline-compiler-dots">
-        <span style="color:#ff5f56;font-size:0.85rem;">●</span><span style="color:#ffbd2e;font-size:0.85rem;">●</span><span style="color:#27c93f;font-size:0.85rem;">●</span>
-        <span style="margin-left:6px;font-weight:700;color:#e2e8f0;letter-spacing:0.04em;">&gt;_ ${validLang.toUpperCase()} TERMINAL &amp; COMPILER</span>
-      </div>
-      <div style="display:flex;align-items:center;gap:8px;">
-        <span class="terminal-status-badge" id="build-status-${blockId}">⚡ Ready</span>
-        <button type="button" class="inline-compiler-close-btn" onclick="toggleInlineCompiler('${blockId}', '${validLang}')">✕ Close Terminal</button>
-      </div>
-    </div>
-    <div class="inline-compiler-editor-wrap">
-      <div class="inline-compiler-label">Code in Terminal (Live Editable):</div>
-      <div style="display:flex;background:#050810;border:1px solid rgba(255,255,255,0.1);border-radius:6px;overflow:hidden;position:relative;">
-        <div id="inline-gutter-${blockId}" style="user-select:none;-webkit-user-select:none;padding:8px 8px 8px 10px;text-align:right;color:#475569;font-family:'JetBrains Mono',monospace;font-size:0.75rem;line-height:1.55;background:#030508;border-right:1px solid rgba(255,255,255,0.08);white-space:pre;overflow:hidden;min-width:34px;">${initialEditorGutter}</div>
-        <textarea class="inline-compiler-editor" id="code-edit-${blockId}" rows="7" spellcheck="false" oninput="updateInlineGutter('${blockId}')" onscroll="syncInlineGutter('${blockId}')" style="flex:1;background:transparent;border:none;outline:none;padding:8px 10px;color:#e2e8f0;font-family:'JetBrains Mono',monospace;font-size:0.75rem;line-height:1.55;resize:vertical;min-height:120px;white-space:pre;overflow-wrap:normal;overflow-x:auto;">${rawCodeEscaped}</textarea>
-      </div>
-    </div>
-    <div class="terminal-action-row" style="display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap;">
-      <button type="button" class="term-action-btn term-compile-btn" id="compile-btn-${blockId}" onclick="compileInlineCode('${blockId}', '${validLang}')" title="Compile code & verify 0 errors">
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
-        <span>Compile</span>
-      </button>
-      <button type="button" class="term-action-btn term-run-btn" id="run-btn-${blockId}" onclick="runInlineCompilerCode('${blockId}', '${validLang}')" title="Run code & show output">
-        <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
-        <span>Run</span>
-      </button>
-      <button type="button" class="term-action-btn term-compile-run-btn" id="comp-run-btn-${blockId}" onclick="compileAndRunInlineCode('${blockId}', '${validLang}')" title="Compile & Run in one step">
-        <span>⚡ Compile &amp; Run</span>
-      </button>
-      <button type="button" class="term-action-btn term-clear-btn" onclick="clearInlineTerminal('${blockId}')" title="Clear terminal screen">
-        <span>Clear</span>
-      </button>
-    </div>
-    <div class="terminal-stdin-bar" id="stdin-wrap-${blockId}" style="display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap;background:#050810;padding:6px 10px;border-radius:6px;border:1px solid rgba(255,255,255,0.08);">
-      <span style="font-size:0.72rem;color:#00ffaa;font-weight:700;font-family:'JetBrains Mono',monospace;">&gt;</span>
-      <span style="font-size:0.72rem;color:#cbd5e1;font-family:'JetBrains Mono',monospace;white-space:nowrap;font-weight:600;">Runtime Input (stdin):</span>
-      <input type="text" class="inline-compiler-stdin" id="stdin-${blockId}" placeholder="Enter runtime input for scanf / cin / input() (e.g. 4)..." onkeydown="if(event.key==='Enter') runInlineCompilerCode('${blockId}', '${validLang}')" style="flex:1;min-width:160px;box-sizing:border-box;background:#020408;border:1px solid rgba(255,255,255,0.12);border-radius:4px;color:#e2e8f0;font-family:'JetBrains Mono',monospace;font-size:0.74rem;padding:5px 8px;outline:none;">
-      <button type="button" class="terminal-send-btn" onclick="runInlineCompilerCode('${blockId}', '${validLang}')" title="Send input & run" style="all:unset;box-sizing:border-box;cursor:pointer;background:rgba(0,255,170,0.15);border:1px solid #00ffaa;color:#00ffaa;font-size:0.72rem;font-weight:700;font-family:'JetBrains Mono',monospace;padding:5px 10px;border-radius:4px;transition:all 0.15s ease;">
-        <span>Send &amp; Run ↵</span>
-      </button>
-    </div>
-    <div class="inline-terminal-screen">
-      <div class="terminal-screen-header">
-        <span>&gt;_ TERMINAL OUTPUT (STDOUT)</span>
-        <span class="terminal-runtime-tag" id="term-tag-${blockId}">Ready</span>
-      </div>
-      <pre class="terminal-output-content" id="term-out-${blockId}"><span style="color:#64748b;">$ Terminal ready. Click [Compile] to verify 0 errors, or [▶ Run] to execute.</span></pre>
-    </div>
-  </div>
 </div>`;
-
     };
 
     renderer.table = function(header, body) {
@@ -8042,63 +8442,60 @@
     return code;
   }
 
-  setTimeout(async () => {
-    if (window.mermaid) {
-      const cards = document.querySelectorAll('.diagram-card-wrap[data-mermaid-pending="1"]');
-      for (const card of cards) {
-        card.removeAttribute('data-mermaid-pending');
-        const mermaidEl = card.querySelector('.mermaid');
-        if (!mermaidEl) continue;
-        const rawCode = mermaidEl.textContent.trim();
-        const renderTarget = card.querySelector('[id$="-render"]');
-        if (!renderTarget) continue;
+  window.renderPendingMermaid = async function() {
+    if (!window.mermaid) return;
+    const cards = document.querySelectorAll('.diagram-card-wrap[data-mermaid-pending="1"]');
+    for (const card of cards) {
+      card.removeAttribute('data-mermaid-pending');
+      const mermaidEl = card.querySelector('.mermaid');
+      if (!mermaidEl) continue;
+      const rawCode = mermaidEl.textContent.trim();
+      const renderTarget = card.querySelector('[id$="-render"]');
+      if (!renderTarget) continue;
+      try {
+        let sanitizedCode = colorizeMermaidCode(rawCode);
+        let svgContent = '';
+        const uniqueSvgId = 'mg_' + Math.random().toString(36).slice(2, 8);
         try {
-          // Colorize node elements dynamically based on content role keywords
-          let sanitizedCode = colorizeMermaidCode(rawCode);
-          
-          let svgContent = '';
-          const uniqueSvgId = 'mg_' + Math.random().toString(36).slice(2, 8);
-          
+          if (window.mermaid.parse) await window.mermaid.parse(sanitizedCode);
+          const rendered = await window.mermaid.render(uniqueSvgId, sanitizedCode);
+          svgContent = rendered ? (rendered.svg || rendered) : '';
+        } catch(e1) {
           try {
-            if (window.mermaid.parse) await window.mermaid.parse(sanitizedCode);
-            const rendered = await window.mermaid.render(uniqueSvgId, sanitizedCode);
-            svgContent = rendered ? (rendered.svg || rendered) : '';
-          } catch(e1) {
-            try {
-              const uniqueSvgId2 = 'mg_' + Math.random().toString(36).slice(2, 8);
-              const rendered2 = await window.mermaid.render(uniqueSvgId2, rawCode);
-              svgContent = rendered2 ? (rendered2.svg || rendered2) : '';
-            } catch(e2) {
-              svgContent = '';
-            }
-          }
-
-            if (svgContent) {
-              renderTarget.innerHTML = svgContent;
-              const svgEl = renderTarget.querySelector('svg');
-              if (svgEl) {
-                svgEl.style.maxWidth = '100%';
-                svgEl.style.height = 'auto';
-                svgEl.style.borderRadius = '8px';
-              }
-            } else {
-              throw new Error('Mermaid render failed');
-            }
-          } catch (err) {
-            // Clean up any loose Mermaid temporary elements safely
-            try {
-              document.querySelectorAll('svg[id^="dmermaid"], .error-icon, #dmermaid').forEach(el => {
-                try { if (el && el.parentNode) el.parentNode.removeChild(el); } catch(e) {}
-              });
-            } catch(e) {}
-            const formattedP2P = formatMermaidToPointToPoint(rawCode);
-            renderTarget.innerHTML = `<div style="text-align:left;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:12px 16px;"><div style="font-size:0.75rem;font-weight:600;color:var(--gold);margin-bottom:6px;display:flex;align-items:center;gap:6px;"><span>📊</span> Flowchart Step-by-Step Sequence</div><pre style="white-space:pre-wrap;font-family:'JetBrains Mono',monospace;font-size:0.82rem;color:var(--text-primary);margin:0;line-height:1.6;">${formattedP2P}</pre></div>`;
+            const uniqueSvgId2 = 'mg_' + Math.random().toString(36).slice(2, 8);
+            const rendered2 = await window.mermaid.render(uniqueSvgId2, rawCode);
+            svgContent = rendered2 ? (rendered2.svg || rendered2) : '';
+          } catch(e2) {
+            svgContent = '';
           }
         }
+
+        if (svgContent) {
+          renderTarget.innerHTML = svgContent;
+          const svgEl = renderTarget.querySelector('svg');
+          if (svgEl) {
+            svgEl.style.maxWidth = '100%';
+            svgEl.style.height = 'auto';
+            svgEl.style.borderRadius = '8px';
+          }
+        } else {
+          throw new Error('Mermaid render failed');
+        }
+      } catch (err) {
+        try {
+          document.querySelectorAll('svg[id^="dmermaid"], .error-icon, #dmermaid').forEach(el => {
+            try { if (el && el.parentNode) el.parentNode.removeChild(el); } catch(e) {}
+          });
+        } catch(e) {}
+        const formattedP2P = formatMermaidToPointToPoint(rawCode);
+        renderTarget.innerHTML = `<div style="text-align:left;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:12px 16px;"><div style="font-size:0.75rem;font-weight:600;color:var(--gold);margin-bottom:6px;display:flex;align-items:center;gap:6px;"><span>📊</span> Flowchart Step-by-Step Sequence</div><pre style="white-space:pre-wrap;font-family:'JetBrains Mono',monospace;font-size:0.82rem;color:var(--text-primary);margin:0;line-height:1.6;">${formattedP2P}</pre></div>`;
       }
-    }, 150);
-    return html;
-  }
+    }
+  };
+
+  setTimeout(window.renderPendingMermaid, 150);
+  return html;
+}
 
   // ---------- Mock "real-time" tool behaviors ----------
   const TOOL_BEHAVIOR = {
@@ -8496,9 +8893,9 @@
       }
     } catch(e){}
 
-    // 4. Guaranteed Image Gallery Fallback
-    const isExplicitImgQ = /\b(images|image|photos|photo|pictures|picture|pics|pic|wallpapers|wallpaper|gallery|diagram|diagrams|chart|look like|show me)\b/i.test(query);
-    if ((isExplicitImgQ || results.images.length === 0) && (!results.images || results.images.length < 4)) {
+    // 4. Guaranteed Image Gallery Fallback (ONLY when user explicitly requests images/photos)
+    const isExplicitImgQ = /\b(images|image|photos|photo|pictures|picture|pics|pic|wallpapers|wallpaper|gallery|diagram|diagrams|chart|look like|show me images|show me photos|show me pictures)\b/i.test(query);
+    if (isExplicitImgQ && (!results.images || results.images.length < 4)) {
       const subject = wikiQuery || query.replace(/\b(images|image|photos|photo|pictures|picture|pics|pic|show me|look like|wallpapers|wallpaper|gallery|diagrams|diagram)\b/gi, '').trim() || 'Visual Topic';
       const seeds = [108, 209, 310, 411, 512];
       const styles = ['hd realistic photo', 'cinematic detailed photo', '4k professional visual', 'vibrant clear view', 'high quality photograph'];
@@ -8514,12 +8911,89 @@
           });
         }
       });
+    } else if (!isExplicitImgQ) {
+      // Never dump unrelated images for non-image queries
+      results.images = [];
     }
 
     // 5. Invidious YouTube videos Fallback
     results.videos = await fetchYouTubeVideos(query, langCode);
 
     return results;
+  }
+
+  // ====== CITATION PILL & RELATED SOURCE URL HELPERS (ChatGPT Style) ======
+  function buildInlineCitationPill(articles) {
+    if (!articles || !articles.length) return '';
+    const top = articles[0];
+    if (!top || !top.url) return '';
+    let domain = 'google.com';
+    try { domain = new URL(top.url).hostname.replace(/^www\./, ''); } catch(e){}
+    const faviconUrl = `https://www.google.com/s2/favicons?domain=${encodeURIComponent(domain)}&sz=32`;
+    let label = top.title || domain;
+    // Clean up label to be short
+    label = label.replace(/\s*[-–—|].*$/, '').slice(0, 22).trim();
+    const remainingCount = articles.length - 1;
+    const countBadge = remainingCount > 0 ? `<span class="citation-pill-count">+${remainingCount}</span>` : '';
+    const safeUrl = escapeHtml(top.url);
+    const safeFullTitle = escapeHtml(top.title || domain);
+
+    return `<a href="${safeUrl}" target="_blank" rel="noopener noreferrer" class="chat-citation-pill" title="${safeFullTitle} — ${safeUrl}"><img src="${faviconUrl}" class="citation-pill-icon" alt="" onerror="this.style.display='none'" /><span class="citation-pill-name">${escapeHtml(label)}</span>${countBadge}</a>`;
+  }
+
+  function buildRelatedSourceLinks(articles) {
+    if (!articles || !articles.length) return '';
+    const topArticles = articles.slice(0, 3);
+    let html = '<div class="chat-related-url-row">';
+    topArticles.forEach(art => {
+      if (!art || !art.url) return;
+      let urlObj;
+      try { urlObj = new URL(art.url); } catch(e) { return; }
+      const domain = urlObj.hostname.replace(/^www\./, '');
+      let cleanTitle = (art.title || domain)
+        .replace(/\s*[-–—|]\s*(DuckDuckGo|Wikipedia).*$/i, '')
+        .trim();
+      if (!cleanTitle || cleanTitle.length < 3) cleanTitle = domain;
+      
+      const isOfficial = domain.endsWith('.edu') || domain.endsWith('.ac.in') || domain.endsWith('.gov') || domain.endsWith('.edu.in') || cleanTitle.toLowerCase().includes('official');
+      const badgeIcon = isOfficial ? '🏛️' : (domain.includes('wikipedia') ? '📚' : (domain.includes('youtube') ? '🎬' : '🌐'));
+      const displayLabel = `${badgeIcon} ${cleanTitle}`;
+      
+      html += `<a href="${escapeHtml(art.url)}" target="_blank" rel="noopener noreferrer" class="chat-related-url-link" title="${escapeHtml(art.snippet || cleanTitle)} — ${escapeHtml(art.url)}"><u>${escapeHtml(displayLabel)}</u> <span class="url-arrow">↗</span></a>`;
+    });
+    html += '</div>';
+    return html;
+  }
+
+  function injectCitationsIntoHtml(generativeHtml, articles) {
+    if (!generativeHtml || !articles || !articles.length) return generativeHtml;
+    const pillHtml = buildInlineCitationPill(articles);
+    const relatedLinksHtml = buildRelatedSourceLinks(articles);
+    if (!pillHtml && !relatedLinksHtml) return generativeHtml;
+
+    // Strategy 1: Place pill at the end of the first paragraph </p>
+    if (pillHtml && generativeHtml.includes('</p>')) {
+      let replaced = false;
+      generativeHtml = generativeHtml.replace(/<\/p>/, (match) => {
+        if (!replaced) {
+          replaced = true;
+          return `${pillHtml}</p>${relatedLinksHtml}`;
+        }
+        return match;
+      });
+      return generativeHtml;
+    }
+
+    // Strategy 2: If no <p> tag, find the end of the first sentence (. ! ? followed by space or newline)
+    if (pillHtml) {
+      const firstSentenceMatch = generativeHtml.match(/^([\s\S]*?[.!?])(\s+[\s\S]*)$/);
+      if (firstSentenceMatch) {
+        return `${firstSentenceMatch[1]} ${pillHtml}${relatedLinksHtml}\n\n${firstSentenceMatch[2]}`;
+      }
+    }
+
+    // Strategy 3: Append at top or bottom cleanly
+    return `${generativeHtml}\n${relatedLinksHtml}`;
   }
 
   function videoCardHTML(v) {
@@ -8591,7 +9065,7 @@
       return `
         <div class="gallery-mini-card" onclick="openMediaModal({url:decodeURIComponent('${encUrl}'), label:decodeURIComponent('${encLabel}'), isImage:true})" style="flex:0 0 195px; width:195px; scroll-snap-align:start; background:#080b10; border:1px solid rgba(255,255,255,0.1); border-radius:10px; overflow:hidden; cursor:pointer; transition:all 0.18s ease-in-out; box-shadow:0 4px 14px rgba(0,0,0,0.4); position:relative;" onmouseover="this.style.transform='translateY(-3px)'; this.style.borderColor='rgba(217,119,87,0.7)'; this.style.boxShadow='0 8px 20px rgba(0,0,0,0.6)';" onmouseout="this.style.transform='none'; this.style.borderColor='rgba(255,255,255,0.1)'; this.style.boxShadow='0 4px 14px rgba(0,0,0,0.4)';">
           <div style="position:relative; width:100%; height:125px; background:#030406; display:flex; align-items:center; justify-content:center; overflow:hidden; padding:3px;">
-            <img src="${img.src}" alt="${safeAlt}" referrerpolicy="no-referrer" loading="lazy" style="max-width:100%; max-height:100%; object-fit:contain; display:block;" onerror="if(!this.dataset.fb){this.dataset.fb=1; this.src='https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?w=600&q=80';}else{this.closest('.gallery-mini-card').style.display='none';}" />
+            <img src="${img.src}" alt="${safeAlt}" referrerpolicy="no-referrer" loading="lazy" style="max-width:100%; max-height:100%; object-fit:contain; display:block;" onerror="this.closest('.gallery-mini-card').style.display='none';" />
             <div style="position:absolute; top:5px; left:5px; z-index:2; background:rgba(0,0,0,0.75); border:1px solid rgba(56,189,248,0.3); backdrop-filter:blur(6px); border-radius:4px; padding:1px 5px; font-size:0.58rem; font-weight:700; color:#38bdf8;">${qTag}</div>
             <div style="position:absolute; top:5px; right:5px; z-index:2; background:rgba(0,0,0,0.75); border:1px solid rgba(245,158,11,0.35); backdrop-filter:blur(6px); border-radius:4px; padding:1px 5px; font-size:0.58rem; font-weight:700; color:#fbbf24; display:flex; align-items:center; gap:2px;">★ ${rating}</div>
             <div style="position:absolute; inset:0; background:linear-gradient(to top, rgba(0,0,0,0.85) 0%, transparent 60%); pointer-events:none;"></div>
@@ -8634,8 +9108,9 @@
   function buildWebResultHTML(data, query, langCode = '') {
     let html = '';
 
-    // Render Query Image Gallery if images are available
-    if (data && data.images && data.images.length) {
+    // Only render image gallery if user explicitly requested images AND images exist
+    const wantsImages = /\b(image|images|photo|photos|picture|pictures|pic|pics|gallery|wallpaper|look like|show me images)\b/i.test(query || '');
+    if (wantsImages && data && data.images && data.images.length) {
       html += buildImageGalleryHTML(data.images, query);
     }
 
@@ -9099,7 +9574,9 @@ Building interactive websites, HTML applications, and frontend UI dashboards is 
       // Check if this is an identity / creator / biodata query
       const isIdentityQuery = /\b(cognisphere\s*biodata|platform\s*biodata|project\s*biodata|creator\s*biodata)\b/i.test(searchQuery) || /^\s*(who\s*are\s*you|what\s*is\s*your\s*name|who\s*created\s*you)\s*[?.]*\s*$/i.test(searchQuery);
 
+      let webData = null;
       const webResultsPromise = isIdentityQuery ? Promise.resolve() : fetchLiveWebResults(liveWebQuery, '').then(data => {
+        webData = data;
         webHtml = buildWebResultHTML(data, liveWebQuery, '');
       }).catch(e => {
         console.warn('Web results failed (ignored):', e.message);
@@ -9165,7 +9642,9 @@ Building interactive websites, HTML applications, and frontend UI dashboards is 
                   msgToUpdate.streaming = true;
                   msgToUpdate.pending = false;
                   msgToUpdate.status = null;
-                  msgToUpdate.text = cleanLLMOutput(llmText);
+                  const cleanedText = cleanLLMOutput(llmText);
+                  msgToUpdate.text = cleanedText;
+                  msgToUpdate.rawMarkdown = cleanedText;
                   msgToUpdate.isHtml = false;
                   streamLiveBubble(msgToUpdate, convToUpdate);
                 }
@@ -9174,11 +9653,11 @@ Building interactive websites, HTML applications, and frontend UI dashboards is 
           }
         }
         if (msgToUpdate) msgToUpdate.streaming = false;
-        if (convToUpdate) {
-          renderThread(convToUpdate);
-          streamAutoScroll(true);
-        }
+        // Clean up trailing stream timer to prevent stale renders
+        if (streamTrailingTimer) { clearTimeout(streamTrailingTimer); streamTrailingTimer = null; }
         if (window.pulseHome3D) window.pulseHome3D(false);
+        // DON'T call renderThread here — it will be called in the .then() handler
+        // which properly sets isHtml, rawMarkdown, and web sources before rendering
       } catch (streamErr) {
         console.warn('Backend LLM stream error:', streamErr.message);
         if (!llmText || !llmText.trim()) {
@@ -9208,11 +9687,15 @@ Building interactive websites, HTML applications, and frontend UI dashboards is 
           }
         }
 
-      // Build final HTML: LLM markdown answer + web result pills below
+      // Build final HTML: LLM markdown answer + citations + web result pills below
+      await webResultsPromise;
       let generativeHtml = '';
       const displayText = cleanLLMOutput(llmText);
       if (displayText && displayText.trim().length > 0) {
         generativeHtml = '<div>' + parseMarkdown(displayText) + '</div>';
+        if (webData && webData.articles && webData.articles.length > 0) {
+          generativeHtml = injectCitationsIntoHtml(generativeHtml, webData.articles);
+        }
       }
       const finalHtml = generativeHtml + (webHtml || '');
 
@@ -9224,7 +9707,7 @@ Building interactive websites, HTML applications, and frontend UI dashboards is 
       if (!finalHtml.trim()) {
         return { text: 'No results found. Please try a different query.', sources: [], isHtml: false };
       }
-      return { text: finalHtml, sources: [], isHtml: true };
+      return { text: finalHtml, sources: [], isHtml: true, rawMarkdown: displayText };
     }
 
     // ---- ALL OTHER TOOLS: streaming quantum backend ----
@@ -9273,6 +9756,7 @@ Building interactive websites, HTML applications, and frontend UI dashboards is 
                   msgToUpdate.pending = false;
                   msgToUpdate.status = null;
                   msgToUpdate.text = accText;
+                  msgToUpdate.rawMarkdown = accText;
                   streamLiveBubble(msgToUpdate, convToUpdate);
                 }
               }
@@ -9280,12 +9764,17 @@ Building interactive websites, HTML applications, and frontend UI dashboards is 
           }
         }
       }
-      if (msgToUpdate) msgToUpdate.streaming = false;
-      if (convToUpdate) {
-        renderThread(convToUpdate);
-        streamAutoScroll(true);
+      if (msgToUpdate) {
+        msgToUpdate.streaming = false;
+        msgToUpdate.pending = false;
+        msgToUpdate.status = null;
+        msgToUpdate.text = accText;
+        msgToUpdate.rawMarkdown = accText;
       }
+      // Clean up trailing stream timer
+      if (streamTrailingTimer) { clearTimeout(streamTrailingTimer); streamTrailingTimer = null; }
       if (window.pulseHome3D) window.pulseHome3D(false);
+      // DON'T renderThread here — the .then() handler does it with proper isHtml + sources
 
       // Attach Image Gallery & Video Cards to final HTML
       const webData = await webResultsPromise;
@@ -9304,11 +9793,14 @@ Building interactive websites, HTML applications, and frontend UI dashboards is 
       const displayText = cleanLLMOutput(accText);
       if (displayText && displayText.trim().length > 0) {
         generativeHtml = '<div>' + parseMarkdown(displayText) + '</div>';
+        if (webData && webData.articles && webData.articles.length > 0) {
+          generativeHtml = injectCitationsIntoHtml(generativeHtml, webData.articles);
+        }
       }
       const finalHtml = (topGalleryHtml || '') + generativeHtml + (topGalleryHtml ? '' : (webHtml || ''));
 
       if (window.saveChatToNeonDb && accText) window.saveChatToNeonDb(query, accText, convToUpdate ? convToUpdate.id : null);
-      return { text: finalHtml, sources: null, isHtml: true };
+      return { text: finalHtml, sources: null, isHtml: true, rawMarkdown: displayText };
     } catch (err) {
       return new Promise(resolve => setTimeout(() => resolve(behavior.reply(query)), behavior.delay));
     }
@@ -9419,7 +9911,7 @@ Building interactive websites, HTML applications, and frontend UI dashboards is 
         activeStreamTimer = null;
         msg.streaming = false;
         msg.text = fullText;
-        msg.isHtml = true;
+        msg.isHtml = false;
         renderThread(conv);
         onDone();
         return;
@@ -9429,7 +9921,7 @@ Building interactive websites, HTML applications, and frontend UI dashboards is 
         activeStreamTimer = null;
         msg.streaming = false;
         msg.text = fullText;
-        msg.isHtml = true;
+        msg.isHtml = false;
         renderThread(conv);
         // Final scroll to end when done
         streamAutoScroll();
@@ -9682,10 +10174,11 @@ Building interactive websites, HTML applications, and frontend UI dashboards is 
       conv = conversations.find(c => c.id === currentConversationId);
     }
     if(!conv){
-      conv = { id: 'conv' + (convIdSeq++), title: text || (msgAttachments.length ? msgAttachments[0].label : 'New conversation'), messages: [] };
+      conv = { id: 'conv' + (convIdSeq++), title: text || (msgAttachments.length ? msgAttachments[0].label : 'New conversation'), createdAt: Date.now(), messages: [] };
       conversations.unshift(conv);
       currentConversationId = conv.id;
     }
+    conv.createdAt = conv.createdAt || Date.now();
     localStorage.setItem('cognisphere_active_conv_id', conv.id);
 
     conv.messages.push({ id: 'm' + (msgIdSeq++), role: 'user', text, attachments: msgAttachments });
@@ -9713,7 +10206,27 @@ Building interactive websites, HTML applications, and frontend UI dashboards is 
       setTimeout(() => { isAutoScrolling = false; }, 400);
     }, 80);
 
-    const behavior = activeTool ? (TOOL_BEHAVIOR[activeTool] || DEFAULT_BEHAVIOR) : DEFAULT_BEHAVIOR;
+    // Dynamic Model Routing: If user is on default Compound AI, dynamically route based on query demand!
+    let routedModel = currentCognisphereModel;
+    if (currentCognisphereModel === 'compound') {
+      const q = (text || '').toLowerCase();
+      // 1. Coding / Full-stack / Debugging
+      if (activeTool === 'code' || /\b(code|program|python|javascript|typescript|c\+\+|cpp|java|rust|go|html|css|sql|function|algorithm|class|regex|debug|compile|terminal|script|react|vue|node)\b/i.test(q)) {
+        routedModel = 'code';
+      }
+      // 2. Math / Reasoning / Logic / Deep proofs
+      else if (activeTool === 'math' || activeTool === 'science' || /\b(solve|calculate|equation|derivative|integral|matrix|proof|theorem|physics|chemistry equation|quantum|deduce|calculus|geometry|logic puzzle)\b/i.test(q)) {
+        routedModel = 'reasoning';
+      }
+      // 3. Live Web / News / Current events / Weather / 2026
+      else if (activeTool === 'search' || /\b(news|today|current|latest|weather|stock|price|who is|recent|live|update|score|2026|headline)\b/i.test(q)) {
+        routedModel = 'web';
+      }
+      // 4. Quick conversational / definitions / greetings
+      else if (q.length < 28 && /^(hi|hello|hey|what is|who is|define|meaning of|translate|synonym|how are you|thanks)\b/i.test(q)) {
+        routedModel = 'turbo';
+      }
+    }
 
     const pendingMsg = {
       id: 'm' + (msgIdSeq++),
@@ -9723,11 +10236,12 @@ Building interactive websites, HTML applications, and frontend UI dashboards is 
       status: '🔍 Analyzing query intent & semantic routing…',
       query: text,
       tool: activeTool,
-      model: currentCognisphereModel
+      model: routedModel
     };
     conv.messages.push(pendingMsg);
     renderThread(conv);
     renderHistory();
+    saveConversations();
 
     generationAborted = false;
     setGeneratingState(true);
@@ -9745,6 +10259,7 @@ Building interactive websites, HTML applications, and frontend UI dashboards is 
         setGeneratingState(false);
         renderThread(conv);
         renderHistory();
+        saveConversations();
         return;
       }
 
@@ -9761,6 +10276,23 @@ Building interactive websites, HTML applications, and frontend UI dashboards is 
       if(result.isHtml){
         pendingMsg.text = result.text;
         pendingMsg.isHtml = true;
+        if (result.rawMarkdown) pendingMsg.rawMarkdown = result.rawMarkdown;
+        // Extract web source HTML (citations + web result pills) to store separately
+        // so renderThread can append them after re-parsing markdown
+        if (result.rawMarkdown && result.text) {
+          const markdownHtml = parseMarkdown(result.rawMarkdown);
+          // Everything in result.text beyond the markdown content is web sources
+          const tempDiv = document.createElement('div');
+          tempDiv.innerHTML = result.text;
+          const sourceParts = [];
+          tempDiv.querySelectorAll('.chat-citation-pill, .web-result-card, .video-pill-wrap, .query-image-gallery-wrap, .image-gallery-container').forEach(el => {
+            sourceParts.push(el.outerHTML);
+          });
+          // Also check for web result sections at end that aren't in markdown
+          if (sourceParts.length > 0) {
+            pendingMsg._webSourcesHtml = sourceParts.join('');
+          }
+        }
         setGeneratingState(false);
         renderThread(conv);
         renderHistory();
@@ -9768,6 +10300,18 @@ Building interactive websites, HTML applications, and frontend UI dashboards is 
       } else if (pendingMsg.text && pendingMsg.text.length > 0) {
         // Already streamed live — just finalize without re-streaming
         pendingMsg.text = result.text || pendingMsg.text;
+        if (result.rawMarkdown) pendingMsg.rawMarkdown = result.rawMarkdown;
+        else if (!pendingMsg.rawMarkdown) pendingMsg.rawMarkdown = pendingMsg.text;
+        // Extract web source HTML for separate rendering
+        if (result.isHtml && result.text && result.rawMarkdown) {
+          const tempDiv2 = document.createElement('div');
+          tempDiv2.innerHTML = result.text;
+          const sp2 = [];
+          tempDiv2.querySelectorAll('.chat-citation-pill, .web-result-card, .video-pill-wrap, .query-image-gallery-wrap, .image-gallery-container').forEach(el => {
+            sp2.push(el.outerHTML);
+          });
+          if (sp2.length > 0) pendingMsg._webSourcesHtml = sp2.join('');
+        }
         pendingMsg.streaming = false;
         setGeneratingState(false);
         renderThread(conv);
@@ -9836,9 +10380,11 @@ Building interactive websites, HTML applications, and frontend UI dashboards is 
       if(result.isHtml){
         msg.text = result.text;
         msg.isHtml = true;
+        if (result.rawMarkdown) msg.rawMarkdown = result.rawMarkdown;
         setGeneratingState(false);
         renderThread(conv);
         renderHistory();
+        saveConversations();
       } else {
         streamMessageText(conv, msg, result.text, () => {
           setGeneratingState(false);
@@ -10945,6 +11491,7 @@ d----        13-09-2026     10:30                api
 
   let streamScrollRaf = null;
   let lastStreamRenderTime = 0;
+  let streamTrailingTimer = null;
 
   function streamLiveBubble(msg, conv) {
     if (!chatThreadEl) return;
@@ -10979,13 +11526,27 @@ d----        13-09-2026     10:30                api
       bubble.appendChild(textEl);
     }
 
-    // Throttle Markdown parsing to ~50ms so browser doesn't thrash on every single character
+    const renderStreamContent = () => {
+      if (!textEl) return;
+      // Solid steady cursor during active generation so it doesn't blink/flicker and distract user
+      textEl.innerHTML = parseMarkdown(msg.text) + '<span class="stream-cursor" style="color:var(--neon);font-weight:900;margin-left:2px;display:inline-block;opacity:0.9;">▍</span>';
+    };
+
+    // Throttle Markdown parsing to ~90ms with trailing execution to keep main thread completely free, smooth and responsive
     const now = performance.now();
-    if (now - lastStreamRenderTime > 50) {
+    if (now - lastStreamRenderTime > 90) {
       lastStreamRenderTime = now;
-      if (textEl) {
-        textEl.innerHTML = parseMarkdown(msg.text) + '<span class="stream-cursor" style="color:var(--neon);font-weight:900;margin-left:2px;animation:blink 0.8s infinite;">▍</span>';
+      if (streamTrailingTimer) {
+        clearTimeout(streamTrailingTimer);
+        streamTrailingTimer = null;
       }
+      requestAnimationFrame(renderStreamContent);
+    } else if (!streamTrailingTimer) {
+      streamTrailingTimer = setTimeout(() => {
+        streamTrailingTimer = null;
+        lastStreamRenderTime = performance.now();
+        requestAnimationFrame(renderStreamContent);
+      }, 90);
     }
 
     // Rock-solid auto-scroll with ZERO shaking or jitter
@@ -11296,10 +11857,41 @@ d----        13-09-2026     10:30                api
         });
       }
 
-      if (m.isHtml || (rawText && /^[\s\n]*<(div|table|ul|ol|p|section|article|pre|figure|header|main)\b/i.test(rawText.trim()))) {
+      // Determine best content to render
+      const markdownSource = (m.rawMarkdown && typeof m.rawMarkdown === 'string' && m.rawMarkdown.trim()) ? m.rawMarkdown : null;
+      const hasWebSourcesHtml = m._webSourcesHtml && typeof m._webSourcesHtml === 'string';
+
+      // Check if text is already rendered HTML (ensuring line numbers, code cards, and inline citations are 100% identical before and after refresh)
+      const hasValidHtmlContent = Boolean(
+        m.isHtml &&
+        rawText &&
+        (/^[\s\n]*<(?:div|table|ul|ol|p|section|article|pre|figure|header|main)\b/i.test(rawText.trim()) ||
+         rawText.includes('class="code-card-wrap"') ||
+         rawText.includes('class="web-result-card"') ||
+         rawText.includes('class="chat-citation-pill"'))
+      );
+
+      if (hasValidHtmlContent) {
+        // Preserved complete HTML with exact code line numbers and inline citations
         textEl.innerHTML = rawText;
+      } else if (markdownSource) {
+        // Re-render from markdown when HTML is not already baked
+        textEl.innerHTML = parseMarkdown(markdownSource);
+        if (hasWebSourcesHtml) {
+          textEl.insertAdjacentHTML('beforeend', m._webSourcesHtml);
+        }
       } else {
+        // Plain text or markdown
         textEl.innerHTML = parseMarkdown(rawText);
+      }
+
+      // Highlight standalone <pre> blocks not already structured inside Cognisphere code-card-wrap
+      if (!hasValidHtmlContent && window.Prism) {
+        try {
+          textEl.querySelectorAll('pre:not(.code-card-wrap pre) > code').forEach(c => {
+            try { Prism.highlightElement(c); } catch(err) {}
+          });
+        } catch(e) {}
       }
 
       bubble.appendChild(textEl);
@@ -11527,7 +12119,17 @@ d----        13-09-2026     10:30                api
 
       frag.appendChild(row);
     });
+    // Preserve scroll position across DOM rebuild to prevent page blink/flash
+    const scrollY = window.scrollY || window.pageYOffset;
+    const scrollX = window.scrollX || window.pageXOffset;
     chatThreadEl.replaceChildren(frag);
+
+    // Immediately restore scroll position so user sees ZERO blink or jump
+    window.scrollTo(scrollX, scrollY);
+
+    if (typeof window.renderPendingMermaid === 'function') {
+      setTimeout(window.renderPendingMermaid, 60);
+    }
     // Smoothly scroll with search-shell bottom clearance so answers are never covered
     if (!userScrolledUp) {
       requestAnimationFrame(() => {
@@ -11686,6 +12288,12 @@ d----        13-09-2026     10:30                api
     renderThread(conv);
     renderHistory();
     closeSidebar();
+    setTimeout(() => {
+      window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+      if (chatThreadEl && chatThreadEl.lastElementChild) {
+        chatThreadEl.lastElementChild.scrollIntoView({ block: 'end', behavior: 'smooth' });
+      }
+    }, 60);
   }
 
   function startNewChat(){
@@ -11917,8 +12525,21 @@ d----        13-09-2026     10:30                api
         const cleanR = cleanPromptDebugText(row.response || '');
         const stableKey = cleanQ.trim();
         if (!stableKey) return;
-        // Skip if already in conversations (match by title or dbKey)
-        if (conversations.some(c => c.title === stableKey.slice(0, 45) || c.fromDbKey === stableKey)) return;
+        // Skip if already in conversations (match by title, id, or dbKey)
+        const existing = conversations.find(c =>
+          (c.dbId && c.dbId === row.id) ||
+          (c.fromDbRecordId && c.fromDbRecordId === row.id) ||
+          (c.fromDbKey && c.fromDbKey === stableKey) ||
+          (c.title && (c.title === stableKey || c.title.startsWith(stableKey.slice(0, 30)) || stableKey.startsWith(c.title.slice(0, 30))))
+        );
+        if (existing) {
+          if (row.id) {
+            existing.dbId = row.id;
+            existing.fromDbRecordId = row.id;
+          }
+          existing.fromDbKey = stableKey;
+          return;
+        }
         const convId = 'db-' + (++convIdSeq);
         const created = row.created_at ? new Date(row.created_at).getTime() : 0;
         const isHtmlResp = /^\s*<(div|table|ul|p|section|article)/i.test(cleanR) || cleanR.includes('<table') || cleanR.includes('<div class=');
@@ -14717,13 +15338,26 @@ d----        13-09-2026     10:30                api
     }
 
     const savedActiveConvId = localStorage.getItem('cognisphere_active_conv_id');
-    if (savedActiveConvId && conversations.length && !window.location.search.includes('share=')) {
-      const convToRestore = conversations.find(c => String(c.id) === String(savedActiveConvId) || c.fromDbKey === savedActiveConvId);
+    if (conversations.length && !window.location.search.includes('share=')) {
+      let convToRestore = null;
+      if (savedActiveConvId) {
+        convToRestore = conversations.find(c => String(c.id) === String(savedActiveConvId) || c.fromDbKey === savedActiveConvId);
+      }
+      if (!convToRestore && conversations[0] && conversations[0].messages && conversations[0].messages.length > 0) {
+        convToRestore = conversations[0];
+      }
       if (convToRestore && convToRestore.messages && convToRestore.messages.length > 0) {
         currentConversationId = convToRestore.id;
+        localStorage.setItem('cognisphere_active_conv_id', convToRestore.id);
         document.body.classList.add('chat-active');
         renderThread(convToRestore);
         renderHistory();
+        setTimeout(() => {
+          window.scrollTo({ top: document.body.scrollHeight, behavior: 'auto' });
+          if (chatThreadEl && chatThreadEl.lastElementChild) {
+            chatThreadEl.lastElementChild.scrollIntoView({ block: 'end', behavior: 'auto' });
+          }
+        }, 120);
       }
     }
   } catch(e) {}

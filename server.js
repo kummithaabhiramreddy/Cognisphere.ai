@@ -1458,7 +1458,279 @@ function getText(url, headers = {}, timeout = 2500) {
   });
 }
 
-// Live web search backend aggregator (Wikipedia + YouTube + DuckDuckGo + Wikidata + OpenAlex + ArXiv)
+// Organic Multi-Engine Web Search (DuckDuckGo HTML Parser for verified, accurate URLs)
+async function searchDuckDuckGoOrganic(query) {
+  try {
+    const postData = 'q=' + encodeURIComponent(query);
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 3500);
+    const res = await fetch('https://html.duckduckgo.com/html/', {
+      method: 'POST',
+      signal: controller.signal,
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'
+      },
+      body: postData
+    });
+    clearTimeout(timeout);
+    if (!res.ok) return [];
+    const data = await res.text();
+    const results = [];
+    const blocks = data.split(/class="result\s+results_links/);
+    blocks.slice(1).forEach(block => {
+      const titleMatch = block.match(/class="result__a"[^>]*href="([^"]+)"[^>]*>([\s\S]*?)<\/a>/);
+      const snippetMatch = block.match(/class="result__snippet"[^>]*>([\s\S]*?)<\/a>/);
+      if (titleMatch) {
+        let rawUrl = titleMatch[1];
+        let title = titleMatch[2].replace(/<[^>]+>/g, '').trim();
+        let snippet = snippetMatch ? snippetMatch[1].replace(/<[^>]+>/g, '').trim() : '';
+        if (rawUrl.includes('uddg=')) {
+          try {
+            const u = new URL('https://duckduckgo.com' + rawUrl);
+            rawUrl = decodeURIComponent(u.searchParams.get('uddg'));
+          } catch(e) {}
+        }
+        if (rawUrl.startsWith('http') && !rawUrl.includes('duckduckgo.com/y.js') && !rawUrl.includes('bing.com/aclick')) {
+          try {
+            const host = new URL(rawUrl).hostname.replace(/^www\./, '');
+            results.push({
+              title,
+              snippet,
+              url: rawUrl,
+              source: host
+            });
+          } catch(e) {}
+        }
+      }
+    });
+    return results.slice(0, 5);
+  } catch (err) {
+    return [];
+  }
+}
+
+// Universal Web Page & Video Reader Engine
+async function readUrlContent(targetUrl) {
+  try {
+    const parsed = new URL(targetUrl);
+    
+    // YouTube video detection & reader
+    const isYouTube = parsed.hostname.includes('youtube.com') || parsed.hostname.includes('youtu.be');
+    if (isYouTube) {
+      let videoId = '';
+      if (parsed.hostname.includes('youtu.be')) {
+        videoId = parsed.pathname.slice(1).split(/[?#]/)[0];
+      } else {
+        videoId = parsed.searchParams.get('v');
+      }
+
+      let title = 'YouTube Video';
+      let author = '';
+      try {
+        const oembedRes = await fetch(`https://www.youtube.com/oembed?url=${encodeURIComponent(targetUrl)}&format=json`);
+        if (oembedRes.ok) {
+          const oembedData = await oembedRes.json();
+          title = oembedData.title || title;
+          author = oembedData.author_name || author;
+        }
+      } catch (e) {}
+
+      let description = '';
+      let transcript = '';
+      try {
+        const pageRes = await fetch(targetUrl, {
+          headers: {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36'
+          }
+        });
+        if (pageRes.ok) {
+          const pageHtml = await pageRes.text();
+          const descMatch = pageHtml.match(/<meta\s+name="description"\s+content="([^"]*)"/i) ||
+                            pageHtml.match(/<meta\s+property="og:description"\s+content="([^"]*)"/i);
+          if (descMatch) description = descMatch[1];
+          
+          const captionMatch = pageHtml.match(/"captionTracks":\s*\[(.*?)\]/);
+          if (captionMatch) {
+            try {
+              const tracks = JSON.parse(`[${captionMatch[1]}]`);
+              if (tracks && tracks.length > 0 && tracks[0].baseUrl) {
+                const subRes = await fetch(tracks[0].baseUrl);
+                if (subRes.ok) {
+                  const subXml = await subRes.text();
+                  transcript = subXml
+                    .replace(/<text[^>]*>/g, ' ')
+                    .replace(/<\/text>/g, '\n')
+                    .replace(/<[^>]+>/g, '')
+                    .replace(/&amp;/g, '&')
+                    .replace(/&quot;/g, '"')
+                    .replace(/&#39;/g, "'")
+                    .replace(/&lt;/g, '<')
+                    .replace(/&gt;/g, '>')
+                    .replace(/\s+/g, ' ')
+                    .trim();
+                }
+              }
+            } catch (e) {}
+          }
+        }
+      } catch (e) {}
+
+      let content = `**Video Title:** ${title}\n**Channel/Creator:** ${author}\n\n`;
+      if (transcript) {
+        content += `**Spoken Transcript / Subtitles:**\n${transcript.slice(0, 6000)}`;
+      } else if (description) {
+        content += `**Video Description & Overview:**\n${description}`;
+      } else {
+        content += `YouTube video metadata retrieved for "${title}".`;
+      }
+
+      return {
+        success: true,
+        type: 'youtube_video',
+        title,
+        author,
+        url: targetUrl,
+        content: content.trim()
+      };
+    }
+
+    // Generic Webpage reader
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 7000);
+    const res = await fetch(targetUrl, {
+      signal: controller.signal,
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'
+      }
+    });
+    clearTimeout(timeout);
+
+    if (!res.ok) {
+      return { success: false, error: `HTTP ${res.status}: ${res.statusText}`, url: targetUrl };
+    }
+
+    const html = await res.text();
+
+    const titleMatch = html.match(/<title[^>]*>([\s\S]*?)<\/title>/i);
+    const title = titleMatch ? titleMatch[1].replace(/\s+/g, ' ').trim() : targetUrl;
+
+    const metaDescMatch = html.match(/<meta\s+name=["']description["']\s+content=["']([\s\S]*?)["']/i) ||
+                          html.match(/<meta\s+property=["']og:description["']\s+content=["']([\s\S]*?)["']/i);
+    const metaDesc = metaDescMatch ? metaDescMatch[1].replace(/\s+/g, ' ').trim() : '';
+
+    let clean = html
+      .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, ' ')
+      .replace(/<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi, ' ')
+      .replace(/<svg\b[^<]*(?:(?!<\/svg>)<[^<]*)*<\/svg>/gi, ' ')
+      .replace(/<nav\b[^<]*(?:(?!<\/nav>)<[^<]*)*<\/nav>/gi, ' ')
+      .replace(/<footer\b[^<]*(?:(?!<\/footer>)<[^<]*)*<\/footer>/gi, ' ')
+      .replace(/<header\b[^<]*(?:(?!<\/header>)<[^<]*)*<\/header>/gi, ' ')
+      .replace(/<noscript\b[^<]*(?:(?!<\/noscript>)<[^<]*)*<\/noscript>/gi, ' ');
+
+    const textPieces = [];
+    const blockRegex = /<(h[1-6]|p|li|article|section|blockquote)[^>]*>([\s\S]*?)<\/\1>/gi;
+    let bMatch;
+    while ((bMatch = blockRegex.exec(clean)) !== null) {
+      const tag = bMatch[1].toLowerCase();
+      const rawBlock = bMatch[2].replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+      if (rawBlock.length > 15) {
+        if (tag.startsWith('h')) {
+          textPieces.push(`\n### ${rawBlock}\n`);
+        } else if (tag === 'li') {
+          textPieces.push(`• ${rawBlock}`);
+        } else {
+          textPieces.push(rawBlock);
+        }
+      }
+    }
+
+    let textContent = textPieces.join('\n\n').trim();
+    if (!textContent || textContent.length < 100) {
+      textContent = clean.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+    }
+
+    if (textContent.length > 7000) {
+      textContent = textContent.slice(0, 7000) + '... [content truncated]';
+    }
+
+    return {
+      success: true,
+      type: 'webpage',
+      title,
+      description: metaDesc,
+      url: targetUrl,
+      domain: parsed.hostname.replace(/^www\./, ''),
+      content: textContent
+    };
+  } catch (err) {
+    return { success: false, error: err.message, url: targetUrl };
+  }
+}
+
+// Dedicated Real-Time Query Image Fetcher (DuckDuckGo Image Engine + Wikipedia API)
+async function fetchRealQueryImages(subject) {
+  const images = [];
+  try {
+    const cleanSub = (subject || '').trim();
+    if (!cleanSub) return images;
+
+    // 1. DuckDuckGo Image API (High-resolution real-world web photos)
+    try {
+      const tokenRes = await fetch(`https://duckduckgo.com/?q=${encodeURIComponent(cleanSub)}`, {
+        headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36' },
+        signal: AbortSignal.timeout(2800)
+      });
+      const tokenHtml = await tokenRes.text();
+      const vqdMatch = tokenHtml.match(/vqd=([\d-]+)/);
+      if (vqdMatch) {
+        const imgRes = await fetch(`https://duckduckgo.com/i.js?l=us-en&o=json&q=${encodeURIComponent(cleanSub)}&vqd=${vqdMatch[1]}`, {
+          headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36' },
+          signal: AbortSignal.timeout(2800)
+        });
+        const imgData = await imgRes.json();
+        if (imgData && Array.isArray(imgData.results)) {
+          imgData.results.slice(0, 10).forEach(r => {
+            if (r.image && r.image.startsWith('http') && !images.some(i => i.src === r.image)) {
+              images.push({
+                src: r.image,
+                alt: r.title ? r.title.replace(/<\/?[^>]+(>|$)/g, '') : cleanSub,
+                link: r.url || r.image
+              });
+            }
+          });
+        }
+      }
+    } catch(ddgErr) {}
+
+    // 2. Wikipedia high-resolution pageimages fallback
+    if (images.length < 4) {
+      try {
+        const wikiRes = await fetch(`https://en.wikipedia.org/w/api.php?action=query&generator=search&gsrsearch=${encodeURIComponent(cleanSub)}&gsrlimit=6&prop=pageimages&pithumbsize=800&format=json`, {
+          headers: { 'User-Agent': 'Cognisphere/1.0 (contact: info@cognisphereai.vercel.app)' },
+          signal: AbortSignal.timeout(2500)
+        });
+        const wikiData = await wikiRes.json();
+        if (wikiData && wikiData.query && wikiData.query.pages) {
+          Object.values(wikiData.query.pages).forEach(p => {
+            if (p.thumbnail && p.thumbnail.source && !images.some(i => i.src === p.thumbnail.source)) {
+              images.push({
+                src: p.thumbnail.source,
+                alt: p.title || cleanSub,
+                link: `https://en.wikipedia.org/wiki/${encodeURIComponent((p.title || cleanSub).replace(/ /g, '_'))}`
+              });
+            }
+          });
+        }
+      } catch(wikiErr) {}
+    }
+  } catch(e) {}
+  return images;
+}
+
+// Live web search backend aggregator (Organic Web + Wikipedia + YouTube + DuckDuckGo + Wikidata + OpenAlex + ArXiv)
 app.get('/api/live-search', async (req, res) => {
   const query = req.query.q || '';
   if (!query) {
@@ -1477,6 +1749,21 @@ app.get('/api/live-search', async (req, res) => {
 
   const results = { summary: '', bullets: [], articles: [], images: [], videos: [] };
 
+  // Primary: Multi-Engine Organic Web Search (Real sites, official domains, documentation)
+  const ddgOrganicPromise = (async () => {
+    try {
+      const organicArticles = await searchDuckDuckGoOrganic(targetTerm);
+      if (organicArticles && organicArticles.length > 0) {
+        results.articles.push(...organicArticles);
+        if (!results.summary && organicArticles[0].snippet) {
+          results.summary = organicArticles[0].snippet;
+        }
+      }
+    } catch (e) {
+      console.error('Organic web search failed:', e.message);
+    }
+  })();
+
   const wikiPromise = (async () => {
     try {
       const wikiSearch = await getJson(
@@ -1492,7 +1779,7 @@ app.get('/api/live-search', async (req, res) => {
         if (wikiExtract && wikiExtract.query && wikiExtract.query.pages) {
           const pages = wikiExtract.query.pages;
           const page = pages[Object.keys(pages)[0]];
-          if (page.extract) {
+          if (page.extract && !results.summary) {
             results.summary = page.extract.slice(0, 1200);
             const sentences = page.extract.split(/(?<=[.!?])\s+/).filter(s => s.length > 30 && s.length < 200).slice(0, 6);
             results.bullets = sentences;
@@ -1501,13 +1788,13 @@ app.get('/api/live-search', async (req, res) => {
             results.images.push({
               src: page.thumbnail.source,
               alt: page.title,
-              link: `https://en.wikipedia.org/wiki/${encodeURIComponent(page.title)}`
+              link: `https://en.wikipedia.org/wiki/${encodeURIComponent(page.title.replace(/ /g, '_'))}`
             });
           }
           results.articles.push(...wikiSearch.query.search.slice(0, 3).map(r => ({
             title: r.title,
             snippet: r.snippet.replace(/<\/?[^>]+(>|$)/g, ''),
-            url: `https://en.wikipedia.org/wiki/${encodeURIComponent(r.title)}`,
+            url: `https://en.wikipedia.org/wiki/${encodeURIComponent(r.title.replace(/ /g, '_'))}`,
             source: 'wikipedia.org'
           })));
         }
@@ -1524,7 +1811,7 @@ app.get('/api/live-search', async (req, res) => {
                 results.images.push({
                   src: p.thumbnail.source,
                   alt: p.title,
-                  link: `https://en.wikipedia.org/wiki/${encodeURIComponent(p.title)}`
+                  link: `https://en.wikipedia.org/wiki/${encodeURIComponent(p.title.replace(/ /g, '_'))}`
                 });
               }
             });
@@ -1712,30 +1999,21 @@ app.get('/api/live-search', async (req, res) => {
   })();
 
   // Include images ONLY if the user explicitly requested images in their query
-  const wantsImages = /\b(image|images|photo|photos|picture|pictures|pic|pics|show me|look like)\b/i.test(query);
+  const wantsImages = /\b(image|images|photo|photos|picture|pictures|pic|pics|gallery|wallpaper|look like|show me images|show me photos|show me pictures)\b/i.test(query);
 
-  await Promise.allSettled([wikiPromise, youtubePromise, ddgPromise, wikidataPromise, openAlexPromise, arxivPromise, pubmedPromise, crossrefPromise]);
+  await Promise.allSettled([ddgOrganicPromise, wikiPromise, youtubePromise, ddgPromise, wikidataPromise, openAlexPromise, arxivPromise, pubmedPromise, crossrefPromise]);
 
   if (!wantsImages) {
     results.images = [];
   } else {
-    // Guaranteed high-resolution image gallery fallback for explicit image queries
-    if (!results.images || results.images.length < 3) {
-      const subject = searchTarget || query.replace(/\b(images|image|photos|photo|pictures|picture|pics|pic|show me|look like|wallpapers|wallpaper|gallery)\b/gi, '').trim() || 'Visual';
-      const encSub = encodeURIComponent(subject);
-      const seeds = [108, 209, 310, 411];
-      const styles = ['hd realistic photo', 'cinematic detailed photo', '4k professional visual', 'vibrant clear view'];
-
+    // Fetch authentic, high-resolution query-related images
+    const imageQuery = targetTerm || query.replace(/\b(images|image|photos|photo|pictures|picture|pics|pic|show me|look like|wallpapers|wallpaper|gallery)\b/gi, '').trim();
+    const realImages = await fetchRealQueryImages(imageQuery);
+    if (realImages && realImages.length > 0) {
       if (!results.images) results.images = [];
-      seeds.forEach((seed, idx) => {
-        const promptStr = encodeURIComponent(`${subject} ${styles[idx]}`);
-        const imgUrl = `https://image.pollinations.ai/prompt/${promptStr}?width=800&height=600&nologo=true&seed=${seed}`;
-        if (!results.images.some(img => img.src === imgUrl)) {
-          results.images.push({
-            src: imgUrl,
-            alt: `${subject} - Photo ${idx + 1}`,
-            link: `https://image.pollinations.ai/prompt/${promptStr}`
-          });
+      realImages.forEach(img => {
+        if (!results.images.some(existing => existing.src === img.src)) {
+          results.images.push(img);
         }
       });
     }
@@ -1749,11 +2027,45 @@ app.get('/api/live-search', async (req, res) => {
     return true;
   });
 
+  // Prioritize organic websites, documentation, and official domains at the top
+  results.articles.sort((a, b) => {
+    const aIsAcademic = a.url.includes('arxiv.org') || a.url.includes('ncbi.nlm.nih.gov') || a.url.includes('openalex.org') || a.url.includes('crossref.org');
+    const bIsAcademic = b.url.includes('arxiv.org') || b.url.includes('ncbi.nlm.nih.gov') || b.url.includes('openalex.org') || b.url.includes('crossref.org');
+    if (!aIsAcademic && bIsAcademic) return -1;
+    if (aIsAcademic && !bIsAcademic) return 1;
+
+    const aIsCollege = /\.(ac\.in|edu\.in|\.edu)\b/i.test(a.url || '');
+    const bIsCollege = /\.(ac\.in|edu\.in|\.edu)\b/i.test(b.url || '');
+    if (aIsCollege && !bIsCollege) return -1;
+    if (!aIsCollege && bIsCollege) return 1;
+
+    return 0;
+  });
+
   res.json(results);
 });
 
+// Dynamic Webpage & YouTube Video Reader API Endpoint
+app.get('/api/read-url', async (req, res) => {
+  const targetUrl = req.query.url;
+  if (!targetUrl) {
+    return res.status(400).json({ error: 'URL query parameter is required' });
+  }
+  const result = await readUrlContent(targetUrl);
+  res.json(result);
+});
+
+app.post('/api/read-url', async (req, res) => {
+  const targetUrl = req.body && req.body.url;
+  if (!targetUrl) {
+    return res.status(400).json({ error: 'url is required in request body' });
+  }
+  const result = await readUrlContent(targetUrl);
+  res.json(result);
+});
+
 // Streaming AI completions with multi-model failover cascade
-const handleSearchStream = (req, res) => {
+const handleSearchStream = async (req, res) => {
   let query = (req.body && req.body.query) || (req.query && (req.query.query || req.query.q)) || '';
   if (!query) {
     return res.status(400).json({ error: 'Query is required' });
@@ -1990,7 +2302,8 @@ You are Cognisphere AI — speaking with the warmth, articulate brilliance, and 
    - Open naturally with a welcoming, engaging explanation that immediately gives the user the core answer.
 
 2. BEAUTIFUL, SCANNABLE & CONCISE PRESENTATION:
-   - Structure responses with natural, conversational Markdown headings (e.g. \`### 💡 The Big Picture\`, \`### ⚙️ How It Works Step-by-Step\`).
+   - For simple, direct, or factual queries: give easy, simple, and direct content answering EXACTLY and ONLY what is asked. Do not add unwanted walls of text or complex templates for simple queries.
+   - For detailed, architectural, or in-depth requests: structure responses with natural, conversational Markdown headings (e.g. \`### 💡 The Big Picture\`, \`### ⚙️ How It Works Step-by-Step\`).
    - Use bold highlights on key terms so the user can read and skim effortlessly.
    - For programming: Provide complete, modern, fully commented code with clear sample execution output.
 
@@ -2038,28 +2351,28 @@ CORE PRINCIPLES & BEHAVIOR:
 
 2. ACTION-ORIENTED & INTERACTIVE UI PRESENCE:
    - Do NOT just explain how to do something — perform the action and create the result!
-   - Output information using Markdown tables, structured cards, step-by-step checklists, interactive flowcharts (\`\`\`mermaid), and C/Python/JS code blocks.
+   - Output information using Markdown tables, structured cards, step-by-step checklists, interactive flowcharts (\`\`\`mermaid), and C/Python/JS code blocks when requested.
    - If user asks for study plan/timetable → create an interactive timetable table + checklist.
    - If user asks for comparison → create a specification comparison table.
    - If user asks for code → provide complete working code in the requested language (or Python/JS/modern stack if unspecified) with sample execution output.
 
 3. FRIENDLY, SHARP & HIGHLY ENGAGING PRESENTATION:
    - Speak with warmth, clarity, enthusiasm, and intellectual depth.
-   - Break down complex concepts into intuitive, approachable explanations followed by deep mechanics.
-   - Always include rich presentation: Markdown tables, relatable analogies, clean code with comments, and proactive related follow-ups.
+   - Break down complex concepts into intuitive, approachable explanations followed by deep mechanics when needed.
 
 4. MULTI-MODAL & REAL-TIME ACCURACY:
    - For images/screenshots, analyze visual details, text, and error traces inside that image.
    - Deliver real-time, accurate facts across science, technology, movies, politics, and research.
 
-5. INTELLIGENT CARD SELECTION & RESPONSE UI DIRECTIVE:
-   Format every response with clean visual hierarchy and ChatGPT-style depth:
-   - Concept / Question → Warm Overview + Real-World Analogy + Step-by-Step Mechanics + Markdown Comparison Table + Related Follow-Up Ideas.
-   - Comparison → Side-by-side feature matrix table with specs, pros, cons, and clear recommendation.
-   - Tutorial / How-To → Friendly Step Cards (Step 1 → Step 2 → Step 3) with practical tips.
-   - Programming → Production Code Card with language label, working code block, complexity analysis, and sample console output.
-   - Weather Request → Weather Card with metrics, humidity, wind, and forecast.
-   - Planning / Tasks → Task Card with checkboxes, timeline table, and completion status.`;
+5. PRECISION, SIMPLICITY & QUERY-DEMAND MATCHING (CRITICAL):
+   - Deliver easy, simple, and direct content matching what the user asks for — answer ONLY what is asked!
+   - For simple queries (e.g. definitions, direct questions, simple math, quick facts), give a clear, simple, concise answer immediately without unnecessary comparison tables, forced analogies, or walls of text.
+   - Only include rich structured components when specifically demanded:
+     * Comparison Request → Side-by-side feature matrix table with specs, pros, cons.
+     * Tutorial / Process Request → Clean Step Cards (Step 1 → Step 2 → Step 3).
+     * Programming Request → Working code block in code card with sample execution output.
+     * Weather Request → Weather metrics with humidity, wind, and forecast.
+     * Planning / Tasks → Checklists and timeline table.`;
 
   // ── MULTI-TURN STRUCTURED MESSAGES BUILDER ──────────────────────────────
   let llmMessages = [{ role: 'system', content: systemPrompt }];
@@ -2116,7 +2429,24 @@ CORE PRINCIPLES & BEHAVIOR:
       ]
     });
   } else {
-    const cleanNoBase64Query = (cleanUserQuery || query).replace(/Base64 Data \(snippet\):[^\n]*/gi, '').trim();
+    let cleanNoBase64Query = (cleanUserQuery || query).replace(/Base64 Data \(snippet\):[^\n]*/gi, '').trim();
+    
+    // Automatic Live URL / Video Content Reader
+    const detectedUrlMatch = cleanNoBase64Query.match(/https?:\/\/[^\s<>"')]+/i);
+    if (detectedUrlMatch) {
+      const targetReadUrl = detectedUrlMatch[0];
+      try {
+        sendUpdate({ type: 'status', status: `Reading content from ${new URL(targetReadUrl).hostname}…` });
+        const readResult = await readUrlContent(targetReadUrl);
+        if (readResult && readResult.success && readResult.content) {
+          const contentType = readResult.type === 'youtube_video' ? 'YOUTUBE VIDEO TRANSCRIPT' : 'LIVE WEBPAGE CONTENT';
+          cleanNoBase64Query = `[${contentType} FOR: ${targetReadUrl}]\n**Title:** ${readResult.title}\n\n${readResult.content}\n[END LIVE CONTENT]\n\nUser Instruction / Question:\n${cleanNoBase64Query}`;
+        }
+      } catch(urlReadErr) {
+        console.warn('URL auto-read failed:', urlReadErr.message);
+      }
+    }
+
     llmMessages.push({ role: 'user', content: cleanNoBase64Query });
   }
 
