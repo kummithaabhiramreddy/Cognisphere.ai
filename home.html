@@ -5864,29 +5864,29 @@
     }
 
     .open-videos-page-btn {
-      background: #20140e;
-      border: 1px solid rgba(217, 119, 87, 0.45);
-      color: #fed7aa;
-      padding: 8px 20px;
-      border-radius: 28px;
-      font-size: 0.92rem;
-      font-weight: 700;
+      background: rgba(32, 20, 14, 0.7);
+      border: 1px solid rgba(217, 119, 87, 0.35);
+      color: #c9a07a;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 0.72rem;
+      font-weight: 600;
       cursor: pointer;
       display: inline-flex;
       align-items: center;
-      gap: 8px;
-      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.45);
-      transition: all 0.2s ease;
-      letter-spacing: 0.015em;
+      gap: 5px;
+      box-shadow: none;
+      transition: all 0.18s ease;
+      letter-spacing: 0.01em;
       font-family: inherit;
     }
 
     .open-videos-page-btn:hover {
-      background: #2e1a12;
-      border-color: rgba(217, 119, 87, 0.75);
+      background: rgba(46, 26, 18, 0.85);
+      border-color: rgba(217, 119, 87, 0.6);
       color: #ffffff;
       transform: translateY(-1px);
-      box-shadow: 0 6px 22px rgba(217, 119, 87, 0.28);
+      box-shadow: 0 3px 10px rgba(217, 119, 87, 0.18);
     }
 
     /* ====== CHAT CITATION PILL (High-Level Authoritative Source Badge) ====== */
@@ -5946,69 +5946,136 @@
       margin-left: 2px;
     }
 
-    /* ====== CHATGPT-STYLE SOURCES SHELF (Non-Intrusive, Dynamic, Authoritative) ====== */
+    /* ====== CLAUDE-STYLE INLINE SOURCE PILLS ====== */
     .chat-sources-shelf {
-      margin-top: 14px;
-      padding-top: 12px;
-      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      display: inline-flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 5px;
+      margin-top: 10px;
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
     }
-    .chat-sources-title {
+    /* Platform pill: favicon + name + +N */
+    .src-platform-pill {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 2px 8px 2px 5px;
+      background: rgba(255, 255, 255, 0.055);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 20px;
+      font-size: 0.7rem;
+      font-weight: 500;
+      color: rgba(255,255,255,0.72);
+      cursor: pointer;
+      user-select: none;
+      transition: all 0.15s ease;
+      white-space: nowrap;
+    }
+    .src-platform-pill:hover {
+      background: rgba(255,255,255,0.1);
+      border-color: rgba(255,255,255,0.22);
+      color: #fff;
+    }
+    .src-platform-pill img {
+      width: 12px;
+      height: 12px;
+      border-radius: 2px;
+      object-fit: contain;
+      flex-shrink: 0;
+    }
+    .src-platform-pill .src-pill-count {
+      font-size: 0.65rem;
+      font-weight: 700;
+      color: rgba(255,255,255,0.45);
+      margin-left: 1px;
+    }
+    /* Popover that appears when pill clicked */
+    .src-pill-popover {
+      display: none;
+      position: absolute;
+      top: calc(100% + 6px);
+      left: 0;
+      z-index: 9999;
+      min-width: 260px;
+      max-width: 340px;
+      background: #1a1f2e;
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 12px;
+      box-shadow: 0 12px 36px rgba(0,0,0,0.55);
+      padding: 8px 0;
+      overflow: hidden;
+    }
+    .src-pill-popover.open {
+      display: block;
+      animation: popoverIn 0.18s cubic-bezier(0.16,1,0.3,1);
+    }
+    @keyframes popoverIn {
+      from { opacity:0; transform: translateY(-4px) scale(0.97); }
+      to   { opacity:1; transform: translateY(0) scale(1); }
+    }
+    .src-popover-header {
       display: flex;
       align-items: center;
       gap: 6px;
-      font-size: 0.76rem;
-      font-weight: 600;
-      letter-spacing: 0.04em;
+      padding: 6px 12px 8px;
+      border-bottom: 1px solid rgba(255,255,255,0.07);
+      font-size: 0.68rem;
+      font-weight: 700;
       text-transform: uppercase;
-      color: rgba(255, 255, 255, 0.55);
-      margin-bottom: 8px;
+      letter-spacing: 0.05em;
+      color: rgba(255,255,255,0.4);
     }
-    .chat-sources-title svg {
-      color: #00ffaa;
-    }
-    .chat-sources-grid {
+    .src-popover-item {
       display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-    }
-    .chat-source-item {
-      display: inline-flex;
-      align-items: center;
-      gap: 7px;
-      padding: 5px 11px;
-      background: rgba(255, 255, 255, 0.04);
-      border: 1px solid rgba(255, 255, 255, 0.09);
-      border-radius: 9px;
-      font-size: 0.76rem;
-      color: #cbd5e1;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 8px 12px;
       text-decoration: none;
-      transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
-      max-width: 240px;
+      color: rgba(255,255,255,0.82);
+      font-size: 0.78rem;
+      line-height: 1.35;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+      transition: background 0.12s;
     }
-    .chat-source-item:hover {
-      background: rgba(0, 255, 170, 0.08);
-      border-color: rgba(0, 255, 170, 0.35);
-      color: #ffffff;
-      transform: translateY(-1px);
+    .src-popover-item:last-child { border-bottom: none; }
+    .src-popover-item:hover {
+      background: rgba(255,255,255,0.05);
+      color: #fff;
     }
-    .source-item-fav {
+    .src-popover-item img {
       width: 14px;
       height: 14px;
+      margin-top: 1px;
       border-radius: 3px;
       flex-shrink: 0;
-      object-fit: contain;
     }
-    .source-item-text {
+    .src-popover-item-body {
+      flex: 1;
+      min-width: 0;
+    }
+    .src-popover-item-title {
+      display: block;
+      font-weight: 500;
+      white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
-      white-space: nowrap;
-      font-weight: 500;
     }
-    .source-item-arrow {
+    .src-popover-item-snippet {
+      display: block;
       font-size: 0.7rem;
-      opacity: 0.5;
-      margin-left: 2px;
+      color: rgba(255,255,255,0.38);
+      margin-top: 2px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .src-popover-arrow {
+      font-size: 0.65rem;
+      opacity: 0.35;
+      flex-shrink: 0;
+      margin-top: 2px;
     }
 
     /* ====== INLINE DYNAMIC VISUAL IMAGE GALLERY ====== */
@@ -14808,43 +14875,148 @@
       return validScored;
     }
 
+    // ── AUTHORITATIVE PLATFORM WHITELIST ──────────────────────────────────────
+    // Only main, trusted platforms are shown. Useless/low-quality domains are excluded.
+    const TRUSTED_PLATFORMS = [
+      'github.com','stackoverflow.com','developer.mozilla.org','mdn.web.docs',
+      'docs.python.org','reactjs.org','nodejs.org','npmjs.com','pypi.org',
+      'medium.com','dev.to','hashnode.com','freecodecamp.org',
+      'geeksforgeeks.org','w3schools.com','tutorialspoint.com','javatpoint.com',
+      'cs50.harvard.edu','coursera.org','udemy.com','edx.org','khanacademy.org',
+      'youtube.com','youtu.be',
+      'arxiv.org','pubmed.ncbi.nlm.nih.gov','springer.com','nature.com','sciencedirect.com',
+      'harvard.edu','mit.edu','stanford.edu','oxford.ac.uk','cambridge.org',
+      'techcrunch.com','theverge.com','wired.com','arstechnica.com','thenextweb.com',
+      'anthropic.com','openai.com','deepmind.com','huggingface.co','tensorflow.org','pytorch.org',
+      'aws.amazon.com','cloud.google.com','azure.microsoft.com','docs.microsoft.com',
+      'kubernetes.io','docker.com','linux.org','ubuntu.com',
+      'vercel.com','netlify.com','heroku.com','supabase.com','firebase.google.com',
+      'neetcode.io','leetcode.com','hackerrank.com','codeforces.com',
+      'britannica.com','nationalgeographic.com','bbc.com','reuters.com','apnews.com',
+      'who.int','cdc.gov','nih.gov','nasa.gov','un.org','gov.in'
+    ];
+
+    // Pill ID counter for unique popovers
+    let _srcPillId = 0;
+
     function buildChatGptStyleSources(articles) {
       if (!articles || !articles.length) return '';
-      const validArticles = articles.filter(a => {
+
+      // Filter: exclude search engines, aggregators, low-quality domains
+      const BLOCKLIST = [
+        'wikipedia.org','wikimedia.org','duckduckgo.com','bing.com',
+        'google.com','yahoo.com','ask.com','answers.com','quora.com',
+        'pinterest.com','reddit.com','twitter.com','x.com','facebook.com',
+        'instagram.com','tiktok.com','scribd.com','slideshare.net'
+      ];
+
+      const valid = articles.filter(a => {
         if (!a || !a.url) return false;
         const u = a.url.toLowerCase();
-        return !u.includes('wikipedia.org') &&
-               !u.includes('wikimedia.org') &&
-               !u.includes('duckduckgo.com') &&
-               !u.includes('bing.com') &&
-               !u.includes('google.com');
-      }).slice(0, 5);
-      if (!validArticles.length) return '';
-
-      let html = '<div class="chat-sources-shelf"><div class="chat-sources-title"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg> Sources</div><div class="chat-sources-grid">';
-      validArticles.forEach(art => {
-        let domain = '';
-        try { domain = new URL(art.url).hostname.replace(/^www\./, ''); } catch (e) { domain = 'web source'; }
-        const favicon = `https://www.google.com/s2/favicons?domain=${encodeURIComponent(domain)}&sz=32`;
-        let title = (art.title || domain)
-          .replace(/&#x27;/g, "'")
-          .replace(/&#39;/g, "'")
-          .replace(/&quot;/g, '"')
-          .replace(/&amp;/g, '&')
-          .replace(/\s*[-–—|].*$/, '')
-          .slice(0, 32).trim() || domain;
-        html += `<a href="${escapeHtml(art.url)}" target="_blank" rel="noopener noreferrer" class="chat-source-item" title="${escapeHtml(art.title || domain)} — ${escapeHtml(art.url)}">
-          <img src="${favicon}" class="source-item-fav" alt="" onerror="this.style.display='none'" />
-          <span class="source-item-text">${escapeHtml(title)}</span>
-          <span class="source-item-arrow">↗</span>
-        </a>`;
+        return !BLOCKLIST.some(b => u.includes(b));
       });
-      html += '</div></div>';
+      if (!valid.length) return '';
+
+      // Group articles by platform (hostname without www)
+      const platformMap = new Map();
+      valid.forEach(art => {
+        let domain = 'web';
+        try { domain = new URL(art.url).hostname.replace(/^www\./, ''); } catch(e) {}
+        // Use registered domain (last 2 parts) as group key for sub-domains
+        const parts = domain.split('.');
+        const groupKey = parts.length >= 2 ? parts.slice(-2).join('.') : domain;
+        if (!platformMap.has(groupKey)) platformMap.set(groupKey, { domain, articles: [] });
+        platformMap.get(groupKey).articles.push(art);
+      });
+
+      // Sort: trusted platforms first, then by article count desc
+      const sorted = [...platformMap.entries()].sort(([ka, va], [kb, vb]) => {
+        const ta = TRUSTED_PLATFORMS.some(p => ka.includes(p) || p.includes(ka)) ? 1 : 0;
+        const tb = TRUSTED_PLATFORMS.some(p => kb.includes(p) || p.includes(kb)) ? 1 : 0;
+        if (tb !== ta) return tb - ta;
+        return vb.articles.length - va.articles.length;
+      });
+
+      // Build platform pills (max 6 platforms shown)
+      const platforms = sorted.slice(0, 6);
+      let html = '<div class="chat-sources-shelf">';
+
+      platforms.forEach(([groupKey, { domain, articles: grpArts }]) => {
+        const pillId = `srcp-${++_srcPillId}`;
+        const favicon = `https://www.google.com/s2/favicons?domain=${encodeURIComponent(domain)}&sz=32`;
+        // Platform display name: capitalize first part
+        const nameParts = domain.split('.');
+        const platformName = (nameParts[0] || domain)
+          .replace(/-/g,' ')
+          .replace(/^(\w)/, c => c.toUpperCase())
+          .slice(0, 18);
+        const extraCount = grpArts.length - 1;
+        const countLabel = extraCount > 0 ? ` +${extraCount}` : '';
+
+        // Build popover items
+        let popoverItems = grpArts.slice(0, 8).map(art => {
+          let artDomain = domain;
+          try { artDomain = new URL(art.url).hostname.replace(/^www\./,''); } catch(e) {}
+          const artFav = `https://www.google.com/s2/favicons?domain=${encodeURIComponent(artDomain)}&sz=32`;
+          const artTitle = (art.title || artDomain)
+            .replace(/&amp;/g,'&').replace(/&quot;/g,'"').replace(/&#39;/g,"'")
+            .replace(/\s*[-–—|][^-–—|]*$/, '').slice(0, 70).trim();
+          const artSnippet = (art.snippet || '').replace(/<[^>]+>/g,'').slice(0, 80).trim();
+          return `<a href="${escapeHtml(art.url)}" target="_blank" rel="noopener noreferrer" class="src-popover-item">
+            <img src="${artFav}" alt="" onerror="this.style.display='none'"/>
+            <div class="src-popover-item-body">
+              <span class="src-popover-item-title">${escapeHtml(artTitle)}</span>
+              ${artSnippet ? `<span class="src-popover-item-snippet">${escapeHtml(artSnippet)}</span>` : ''}
+            </div>
+            <span class="src-popover-arrow">↗</span>
+          </a>`;
+        }).join('');
+
+        html += `<span class="src-platform-pill" id="${pillId}" onclick="toggleSrcPopover(event,'${pillId}')" role="button" tabindex="0" aria-expanded="false">
+          <img src="${favicon}" alt="" onerror="this.style.display='none'"/>
+          ${escapeHtml(platformName)}${countLabel ? `<span class="src-pill-count">${escapeHtml(countLabel)}</span>` : ''}
+          <div class="src-pill-popover" id="pop-${pillId}">
+            <div class="src-popover-header">
+              <img src="${favicon}" alt="" style="width:12px;height:12px;border-radius:2px;" onerror="this.style.display='none'"/>
+              ${escapeHtml(platformName)} &mdash; ${grpArts.length} source${grpArts.length > 1 ? 's' : ''}
+            </div>
+            ${popoverItems}
+          </div>
+        </span>`;
+      });
+
+      html += '</div>';
       return html;
     }
 
+    // Toggle source pill popover — close others, open clicked
+    function toggleSrcPopover(event, pillId) {
+      event.stopPropagation();
+      const pill = document.getElementById(pillId);
+      const pop = document.getElementById('pop-' + pillId);
+      if (!pill || !pop) return;
+      const isOpen = pop.classList.contains('open');
+      // Close all other popovers
+      document.querySelectorAll('.src-pill-popover.open').forEach(p => {
+        p.classList.remove('open');
+        const parentPill = p.closest('.src-platform-pill');
+        if (parentPill) parentPill.setAttribute('aria-expanded', 'false');
+      });
+      if (!isOpen) {
+        pop.classList.add('open');
+        pill.setAttribute('aria-expanded', 'true');
+      }
+    }
+    // Close popovers when clicking outside
+    document.addEventListener('click', () => {
+      document.querySelectorAll('.src-pill-popover.open').forEach(p => {
+        p.classList.remove('open');
+        const parentPill = p.closest('.src-platform-pill');
+        if (parentPill) parentPill.setAttribute('aria-expanded', 'false');
+      });
+    });
+
     function buildInlineCitationPill(articles) {
-      // Legacy compatibility stub — no intrusive static pills injected inside text
       return '';
     }
 
@@ -14981,10 +15153,10 @@
         const displayCount = videoCount >= 5 ? 20 : videoCount;
         const fullVideoCardsMarkup = hasVideos ? buildVideoCardsHTML(data.videos, query, langCode) : '';
 
-        html += `<div class="video-pill-wrap" style="margin-top:16px; margin-bottom:8px; display:inline-flex; align-items:center;">
+        html += `<div class="video-pill-wrap" style="margin-top:10px; margin-bottom:6px; display:inline-flex; align-items:center;">
           <button type="button" class="open-videos-page-btn" data-query="${escapeHtml(query)}" title="Watch ${displayCount} Classes in Telugu & English">
-            <span style="pointer-events:none; font-size:1.1rem; line-height:1;">🎓</span>
-            <span style="pointer-events:none;">Watch ${displayCount} Classes (Telugu & English) ➔</span>
+            <span style="pointer-events:none; font-size:0.75rem; line-height:1;">🎓</span>
+            <span style="pointer-events:none;">Watch ${displayCount} Classes ➔</span>
           </button>
           <div class="preloaded-video-markup" style="display:none !important;">${fullVideoCardsMarkup}</div>
         </div>`;
