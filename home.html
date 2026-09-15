@@ -8685,6 +8685,24 @@
 
       .search-shell {
         max-width: 100% !important;
+        width: 100% !important;
+      }
+
+      #askForm.antigravity-search-form {
+        padding: 10px 14px 8px 14px !important;
+        border-radius: 14px !important;
+      }
+
+      #askForm.antigravity-search-form .search-controls-row {
+        width: 100% !important;
+        display: flex !important;
+        flex-direction: row !important;
+        justify-content: space-between !important;
+        align-items: center !important;
+      }
+
+      .omni-word-counter {
+        display: none !important;
       }
 
       .modes-card-popup {
@@ -12527,26 +12545,13 @@
 
         <!-- Controls Row -->
         <div class="search-controls-row">
-          <!-- Left: Universal Attach + Autonomous AI Engine + Prompt Enhancer -->
+          <!-- Left: Universal Attach -->
           <div class="search-controls-left">
             <button type="button" class="plus-attach-btn" id="attachFileBtn" aria-label="Attach file" title="Attach file, image, or code">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16">
                 <line x1="12" y1="5" x2="12" y2="19"></line>
                 <line x1="5" y1="12" x2="19" y2="12"></line>
               </svg>
-            </button>
-
-            <!-- Autonomous AI Engine Indicator (Surpassing ChatGPT & Claude — All-in-one unified intelligence without mode friction) -->
-            <div class="autonomous-omni-badge" id="omniEngineBadge" title="Superhuman Autonomous Compound AI — Real-time Web Grounding, Code Synthesis, Deep Reasoning, and Multi-model Intelligence">
-              <span class="omni-pulse-dot"></span>
-              <span class="omni-engine-text">Autonomous AI</span>
-              <span class="omni-pill-tag">Frontier</span>
-            </div>
-
-            <!-- Prompt Enhancer Button -->
-            <button type="button" class="enhance-prompt-btn" id="enhancePromptBtn" title="Refine and elevate your prompt with autonomous AI" onclick="enhanceCurrentPrompt(event)">
-              <span class="sparkle-icon">✨</span>
-              <span class="enhance-text">Enhance</span>
             </button>
           </div>
 
