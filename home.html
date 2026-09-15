@@ -15149,8 +15149,10 @@
       const isSimpleGreeting = /^\s*(hi|hello|hey|who are you|what is your name)\b/i.test(query || '');
 
       if (!isSimpleGreeting) {
-        const videoCount = (hasVideos && data.videos.length) ? data.videos.length : 20;
-        const displayCount = videoCount >= 5 ? 20 : videoCount;
+        const videoCount = (hasVideos && data.videos.length) ? data.videos.length : 0;
+        // Show the REAL count of pulled videos — never fake it
+        if (videoCount === 0) return html; // no videos fetched, skip the button
+        const displayCount = videoCount;
         const fullVideoCardsMarkup = hasVideos ? buildVideoCardsHTML(data.videos, query, langCode) : '';
 
         html += `<div class="video-pill-wrap" style="margin-top:10px; margin-bottom:6px; display:inline-flex; align-items:center;">
@@ -17243,107 +17245,242 @@ d----        13-09-2026     10:30                api
     function generateStudioSuggestions(query) {
       let cleanQ = (query || '')
         .replace(/^[\s↳🔬💻⚡🪐🚀🧬🔍💡🔒📊🤖•\-\d.]+/gu, '')
-        .replace(/^(?:Deep dive:?\s*|Production code implementation & benchmark test for|Comparative performance analysis & real-world trade-offs in|Future trajectory & next breakthroughs for|Advanced theoretical foundations & mechanisms of|Theoretical architecture & mechanisms of|Production code implementation for|Performance benchmarks & real-world scaling for)\s*/i, '')
-        .replace(/^(?:can you\s+)?(?:please\s+)?(?:explain|what is|what'?s|tell me about|how does|how do|how to|define|describe|overview of|details about|search for|give me|show me)\s+/i, '')
+        .replace(/^(?:can you\s+)?(?:please\s+)?(?:explain|what is|what'?s|tell me about|how does|how do|how to|define|describe|overview of|details about|search for|give me|show me|what are|list|write about)\s+/i, '')
         .replace(/[?.!]+$/g, '')
         .trim();
 
       cleanQ = cleanQ.replace(/^of\s+/i, '').replace(/^in\s+/i, '').replace(/^for\s+/i, '').trim();
-      if (!cleanQ) return [];
+      if (!cleanQ || cleanQ.length < 3) return [];
 
       const lower = cleanQ.toLowerCase();
 
-      // Filter out casual greetings / trivial phrases (prevents awkward "foundations of hi")
-      if (/^(hi|hello|hey|greetings|hola|namaste|yo|how are you|who are you|thanks|thank you|ok|okay|bye|good morning|good evening)$/i.test(lower) || lower.length < 3) {
+      // Skip trivial greetings
+      if (/^(hi|hello|hey|greetings|hola|namaste|yo|how are you|who are you|thanks|thank you|ok|okay|bye|good morning|good evening)$/i.test(lower)) {
         return [];
       }
 
-      // 1. Linear Search / Binary Search & Searching Algorithms
-      if (lower.includes('linear search') || lower.includes('search algorithm') || lower.includes('searching')) {
-        return [
-          'Worst-case O(N) trace',
-          'Sentinel optimization',
-          'Singly linked list traversal',
-          'Cache locality vs Binary Search'
-        ];
-      }
+      // Extract the core topic (strip filler words to get the key noun/concept)
+      const topic = cleanQ
+        .replace(/\b(the|a|an|its|their|this|that|these|those|my|your|our|very|really|just|also|more|most|best|how|why|when|where|which|what|who)\b/gi, '')
+        .replace(/\s+/g, ' ')
+        .trim()
+        .slice(0, 40);
 
-      // 2. Binary Search & Divide and Conquer
-      if (lower.includes('binary search')) {
-        return [
-          'Safe midpoint calculation',
-          'Rotated sorted array search',
-          'Bisect left vs bisect right',
-          'Monotonic answer spaces'
-        ];
-      }
+      const T = topic; // shorthand
 
-      // 3. Sorting Algorithms (Bubble, Merge, Quick, Insertion)
-      if (lower.includes('sort') || lower.includes('bubble') || lower.includes('merge sort') || lower.includes('quick sort')) {
-        return [
-          'In-place memory footprint',
-          'Sorting stability in databases',
-          'Worst-case vs average recurrence',
-          'Timsort & Introsort optimizations'
-        ];
-      }
+      // ── DOMAIN DETECTION → DOMAIN-SPECIFIC SHARP QUESTIONS ──────────────────
 
-      // 4. Data Structures (Arrays, Linked Lists, Trees, Graphs, DP)
-      if (lower.includes('linked list') || lower.includes('tree') || lower.includes('graph') || lower.includes('stack') || lower.includes('queue') || lower.includes('dp') || lower.includes('dynamic programming')) {
-        return [
-          'Array vs linked node cache layout',
-          'CRUD operation complexity',
-          'Fast & slow pointer cycle check',
-          'Memoization vs tabulation'
-        ];
-      }
+      // Programming languages
+      const isPython    = lower.includes('python');
+      const isJS        = lower.includes('javascript') || lower.includes(' js ') || lower.endsWith(' js');
+      const isReact     = lower.includes('react');
+      const isCpp       = lower.includes('c++') || lower.includes('cpp');
+      const isC         = !isCpp && (lower.includes(' c ') || lower.startsWith('c ') || lower === 'c');
+      const isJava      = lower.includes('java') && !lower.includes('javascript');
+      const isSQL       = lower.includes('sql') || lower.includes('database') || lower.includes('query');
+      const isHTML      = lower.includes('html') || lower.includes('css');
 
-      // 5. Python Specific
-      if (lower.includes('python')) {
-        return [
-          'List comprehension & generators',
-          'Memory profiling with tracemalloc',
-          'Pytest fixtures & edge cases',
-          'Type hints & PEP 8 standards'
-        ];
-      }
+      // CS concepts
+      const isAlgo      = lower.includes('algorithm') || lower.includes('complexity') || lower.includes('big o') || lower.includes('time complexity');
+      const isSort      = lower.includes('sort');
+      const isSearch    = lower.includes('search');
+      const isDS        = lower.includes('data structure') || lower.includes('linked list') || lower.includes('tree') || lower.includes('graph') || lower.includes('stack') || lower.includes('queue') || lower.includes('heap');
+      const isDP        = lower.includes('dynamic programming') || lower.includes(' dp ');
 
-      // 6. C / C++ Specific
-      if (lower.includes('c++') || lower.includes('cpp') || lower.includes(' c ') || lower.startsWith('c ') || lower.endsWith(' c')) {
-        return [
-          'Pointer offsets & cache line hit',
-          'Valgrind memory leak checks',
-          'STL std::find vs custom loop',
-          'Modern C++20 constexpr evaluation'
-        ];
-      }
+      // AI / ML
+      const isAI        = lower.includes('artificial intelligence') || lower.includes('machine learning') || lower.includes(' ml ') || lower.includes('deep learning') || lower.includes('neural') || lower.includes('llm') || lower.includes('gpt') || lower.includes('ai ');
+      const isModel     = lower.includes(' model') || lower.includes('transformer') || lower.includes('diffusion');
 
-      // 7. Web / JavaScript / Frontend / UI (Matching exact Image 2 suggestions!)
-      if (lower.includes('javascript') || lower.includes('react') || lower.includes('html') || lower.includes('css') || lower.includes('ui') || lower.includes('website') || lower.includes('web')) {
-        return [
-          'a polished visual version',
-          'an actual app-style mockup image',
-          'Live interactive animations',
-          'Responsive mobile layout'
-        ];
-      }
+      // Web / system
+      const isWeb       = lower.includes('web') || lower.includes('html') || lower.includes('css') || lower.includes('frontend') || lower.includes('backend');
+      const isAPI       = lower.includes('api') || lower.includes('rest') || lower.includes('graphql');
+      const isCloud     = lower.includes('cloud') || lower.includes('aws') || lower.includes('docker') || lower.includes('kubernetes') || lower.includes('devops');
 
-      // 8. AI / Machine Learning
-      if (lower.includes('ai') || lower.includes('llm') || lower.includes('neural') || lower.includes('model') || lower.includes('agent')) {
-        return [
-          'MoE routing & KV-cache memory',
-          'Multi-agent orchestration',
-          'Chain-of-thought compute scaling',
-          'Speculative decoding benchmarks'
-        ];
-      }
+      // Science
+      const isPhysics   = lower.includes('physics') || lower.includes('quantum') || lower.includes('relativity') || lower.includes('energy') || lower.includes('force') || lower.includes('wave');
+      const isBio       = lower.includes('biology') || lower.includes('dna') || lower.includes('cell') || lower.includes('protein') || lower.includes('gene') || lower.includes('evolution');
+      const isChem      = lower.includes('chemistry') || lower.includes('atom') || lower.includes('molecule') || lower.includes('reaction') || lower.includes('element') || lower.includes('bond');
+      const isMath      = lower.includes('math') || lower.includes('calculus') || lower.includes('algebra') || lower.includes('geometry') || lower.includes('equation') || lower.includes('theorem') || lower.includes('proof');
 
-      // 9. General High-Quality Follow-up
+      // History / geography
+      const isHistory   = lower.includes('history') || lower.includes('war') || lower.includes('empire') || lower.includes('revolution') || lower.includes('ancient') || lower.includes('century') || lower.includes('dynasty');
+      const isGeo       = lower.includes('country') || lower.includes('capital') || lower.includes('geography') || lower.includes('continent') || lower.includes('ocean') || lower.includes('river') || lower.includes('mountain');
+
+      // Business / finance
+      const isBiz       = lower.includes('business') || lower.includes('startup') || lower.includes('market') || lower.includes('finance') || lower.includes('economy') || lower.includes('investment') || lower.includes('revenue');
+
+      // Health / medicine
+      const isHealth    = lower.includes('health') || lower.includes('disease') || lower.includes('medicine') || lower.includes('symptom') || lower.includes('treatment') || lower.includes('medical') || lower.includes('virus');
+
+      // ── BUILD QUESTIONS BASED ON DETECTED DOMAIN ──────────────────────────
+
+      if (isSort) return [
+        `Time & space complexity of ${T}`,
+        `Stable vs unstable variant of ${T}`,
+        `${T} on nearly-sorted input`,
+        `When to prefer ${T} over QuickSort`
+      ];
+
+      if (isSearch) return [
+        `Worst-case trace of ${T}`,
+        `${T} on linked list vs array`,
+        `Sentinel optimization for ${T}`,
+        `${T} vs Binary Search — when to use`
+      ];
+
+      if (isDP) return [
+        `Memoization vs tabulation for ${T}`,
+        `State space reduction in ${T}`,
+        `Reconstructing solution from DP table`,
+        `${T} real interview problems`
+      ];
+
+      if (isDS) return [
+        `${T} CRUD operation complexities`,
+        `Memory layout of ${T}`,
+        `${T} real-world use cases`,
+        `Common bugs & edge cases in ${T}`
+      ];
+
+      if (isAlgo) return [
+        `${T} best / worst / average case`,
+        `${T} implementation step-by-step`,
+        `When NOT to use ${T}`,
+        `${T} optimization techniques`
+      ];
+
+      if (isPython) return [
+        `${T} with type hints & PEP 8`,
+        `Memory profile ${T} with tracemalloc`,
+        `Unit test ${T} with pytest`,
+        `${T} — generator vs list comprehension`
+      ];
+
+      if (isCpp) return [
+        `${T} with STL & modern C++20`,
+        `Pointer & memory layout for ${T}`,
+        `Valgrind check for ${T}`,
+        `${T} constexpr at compile time`
+      ];
+
+      if (isC) return [
+        `${T} pointer arithmetic`,
+        `${T} struct memory layout`,
+        `${T} common undefined behavior`,
+        `${T} vs C++ equivalent`
+      ];
+
+      if (isJava) return [
+        `${T} in Java Collections Framework`,
+        `${T} thread safety & concurrency`,
+        `${T} generics & type bounds`,
+        `${T} JVM memory impact`
+      ];
+
+      if (isJS || isReact) return [
+        `${T} — event loop internals`,
+        `${T} performance optimization`,
+        `${T} responsive mobile layout`,
+        `${T} real-world production pattern`
+      ];
+
+      if (isHTML) return [
+        `${T} accessibility & ARIA`,
+        `${T} CSS animation example`,
+        `${T} responsive grid layout`,
+        `${T} semantic HTML best practice`
+      ];
+
+      if (isSQL) return [
+        `${T} query optimization & indexes`,
+        `${T} vs NoSQL — when to choose`,
+        `${T} JOIN types with examples`,
+        `${T} transactions & ACID`
+      ];
+
+      if (isAPI) return [
+        `${T} authentication — JWT vs OAuth`,
+        `${T} rate limiting & caching`,
+        `${T} versioning best practices`,
+        `${T} error handling & status codes`
+      ];
+
+      if (isCloud) return [
+        `${T} scalability architecture`,
+        `${T} cost optimization tips`,
+        `${T} CI/CD pipeline setup`,
+        `${T} monitoring & alerting`
+      ];
+
+      if (isAI || isModel) return [
+        `${T} training data & architecture`,
+        `${T} fine-tuning vs prompting`,
+        `${T} benchmark performance`,
+        `${T} real-world deployment challenges`
+      ];
+
+      if (isPhysics) return [
+        `${T} mathematical derivation`,
+        `${T} real-world applications`,
+        `${T} common misconceptions`,
+        `${T} connection to quantum mechanics`
+      ];
+
+      if (isBio) return [
+        `${T} mechanism at molecular level`,
+        `${T} diseases linked to it`,
+        `${T} recent research breakthroughs`,
+        `${T} role in evolution`
+      ];
+
+      if (isChem) return [
+        `${T} reaction mechanism`,
+        `${T} industrial applications`,
+        `${T} safety & hazards`,
+        `${T} comparison with similar compounds`
+      ];
+
+      if (isMath) return [
+        `Proof of ${T}`,
+        `${T} real-world application`,
+        `${T} edge cases & exceptions`,
+        `${T} vs related theorems`
+      ];
+
+      if (isHistory) return [
+        `Root causes of ${T}`,
+        `Key figures in ${T}`,
+        `Long-term impact of ${T}`,
+        `${T} compared to similar events`
+      ];
+
+      if (isGeo) return [
+        `${T} climate & geography`,
+        `${T} economy & key industries`,
+        `${T} culture & people`,
+        `${T} current events & challenges`
+      ];
+
+      if (isBiz) return [
+        `${T} business model breakdown`,
+        `${T} market size & growth`,
+        `${T} biggest risks & challenges`,
+        `${T} successful case studies`
+      ];
+
+      if (isHealth) return [
+        `${T} symptoms & diagnosis`,
+        `${T} treatment & prevention`,
+        `${T} latest medical research`,
+        `${T} risk factors & causes`
+      ];
+
+      // ── UNIVERSAL FALLBACK — always query-specific ──────────────────────────
       return [
-        `Key mechanism breakdown`,
-        `Production code example`,
-        `Performance benchmarks & trade-offs`,
-        `Future trajectory & breakthroughs`
+        `How does ${T} work internally?`,
+        `Real-world use cases of ${T}`,
+        `Common mistakes with ${T}`,
+        `${T} vs alternatives — comparison`
       ];
     }
 
