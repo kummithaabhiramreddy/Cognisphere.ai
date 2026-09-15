@@ -2433,7 +2433,9 @@
               query: query,
               messages: [],
               attachments: [],
-              mode: activeLandingMode
+              mode: activeLandingMode,
+              source: 'landing',
+              noMedia: true
             })
           });
 
@@ -2481,10 +2483,15 @@
             const payload = JSON.parse(jsonStr);
             if (payload.text) {
               currentLandingAnswer += payload.text;
+              // Clean any media tags on index page (text and exploration only)
+              const cleanAnswer = currentLandingAnswer
+                .replace(/<div class="ai-inline-image-grid"[\s\S]*?<\/div>/gi, '')
+                .replace(/<a class="ai-inline-img-card"[\s\S]*?<\/a>/gi, '')
+                .replace(/### 📷 Visual Gallery[\s\S]*?(?=(?:##|$))/gi, '');
               if (window.marked) {
-                respEl.innerHTML = marked.parse(currentLandingAnswer);
+                respEl.innerHTML = marked.parse(cleanAnswer);
               } else {
-                respEl.textContent = currentLandingAnswer;
+                respEl.textContent = cleanAnswer;
               }
             }
           } catch(parseErr) {}

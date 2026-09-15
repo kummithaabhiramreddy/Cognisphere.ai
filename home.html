@@ -5864,22 +5864,29 @@
     }
 
     .open-videos-page-btn {
-      background: rgba(217, 119, 87, 0.12);
-      border: 1px solid rgba(217, 119, 87, 0.3);
-      color: var(--gold-soft);
-      padding: 4px 10px;
-      border-radius: 16px;
-      font-size: 0.68rem;
-      font-weight: 600;
+      background: #20140e;
+      border: 1px solid rgba(217, 119, 87, 0.45);
+      color: #fed7aa;
+      padding: 8px 20px;
+      border-radius: 28px;
+      font-size: 0.92rem;
+      font-weight: 700;
       cursor: pointer;
       display: inline-flex;
       align-items: center;
-      gap: 4px;
+      gap: 8px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.45);
       transition: all 0.2s ease;
+      letter-spacing: 0.015em;
+      font-family: inherit;
     }
 
     .open-videos-page-btn:hover {
-      background: rgba(217, 119, 87, 0.2);
+      background: #2e1a12;
+      border-color: rgba(217, 119, 87, 0.75);
+      color: #ffffff;
+      transform: translateY(-1px);
+      box-shadow: 0 6px 22px rgba(217, 119, 87, 0.28);
     }
 
     /* ====== CHAT CITATION PILL (High-Level Authoritative Source Badge) ====== */
@@ -5937,6 +5944,118 @@
       border-radius: 8px;
       padding: 1px 5px;
       margin-left: 2px;
+    }
+
+    /* ====== CHATGPT-STYLE SOURCES SHELF (Non-Intrusive, Dynamic, Authoritative) ====== */
+    .chat-sources-shelf {
+      margin-top: 14px;
+      padding-top: 12px;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+    .chat-sources-title {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.76rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: rgba(255, 255, 255, 0.55);
+      margin-bottom: 8px;
+    }
+    .chat-sources-title svg {
+      color: #00ffaa;
+    }
+    .chat-sources-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .chat-source-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 5px 11px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.09);
+      border-radius: 9px;
+      font-size: 0.76rem;
+      color: #cbd5e1;
+      text-decoration: none;
+      transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+      max-width: 240px;
+    }
+    .chat-source-item:hover {
+      background: rgba(0, 255, 170, 0.08);
+      border-color: rgba(0, 255, 170, 0.35);
+      color: #ffffff;
+      transform: translateY(-1px);
+    }
+    .source-item-fav {
+      width: 14px;
+      height: 14px;
+      border-radius: 3px;
+      flex-shrink: 0;
+      object-fit: contain;
+    }
+    .source-item-text {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      font-weight: 500;
+    }
+    .source-item-arrow {
+      font-size: 0.7rem;
+      opacity: 0.5;
+      margin-left: 2px;
+    }
+
+    /* ====== INLINE DYNAMIC VISUAL IMAGE GALLERY ====== */
+    .ai-inline-image-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 10px;
+      margin: 14px 0;
+    }
+    .ai-inline-img-card {
+      display: flex;
+      flex-direction: column;
+      background: rgba(18, 22, 34, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      overflow: hidden;
+      text-decoration: none;
+      transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
+    }
+    .ai-inline-img-card:hover {
+      transform: translateY(-3px) scale(1.01);
+      border-color: rgba(0, 255, 170, 0.45);
+      box-shadow: 0 8px 24px rgba(0, 255, 170, 0.15);
+    }
+    .ai-inline-img-card img {
+      width: 100%;
+      height: 130px;
+      object-fit: cover;
+      display: block;
+      background: #0d1117;
+      transition: transform 0.25s ease;
+    }
+    .ai-inline-img-card:hover img {
+      transform: scale(1.04);
+    }
+    .ai-inline-img-caption {
+      padding: 7px 9px;
+      font-size: 0.72rem;
+      color: #94a3b8;
+      font-weight: 500;
+      line-height: 1.3;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      background: rgba(11, 15, 24, 0.95);
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
     }
 
     /* ====== ANTIGRAVITY-STYLE VISUAL WEB SNAPSHOT ARTIFACT CARD ====== */
@@ -7317,12 +7436,156 @@
     }
 
     .cloud-preview-card {
-      width: 100vw;
-      height: 100vh;
+      width: min(1280px, 96vw);
+      height: min(90vh, 920px);
       background: #0d0d0d;
+      border: 1px solid rgba(217, 119, 87, 0.4);
+      border-radius: 16px;
+      box-shadow: 0 24px 80px rgba(0, 0, 0, 0.9), 0 0 35px rgba(217, 119, 87, 0.15);
       display: flex;
       flex-direction: column;
       overflow: hidden;
+      transition: transform 0.2s ease;
+    }
+
+    .cloud-action-pill-btn {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      color: #e2e8f0;
+      font-size: 0.76rem;
+      font-weight: 600;
+      padding: 5px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.15s ease;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .cloud-action-pill-btn:hover {
+      background: rgba(255, 255, 255, 0.16);
+      border-color: rgba(255, 255, 255, 0.35);
+      color: #ffffff;
+      transform: translateY(-1px);
+    }
+
+    /* ====== CLAUDE-STYLE ARTIFACT BANNER CARD ====== */
+    .claude-artifact-banner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin: 16px 0 10px 0;
+      padding: 12px 18px;
+      background: linear-gradient(135deg, rgba(217, 119, 87, 0.14) 0%, rgba(15, 17, 23, 0.96) 100%);
+      border: 1px solid rgba(217, 119, 87, 0.45);
+      border-radius: 14px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45), 0 0 18px rgba(217, 119, 87, 0.12);
+      cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      user-select: none;
+    }
+
+    .claude-artifact-banner:hover {
+      border-color: rgba(217, 119, 87, 0.85);
+      background: linear-gradient(135deg, rgba(217, 119, 87, 0.22) 0%, rgba(20, 24, 33, 0.98) 100%);
+      transform: translateY(-2px);
+      box-shadow: 0 14px 34px rgba(0, 0, 0, 0.6), 0 0 24px rgba(217, 119, 87, 0.25);
+    }
+
+    .claude-artifact-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+    }
+
+    .claude-artifact-icon-box {
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      background: rgba(217, 119, 87, 0.2);
+      border: 1px solid rgba(217, 119, 87, 0.45);
+      color: #d97757;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .claude-artifact-meta {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      min-width: 0;
+    }
+
+    .claude-artifact-title {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: #ffffff;
+      font-family: 'Inter', sans-serif;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .claude-artifact-subtitle {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.73rem;
+      color: #94a3b8;
+      font-family: 'Inter', sans-serif;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .claude-pill-badge {
+      font-size: 0.64rem;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: #00ffaa;
+      background: rgba(0, 255, 170, 0.12);
+      border: 1px solid rgba(0, 255, 170, 0.35);
+      padding: 1px 7px;
+      border-radius: 999px;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .claude-artifact-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+
+    .claude-artifact-btn {
+      all: unset;
+      box-sizing: border-box;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 15px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, #d97757 0%, #c05c38 100%);
+      color: #ffffff;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.78rem;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(217, 119, 87, 0.4);
+      transition: all 0.15s ease;
+    }
+
+    .claude-artifact-btn:hover {
+      background: linear-gradient(135deg, #e58869 0%, #d97757 100%);
+      transform: translateY(-1px);
+      box-shadow: 0 6px 18px rgba(217, 119, 87, 0.55);
     }
 
     .cloud-preview-header {
@@ -7661,104 +7924,85 @@
     }
 
     /* ====== ANTIGRAVITY / GEMINI-STYLE CHAT BAR ====== */
+    /* ====== RAZOR-SHARP AUTONOMOUS OMNI SEARCH BAR (SURPASSING CHATGPT & CLAUDE) ====== */
     .search-shell {
       position: relative;
       width: 100%;
-      max-width: 760px;
+      max-width: 780px;
       margin: 0 auto;
-      transition: all 0.3s ease;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      z-index: 80;
     }
 
-    /* Override global form style completely */
     #askForm.antigravity-search-form {
       display: flex !important;
       flex-direction: column !important;
       align-items: stretch !important;
       gap: 0 !important;
-      background: #1e1f24 !important;
-      border: 1px solid rgba(255, 255, 255, 0.10) !important;
-      border-radius: 20px !important;
+      background: linear-gradient(180deg, rgba(16, 19, 28, 0.88) 0%, rgba(10, 12, 18, 0.96) 100%) !important;
+      border: 1px solid rgba(255, 255, 255, 0.12) !important;
+      border-radius: 14px !important;
       padding: 14px 16px 10px 16px !important;
-      box-shadow: 0 8px 36px rgba(0, 0, 0, 0.5) !important;
-      transition: border-color 0.2s, box-shadow 0.2s !important;
+      box-shadow: 0 18px 50px -10px rgba(0, 0, 0, 0.85), inset 0 1px 0 rgba(255, 255, 255, 0.12), inset 0 0 24px rgba(0, 0, 0, 0.35) !important;
+      backdrop-filter: blur(28px) saturate(180%) !important;
+      -webkit-backdrop-filter: blur(28px) saturate(180%) !important;
+      transition: border-color 0.25s ease, box-shadow 0.25s ease, transform 0.2s ease !important;
       width: 100% !important;
       box-sizing: border-box !important;
       position: relative !important;
+      overflow: visible !important;
     }
 
     #askForm.antigravity-search-form::before {
       display: none !important;
     }
 
+    /* Laser beam across the top perimeter */
+    .search-sharp-laser-beam {
+      position: absolute;
+      top: -1px;
+      left: 18%;
+      right: 18%;
+      height: 1.5px;
+      background: linear-gradient(90deg, transparent 0%, #d97757 25%, #00ffaa 50%, #38bdf8 75%, transparent 100%);
+      border-radius: 2px;
+      opacity: 0.65;
+      filter: drop-shadow(0 0 6px #00ffaa);
+      transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    #askForm.antigravity-search-form:focus-within .search-sharp-laser-beam {
+      left: 2%;
+      right: 2%;
+      opacity: 1;
+      filter: drop-shadow(0 0 10px #00ffaa) drop-shadow(0 0 4px #38bdf8);
+    }
+
     #askForm.antigravity-search-form:focus-within {
-      border-color: rgba(0, 136, 255, 0.45) !important;
-      box-shadow: 0 12px 44px rgba(0, 136, 255, 0.22), 0 0 0 1px rgba(0, 136, 255, 0.3) !important;
+      border-color: rgba(0, 255, 170, 0.45) !important;
+      box-shadow: 0 24px 60px -10px rgba(0, 0, 0, 0.9), 0 0 0 1px rgba(0, 255, 170, 0.25), 0 0 35px rgba(0, 255, 170, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.18) !important;
     }
 
     body.is-generating #askForm.antigravity-search-form {
-      border-color: rgba(0, 200, 255, 0.5) !important;
-      box-shadow: 0 0 25px rgba(0, 136, 255, 0.25) !important;
-      animation: searchPulseGlow 2s infinite ease-in-out !important;
+      border-color: rgba(0, 255, 170, 0.6) !important;
+      box-shadow: 0 0 35px rgba(0, 255, 170, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2) !important;
+      animation: omniPulseGlow 2s infinite ease-in-out !important;
     }
 
-    @keyframes searchPulseGlow {
-      0% {
-        box-shadow: 0 0 15px rgba(0, 136, 255, 0.2);
-      }
-
-      50% {
-        box-shadow: 0 0 30px rgba(0, 200, 255, 0.4);
-      }
-
-      100% {
-        box-shadow: 0 0 15px rgba(0, 136, 255, 0.2);
-      }
+    @keyframes omniPulseGlow {
+      0% { box-shadow: 0 0 15px rgba(0, 255, 170, 0.2); }
+      50% { box-shadow: 0 0 35px rgba(0, 255, 170, 0.45), 0 0 0 1px rgba(0, 255, 170, 0.35); }
+      100% { box-shadow: 0 0 15px rgba(0, 255, 170, 0.2); }
     }
 
-    /* Premium Query Presentation Header Bar */
-    .premium-query-badge-bar {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      margin-bottom: 12px;
-      flex-wrap: wrap;
-      font-family: 'Inter', system-ui, sans-serif;
-    }
-
-    .premium-query-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      padding: 3px 10px;
-      border-radius: 20px;
-      font-size: 0.74rem;
-      font-weight: 600;
-      letter-spacing: 0.02em;
-      backdrop-filter: blur(8px);
-    }
-
-    .badge-engine {
-      background: rgba(0, 136, 255, 0.15);
-      color: #60a5fa;
-      border: 1px solid rgba(0, 136, 255, 0.35);
-    }
-
-    .badge-speed {
-      background: rgba(34, 197, 94, 0.12);
-      color: #4ade80;
-      border: 1px solid rgba(34, 197, 94, 0.3);
-    }
-
-    .badge-verified {
-      background: rgba(168, 85, 247, 0.14);
-      color: #c084fc;
-      border: 1px solid rgba(168, 85, 247, 0.35);
-    }
-
-    /* Top row: full-width textarea */
-    #askForm.antigravity-search-form .search-input-row {
+    /* Textarea & Input Wrapper */
+    .search-input-wrapper {
+      position: relative !important;
       width: 100% !important;
-      display: block !important;
+      display: flex !important;
+      flex-direction: column !important;
       margin-bottom: 6px !important;
     }
 
@@ -7769,21 +8013,74 @@
       border: none !important;
       outline: none !important;
       resize: none !important;
-      color: #e8e8e8 !important;
-      font-family: 'Inter', system-ui, sans-serif !important;
-      font-size: 1rem !important;
-      line-height: 1.55 !important;
-      padding: 0 !important;
+      color: #f5f5f7 !important;
+      font-family: 'Inter', system-ui, -apple-system, sans-serif !important;
+      font-size: 1.02rem !important;
+      font-weight: 400 !important;
+      letter-spacing: -0.01em !important;
+      line-height: 1.6 !important;
+      padding: 0 65px 0 0 !important;
       margin: 0 !important;
-      min-height: 44px !important;
+      min-height: 46px !important;
       max-height: 240px !important;
       overflow-y: auto !important;
       box-sizing: border-box !important;
       flex: unset !important;
+      caret-color: #00ffaa !important;
     }
 
     #askForm.antigravity-search-form textarea#askInput::placeholder {
-      color: rgba(255, 255, 255, 0.35) !important;
+      color: rgba(255, 255, 255, 0.36) !important;
+      font-weight: 400 !important;
+    }
+
+    .search-input-actions {
+      position: absolute !important;
+      right: 0 !important;
+      top: 3px !important;
+      display: flex !important;
+      align-items: center !important;
+      gap: 6px !important;
+      pointer-events: auto !important;
+    }
+
+    .ask-clear-btn {
+      display: none;
+      align-items: center;
+      justify-content: center;
+      width: 22px;
+      height: 22px;
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: rgba(255, 255, 255, 0.7);
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      line-height: 1;
+    }
+
+    .ask-clear-btn:hover {
+      background: rgba(255, 255, 255, 0.18);
+      color: #fff;
+    }
+
+    .omni-kbd-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 2px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.68rem;
+      color: rgba(255, 255, 255, 0.36);
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      padding: 2px 5px;
+      border-radius: 5px;
+      user-select: none;
+    }
+
+    .omni-kbd-badge .kbd-key {
+      font-size: 0.68rem;
     }
 
     /* Bottom row: controls all on one horizontal line */
@@ -7794,14 +8091,15 @@
       justify-content: space-between !important;
       width: 100% !important;
       gap: 0 !important;
-      padding-top: 2px !important;
+      padding-top: 4px !important;
+      border-top: 1px solid rgba(255, 255, 255, 0.05) !important;
     }
 
     #askForm.antigravity-search-form .search-controls-left {
       display: flex !important;
       flex-direction: row !important;
       align-items: center !important;
-      gap: 6px !important;
+      gap: 8px !important;
     }
 
     #askForm.antigravity-search-form .search-controls-right {
@@ -7813,87 +8111,342 @@
 
     /* Button styles for the chat bar */
     .plus-attach-btn {
-      width: 30px;
-      height: 30px;
+      width: 32px;
+      height: 32px;
       border-radius: 8px;
-      background: transparent;
-      border: none;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
       cursor: pointer;
-      color: rgba(255, 255, 255, 0.6);
+      color: rgba(255, 255, 255, 0.65);
       display: flex !important;
       align-items: center;
       justify-content: center;
       flex-shrink: 0;
-      transition: background 0.15s, color 0.15s;
+      transition: background 0.15s, color 0.15s, border-color 0.15s;
     }
 
     .plus-attach-btn:hover {
-      background: rgba(255, 255, 255, 0.08);
+      background: rgba(255, 255, 255, 0.12);
+      border-color: rgba(255, 255, 255, 0.2);
       color: #fff;
     }
 
-    .antigravity-mode-btn {
-      display: inline-flex !important;
-      flex-direction: row !important;
-      align-items: center !important;
-      gap: 5px;
-      background: transparent;
-      border: none;
-      color: rgba(255, 255, 255, 0.72);
-      font-family: 'Inter', system-ui, sans-serif;
-      font-size: 0.84rem;
-      font-weight: 500;
-      cursor: pointer;
-      padding: 4px 8px;
+    /* Autonomous Engine Status Badge */
+    .autonomous-omni-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.1);
       border-radius: 8px;
-      white-space: nowrap;
-      flex-shrink: 0;
-      transition: background 0.15s, color 0.15s;
+      padding: 5px 10px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: #e2e8f0;
+      letter-spacing: 0.01em;
+      transition: all 0.2s ease;
+      user-select: none;
     }
 
-    .antigravity-mode-btn:hover {
+    .autonomous-omni-badge:hover {
       background: rgba(255, 255, 255, 0.08);
+      border-color: rgba(0, 255, 170, 0.35);
       color: #fff;
+    }
+
+    .omni-pulse-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #00ffaa;
+      box-shadow: 0 0 8px #00ffaa;
+      animation: omniDotPulse 2s infinite ease-in-out;
+    }
+
+    @keyframes omniDotPulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.35; transform: scale(0.8); }
+    }
+
+    .omni-pill-tag {
+      background: rgba(0, 255, 170, 0.15);
+      color: #00ffaa;
+      border: 1px solid rgba(0, 255, 170, 0.3);
+      padding: 1px 6px;
+      border-radius: 5px;
+      font-size: 0.68rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    /* Prompt Enhancer Button */
+    .enhance-prompt-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      background: rgba(217, 119, 87, 0.12);
+      border: 1px solid rgba(217, 119, 87, 0.35);
+      border-radius: 8px;
+      padding: 5px 10px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: #f6ad85;
+      cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .enhance-prompt-btn:hover {
+      background: rgba(217, 119, 87, 0.24);
+      border-color: rgba(217, 119, 87, 0.6);
+      color: #ffffff;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 14px rgba(217, 119, 87, 0.3);
+    }
+
+    .enhance-prompt-btn:active {
+      transform: scale(0.97);
+    }
+
+    .omni-word-counter {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.72rem;
+      color: rgba(255, 255, 255, 0.35);
+      padding-right: 4px;
+      user-select: none;
     }
 
     .mic-control-btn {
       width: 32px;
       height: 32px;
-      border-radius: 50%;
-      background: transparent;
-      border: none;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
       cursor: pointer;
-      color: rgba(255, 255, 255, 0.62);
+      color: rgba(255, 255, 255, 0.65);
       display: flex !important;
       align-items: center;
       justify-content: center;
       flex-shrink: 0;
-      transition: background 0.15s, color 0.15s;
+      transition: background 0.15s, color 0.15s, border-color 0.15s;
     }
 
     .mic-control-btn:hover {
-      background: rgba(255, 255, 255, 0.08);
+      background: rgba(255, 255, 255, 0.12);
+      border-color: rgba(255, 255, 255, 0.2);
       color: #fff;
     }
 
-    .send-circle-btn {
-      width: 35px;
-      height: 35px;
-      border-radius: 50%;
-      background: #d97757 !important;
-      border: none;
-      cursor: pointer;
+    body.recording .mic-control-btn {
+      background: rgba(239, 68, 68, 0.2) !important;
+      color: #ef4444 !important;
+      border: 1px solid rgba(239, 68, 68, 0.5) !important;
+      animation: micPulse 1.2s infinite ease-in-out !important;
+    }
+
+    @keyframes micPulse {
+      0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
+      50% { transform: scale(1.08); box-shadow: 0 0 14px 2px rgba(239, 68, 68, 0.5); }
+    }
+
+    .send-sharp-btn {
+      width: 36px !important;
+      height: 36px !important;
+      border-radius: 10px !important;
+      background: linear-gradient(135deg, #d97757 0%, #b85434 100%) !important;
+      border: 1px solid rgba(255, 255, 255, 0.2) !important;
+      cursor: pointer !important;
       display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      box-shadow: 0 4px 16px rgba(217, 119, 87, 0.45) !important;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+      flex-shrink: 0 !important;
+    }
+
+    .send-sharp-btn:hover {
+      transform: scale(1.06) translateY(-1px) !important;
+      box-shadow: 0 6px 24px rgba(217, 119, 87, 0.65), 0 0 16px rgba(217, 119, 87, 0.4) !important;
+      background: linear-gradient(135deg, #f08967 0%, #c95c3a 100%) !important;
+    }
+
+    .send-sharp-btn:active {
+      transform: scale(0.96) !important;
+    }
+
+    /* Drag & Drop Overlay */
+    .search-drag-overlay {
+      position: absolute;
+      inset: -2px;
+      background: rgba(10, 12, 18, 0.95);
+      border: 2px dashed #00ffaa;
+      border-radius: 16px;
+      display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 2px 10px rgba(217, 119, 87, 0.35);
-      transition: transform 0.15s, background 0.15s;
+      z-index: 100;
+      backdrop-filter: blur(14px);
+      box-shadow: 0 0 35px rgba(0, 255, 170, 0.35);
+    }
+
+    .search-drag-box {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      color: #00ffaa;
+      font-weight: 600;
+      font-size: 0.92rem;
+    }
+
+    /* Omni Suggestions & Slash Dropdown */
+    .omni-suggestions-drop {
+      display: none;
+      position: absolute;
+      top: calc(100% + 8px);
+      left: 0;
+      right: 0;
+      background: #0d0f17 !important;
+      border: 1px solid rgba(255, 255, 255, 0.16) !important;
+      border-radius: 14px;
+      box-shadow: 0 32px 85px rgba(0, 0, 0, 0.98), 0 0 40px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(255, 255, 255, 0.12) !important;
+      backdrop-filter: blur(30px);
+      -webkit-backdrop-filter: blur(30px);
+      z-index: 999999 !important;
+      padding: 8px;
+      overflow: hidden;
+      animation: omniDropIn 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    body.docked .omni-suggestions-drop,
+    body.chat-active .omni-suggestions-drop {
+      top: auto;
+      bottom: calc(100% + 8px);
+    }
+
+    .search-shell:focus-within ~ .omni-quick-domains {
+      opacity: 0.25;
+      filter: blur(1.5px);
+      transition: all 0.25s ease;
+    }
+
+    @keyframes omniDropIn {
+      from { opacity: 0; transform: translateY(-6px) scale(0.99); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .omni-drop-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 6px 10px 8px;
+      font-size: 0.72rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: rgba(255, 255, 255, 0.42);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      margin-bottom: 6px;
+    }
+
+    .omni-drop-tip {
+      font-size: 0.68rem;
+      color: rgba(255, 255, 255, 0.3);
+      text-transform: none;
+      letter-spacing: normal;
+    }
+
+    .omni-drop-list {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      max-height: 280px;
+      overflow-y: auto;
+    }
+
+    .omni-suggestion-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 9px 12px;
+      border-radius: 9px;
+      color: #e2e8f0;
+      font-size: 0.86rem;
+      cursor: pointer;
+      transition: all 0.12s;
+    }
+
+    .omni-suggestion-item:hover,
+    .omni-suggestion-item.selected {
+      background: rgba(255, 255, 255, 0.08);
+      color: #fff;
+      border-left: 2.5px solid #00ffaa;
+      padding-left: 9.5px;
+    }
+
+    .omni-item-icon {
+      font-size: 1.05rem;
+      width: 24px;
+      text-align: center;
       flex-shrink: 0;
     }
 
-    .send-circle-btn:hover {
-      background: #e88868 !important;
-      transform: scale(1.05);
+    .omni-item-text {
+      flex: 1;
+      font-weight: 500;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .omni-item-tag {
+      font-size: 0.7rem;
+      font-family: 'JetBrains Mono', monospace;
+      padding: 2px 7px;
+      border-radius: 4px;
+      background: rgba(255, 255, 255, 0.06);
+      color: rgba(255, 255, 255, 0.5);
+    }
+
+    /* Sharp Domain Explorer Chips */
+    .omni-quick-domains {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 18px;
+      max-width: 820px;
+    }
+
+    .sharp-domain-chip {
+      all: unset;
+      box-sizing: border-box;
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 6px 14px;
+      border-radius: 20px;
+      background: rgba(255, 255, 255, 0.035);
+      border: 1px solid rgba(255, 255, 255, 0.09);
+      color: rgba(240, 237, 232, 0.75);
+      font-size: 0.81rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+      backdrop-filter: blur(12px);
+    }
+
+    .sharp-domain-chip:hover {
+      background: rgba(255, 255, 255, 0.08);
+      border-color: rgba(0, 255, 170, 0.4);
+      color: #ffffff;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4), 0 0 14px rgba(0, 255, 170, 0.18);
+    }
+
+    .sharp-domain-chip .chip-icon {
+      font-size: 0.92rem;
     }
 
     .modes-card-popup {
@@ -11496,9 +12049,26 @@
               </svg>
             </button>
           </div>
-          <div class="cloud-preview-file-title" id="cloudPreviewTitle">Meridian · HTML</div>
+          <div class="cloud-preview-file-title" id="cloudPreviewTitle">Interactive Web App · HTML</div>
+          <span style="font-size:0.62rem; font-weight:800; padding:2px 8px; border-radius:999px; background:rgba(217,119,87,0.18); border:1px solid rgba(217,119,87,0.4); color:#d97757; font-family:'JetBrains Mono',monospace; letter-spacing:0.06em;">ARTIFACT</span>
         </div>
         <div class="cloud-preview-header-right">
+          <button type="button" class="cloud-action-pill-btn" onclick="downloadCurrentPreviewHtml()" title="Download HTML">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="7 10 12 15 17 10"></polyline>
+              <line x1="12" y1="15" x2="12" y2="3"></line>
+            </svg>
+            <span>Download</span>
+          </button>
+          <button type="button" class="cloud-action-pill-btn" onclick="openCurrentPreviewInNewTab()" title="Open in New Tab">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13">
+              <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+              <polyline points="15 3 21 3 21 9"></polyline>
+              <line x1="10" y1="14" x2="21" y2="3"></line>
+            </svg>
+            <span>New Tab</span>
+          </button>
           <button type="button" class="cloud-copy-btn" id="cloudPreviewCopyBtn" onclick="copyCloudPreviewCode(this)">
             <span>Copy</span>
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="12" height="12">
@@ -11861,116 +12431,72 @@
 
       <div class="attached-files" id="attachedFiles"></div>
 
-      <!-- Language Picker Popup (shows when coding question detected without language) -->
-      <div id="langPickerPopup"
-        style="display:none; position:fixed; inset:0; z-index:9999; background:rgba(0,0,0,0.65); backdrop-filter:blur(8px); align-items:center; justify-content:center;">
-        <div
-          style="background:#1c1e26; border:1px solid rgba(255,255,255,0.13); border-radius:20px; padding:28px 28px 22px; max-width:420px; width:90%; box-shadow:0 24px 80px rgba(0,0,0,0.7);">
-          <div style="display:flex; align-items:center; gap:12px; margin-bottom:20px;">
-            <div
-              style="width:38px; height:38px; background:linear-gradient(135deg,#d97757,#c05a3a); border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:1.2rem; flex-shrink:0;">
-              💻</div>
-            <div>
-              <div style="color:#e8e8e8; font-weight:600; font-size:1rem; font-family:'Inter',sans-serif;">Choose
-                Programming Language</div>
-              <div
-                style="color:rgba(255,255,255,0.45); font-size:0.8rem; font-family:'Inter',sans-serif; margin-top:2px;">
-                Which language would you like the code in?</div>
-            </div>
-          </div>
-          <div id="langPickerGrid" style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:20px;">
-            <button onclick="selectCodingLang('C')"
-              style="all:unset;box-sizing:border-box;display:flex;align-items:center;gap:10px;padding:11px 14px;border-radius:12px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);cursor:pointer;color:#e8e8e8;font-family:'Inter',sans-serif;font-size:0.88rem;font-weight:500;transition:all 0.15s;"
-              onmouseover="this.style.background='rgba(217,119,87,0.18)';this.style.borderColor='rgba(217,119,87,0.5)';"
-              onmouseout="this.style.background='rgba(255,255,255,0.05)';this.style.borderColor='rgba(255,255,255,0.1)';">
-              <span style="font-size:1.1rem;">⚙️</span> C Language
-            </button>
-            <button onclick="selectCodingLang('Python')"
-              style="all:unset;box-sizing:border-box;display:flex;align-items:center;gap:10px;padding:11px 14px;border-radius:12px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);cursor:pointer;color:#e8e8e8;font-family:'Inter',sans-serif;font-size:0.88rem;font-weight:500;transition:all 0.15s;"
-              onmouseover="this.style.background='rgba(217,119,87,0.18)';this.style.borderColor='rgba(217,119,87,0.5)';"
-              onmouseout="this.style.background='rgba(255,255,255,0.05)';this.style.borderColor='rgba(255,255,255,0.1)';">
-              <span style="font-size:1.1rem;">🐍</span> Python
-            </button>
-            <button onclick="selectCodingLang('Java')"
-              style="all:unset;box-sizing:border-box;display:flex;align-items:center;gap:10px;padding:11px 14px;border-radius:12px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);cursor:pointer;color:#e8e8e8;font-family:'Inter',sans-serif;font-size:0.88rem;font-weight:500;transition:all 0.15s;"
-              onmouseover="this.style.background='rgba(217,119,87,0.18)';this.style.borderColor='rgba(217,119,87,0.5)';"
-              onmouseout="this.style.background='rgba(255,255,255,0.05)';this.style.borderColor='rgba(255,255,255,0.1)';">
-              <span style="font-size:1.1rem;">☕</span> Java
-            </button>
-            <button onclick="selectCodingLang('C++')"
-              style="all:unset;box-sizing:border-box;display:flex;align-items:center;gap:10px;padding:11px 14px;border-radius:12px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);cursor:pointer;color:#e8e8e8;font-family:'Inter',sans-serif;font-size:0.88rem;font-weight:500;transition:all 0.15s;"
-              onmouseover="this.style.background='rgba(217,119,87,0.18)';this.style.borderColor='rgba(217,119,87,0.5)';"
-              onmouseout="this.style.background='rgba(255,255,255,0.05)';this.style.borderColor='rgba(255,255,255,0.1)';">
-              <span style="font-size:1.1rem;">⚡</span> C++
-            </button>
-            <button onclick="selectCodingLang('JavaScript')"
-              style="all:unset;box-sizing:border-box;display:flex;align-items:center;gap:10px;padding:11px 14px;border-radius:12px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);cursor:pointer;color:#e8e8e8;font-family:'Inter',sans-serif;font-size:0.88rem;font-weight:500;transition:all 0.15s;"
-              onmouseover="this.style.background='rgba(217,119,87,0.18)';this.style.borderColor='rgba(217,119,87,0.5)';"
-              onmouseout="this.style.background='rgba(255,255,255,0.05)';this.style.borderColor='rgba(255,255,255,0.1)';">
-              <span style="font-size:1.1rem;">📜</span> JavaScript
-            </button>
-            <button onclick="selectCodingLang('Go')"
-              style="all:unset;box-sizing:border-box;display:flex;align-items:center;gap:10px;padding:11px 14px;border-radius:12px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);cursor:pointer;color:#e8e8e8;font-family:'Inter',sans-serif;font-size:0.88rem;font-weight:500;transition:all 0.15s;"
-              onmouseover="this.style.background='rgba(217,119,87,0.18)';this.style.borderColor='rgba(217,119,87,0.5)';"
-              onmouseout="this.style.background='rgba(255,255,255,0.05)';this.style.borderColor='rgba(255,255,255,0.1)';">
-              <span style="font-size:1.1rem;">🔵</span> Go
-            </button>
-          </div>
-          <button onclick="closeLangPicker()"
-            style="all:unset;box-sizing:border-box;width:100%;text-align:center;padding:10px;border-radius:10px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);cursor:pointer;color:rgba(255,255,255,0.5);font-family:'Inter',sans-serif;font-size:0.84rem;display:block;">Cancel</button>
+      <!-- Drag & Drop File Overlay -->
+      <div id="searchDragOverlay" class="search-drag-overlay" style="display:none;">
+        <div class="search-drag-box">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#00ffaa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <polyline points="17 8 12 3 7 8"></polyline>
+            <line x1="12" y1="3" x2="12" y2="15"></line>
+          </svg>
+          <span>Drop file, code, or image for autonomous AI analysis</span>
         </div>
       </div>
 
-      <form id="askForm" class="antigravity-search-form"
-        style="display:flex !important; flex-direction:column !important; align-items:stretch !important; gap:0 !important; background:#1e1f24 !important; border:1px solid rgba(255,255,255,0.11) !important; border-radius:20px !important; padding:14px 16px 10px !important; box-shadow:0 8px 36px rgba(0,0,0,0.5) !important; width:100% !important; box-sizing:border-box !important; position:relative !important;">
-        <div style="width:100%; display:block; margin-bottom:8px;">
-          <textarea placeholder="Ask Cognisphere AI anything…" id="askInput" rows="1"
-            style="display:block; width:100%; background:transparent; border:none; outline:none; resize:none; color:#e8e8e8; font-family:'Inter',system-ui,sans-serif; font-size:1rem; line-height:1.55; padding:0; margin:0; min-height:44px; max-height:240px; overflow-y:auto; box-sizing:border-box;"></textarea>
+      <form id="askForm" class="antigravity-search-form" autocomplete="off">
+        <!-- Top Laser Beam Accent -->
+        <div class="search-sharp-laser-beam"></div>
+
+        <!-- Textarea with Clear & Shortcut Badge -->
+        <div class="search-input-wrapper">
+          <textarea placeholder="Ask Cognisphere AI anything — Code, Live Web, Deep Reasoning, Math…" id="askInput" rows="1" spellcheck="false" autocomplete="off"></textarea>
+          <div class="search-input-actions">
+            <button type="button" id="askClearBtn" class="ask-clear-btn" title="Clear input (Esc)" aria-label="Clear">✕</button>
+            <span class="omni-kbd-badge" title="Focus shortcut: Ctrl+K"><span class="kbd-key">Ctrl</span><span class="kbd-key">K</span></span>
+          </div>
         </div>
 
         <div class="active-tool-pill" id="activeToolPill" style="display:none;"></div>
 
-        <div
-          style="display:flex; flex-direction:row; align-items:center; justify-content:space-between; width:100%; padding-top:4px;">
-          <div style="display:flex; flex-direction:row; align-items:center; gap:6px;">
-            <button type="button" class="icon-btn plus-attach-btn" id="attachFileBtn" aria-label="Attach file"
-              title="Attach file, image, or code"
-              style="display:flex; align-items:center; justify-content:center; width:30px; height:30px; border-radius:8px; background:transparent; border:none; cursor:pointer; color:rgba(255,255,255,0.6); flex-shrink:0;">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"
-                stroke-linejoin="round" width="16" height="16">
+        <!-- Controls Row -->
+        <div class="search-controls-row">
+          <!-- Left: Universal Attach + Autonomous AI Engine + Prompt Enhancer -->
+          <div class="search-controls-left">
+            <button type="button" class="plus-attach-btn" id="attachFileBtn" aria-label="Attach file" title="Attach file, image, or code">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16">
                 <line x1="12" y1="5" x2="12" y2="19"></line>
                 <line x1="5" y1="12" x2="19" y2="12"></line>
               </svg>
             </button>
 
-            <button type="button" class="antigravity-mode-btn" id="searchBarModeBtn" onclick="toggleModesCard(event)"
-              title="Select AI Model & Intelligence Engine" aria-label="AI Model Selector">
-              <span class="mode-icon" id="currentModeIcon" style="font-size:0.92rem;">✨</span>
-              <span id="currentModeLabel" style="font-weight:600; color:#ffffff;">Smart Compound AI</span>
-              <span class="mode-provider-badge" id="currentModelBadge">Groq</span>
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" width="11" height="11"
-                style="color:rgba(255,255,255,0.6); margin-left:1px;">
-                <polyline points="6 9 12 15 18 9"></polyline>
-              </svg>
+            <!-- Autonomous AI Engine Indicator (Surpassing ChatGPT & Claude — All-in-one unified intelligence without mode friction) -->
+            <div class="autonomous-omni-badge" id="omniEngineBadge" title="Superhuman Autonomous Compound AI — Real-time Web Grounding, Code Synthesis, Deep Reasoning, and Multi-model Intelligence">
+              <span class="omni-pulse-dot"></span>
+              <span class="omni-engine-text">Autonomous AI</span>
+              <span class="omni-pill-tag">Frontier</span>
+            </div>
+
+            <!-- Prompt Enhancer Button -->
+            <button type="button" class="enhance-prompt-btn" id="enhancePromptBtn" title="Refine and elevate your prompt with autonomous AI" onclick="enhanceCurrentPrompt(event)">
+              <span class="sparkle-icon">✨</span>
+              <span class="enhance-text">Enhance</span>
             </button>
           </div>
 
-          <div style="display:flex; flex-direction:row; align-items:center; gap:8px;">
-            <button type="button" class="icon-btn mic-control-btn" id="micBtn" aria-label="Voice input"
-              title="Voice input"
-              style="display:flex; align-items:center; justify-content:center; width:32px; height:32px; border-radius:50%; background:transparent; border:none; cursor:pointer; color:rgba(255,255,255,0.62); flex-shrink:0;">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                stroke-linejoin="round" width="18" height="18">
+          <!-- Right: Live Counter + Voice Mic + Sharp Send Button -->
+          <div class="search-controls-right">
+            <span class="omni-word-counter" id="omniWordCount">Ready</span>
+
+            <button type="button" class="mic-control-btn" id="micBtn" aria-label="Voice input" title="Voice dictation">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="17" height="17">
                 <rect x="9" y="2" width="6" height="12" rx="3"></rect>
                 <path d="M5 10a7 7 0 0014 0"></path>
                 <line x1="12" y1="19" x2="12" y2="22"></line>
               </svg>
             </button>
 
-            <button type="submit" class="send-circle-btn" id="sendBtn" aria-label="Ask"
-              style="display:flex; align-items:center; justify-content:center; width:35px; height:35px; border-radius:50%; background:#d97757; border:none; cursor:pointer; box-shadow:0 2px 10px rgba(217,119,87,0.35); flex-shrink:0;">
-              <svg viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round"
-                stroke-linejoin="round" width="16" height="16">
+            <button type="submit" class="send-sharp-btn" id="sendBtn" aria-label="Ask">
+              <svg viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="16" height="16">
                 <line x1="5" y1="12" x2="19" y2="12"></line>
                 <polyline points="12 5 19 12 12 19"></polyline>
               </svg>
@@ -11978,18 +12504,23 @@
             </button>
           </div>
         </div>
+
+        <!-- Omni Suggestions & Slash Command Dropdown -->
+        <div id="omniSuggestionsDrop" class="omni-suggestions-drop" style="display:none;">
+          <div class="omni-drop-header">
+            <span>⚡ Superhuman Starters &amp; Commands</span>
+            <span class="omni-drop-tip">Tab or ↑ ↓ to navigate</span>
+          </div>
+          <div class="omni-drop-list" id="omniSuggestionsList"></div>
+        </div>
       </form>
+
+      <!-- Hidden compatibility anchors for legacy handlers -->
+      <div id="langPickerPopup" style="display:none !important;"></div>
+      <button id="searchBarModeBtn" style="display:none !important;" onclick="toggleModesCard(event)"><span id="currentModeIcon"></span><span id="currentModeLabel"></span><span id="currentModelBadge"></span></button>
+      <div id="modesCardPopup" style="display:none !important;"></div>
     </div>
 
-    <div class="hint">
-      <span class="domain-link" style="cursor:pointer; color:var(--teal);" data-domain="Science">Science</span> ·
-      <span class="domain-link" style="cursor:pointer; color:var(--teal);" data-domain="Medicine">Medicine</span> ·
-      <span class="domain-link" style="cursor:pointer; color:var(--teal);" data-domain="Law">Law</span> ·
-      <span class="domain-link" style="cursor:pointer; color:var(--teal);" data-domain="History">History</span> ·
-      <span class="domain-link" style="cursor:pointer; color:var(--teal);" data-domain="Technology">Technology</span> ·
-      <span class="domain-link" style="cursor:pointer; color:var(--teal);" data-domain="Economics">Economics</span>
-      <span>+ more</span>
-    </div>
   </main>
 
   <footer>Cognisphere AI — plots a course through your question, checks its bearings, and arrives at an answer</footer>
@@ -12196,10 +12727,54 @@
     let userScrolledUp = false;
     let isAutoScrolling = false; // guard: ignore scroll events we trigger ourselves
 
+    let jumpToBottomBtn = null;
+    function updateJumpToBottomButton() {
+      if (!jumpToBottomBtn) {
+        jumpToBottomBtn = document.createElement('button');
+        jumpToBottomBtn.id = 'jumpToBottomBtn';
+        jumpToBottomBtn.innerHTML = `<span>↓</span> Jump to latest`;
+        jumpToBottomBtn.setAttribute('style', `
+          position: fixed;
+          bottom: 95px;
+          right: 28px;
+          z-index: 999;
+          background: rgba(18, 18, 22, 0.88);
+          backdrop-filter: blur(12px);
+          -webkit-backdrop-filter: blur(12px);
+          color: #f1f5f9;
+          border: 1px solid rgba(255, 255, 255, 0.16);
+          box-shadow: 0 8px 24px rgba(0,0,0,0.55);
+          border-radius: 20px;
+          padding: 8px 16px;
+          font-size: 0.82rem;
+          font-weight: 600;
+          cursor: pointer;
+          display: none;
+          align-items: center;
+          gap: 6px;
+          transition: transform 0.15s ease, opacity 0.15s ease;
+        `);
+        jumpToBottomBtn.onmouseenter = () => { jumpToBottomBtn.style.transform = 'translateY(-2px)'; };
+        jumpToBottomBtn.onmouseleave = () => { jumpToBottomBtn.style.transform = 'translateY(0)'; };
+        jumpToBottomBtn.onclick = () => {
+          userScrolledUp = false;
+          streamAutoScroll(true);
+          jumpToBottomBtn.style.display = 'none';
+        };
+        document.body.appendChild(jumpToBottomBtn);
+      }
+      if (userScrolledUp && isGenerating) {
+        jumpToBottomBtn.style.display = 'inline-flex';
+      } else {
+        jumpToBottomBtn.style.display = 'none';
+      }
+    }
+
     window.addEventListener('scroll', () => {
       if (isAutoScrolling) return; // ignore programmatic auto-scrolls
       if (!isGenerating) {
         userScrolledUp = false;
+        updateJumpToBottomButton();
         return;
       }
       const distFromBottom = document.body.scrollHeight - window.scrollY - window.innerHeight;
@@ -12209,6 +12784,7 @@
       } else {
         userScrolledUp = false; // user scrolled back down
       }
+      updateJumpToBottomButton();
     }, { passive: true });
 
     // Smoothly scroll the latest AI message bubble into view with ample search-shell clearance
@@ -12230,6 +12806,7 @@
       // Always reset userScrolledUp when generation starts or ends
       userScrolledUp = false;
       isAutoScrolling = false;
+      updateJumpToBottomButton();
     }
 
     function stopGeneration() {
@@ -12445,6 +13022,7 @@
         title: '🤖 AI Models & Reasoning Cores',
         cards: [
           { id: 'model-compound', icon: '✨', label: 'Smart Compound AI — Auto Router', desc: 'Auto-routes across web grounding, tool execution, and deep synthesis at ~900 tok/s.', control: `<label style="display:flex;align-items:center;gap:8px;cursor:pointer;"><input type="radio" name="aimodel" value="compound" checked style="accent-color:#00ffaa;width:15px;height:15px;" onchange="selectCognisphereModel('compound')"><span style="font-size:0.8rem;color:#00ffaa;font-weight:600;">Active ✓</span></label>` },
+          { id: 'model-claude', icon: '🎭', label: 'Claude 3.7 Sonnet — Hybrid Reasoning & Artifacts', desc: 'Anthropic Claude 3.7 Sonnet with extended thinking & live interactive artifacts.', control: `<label style="display:flex;align-items:center;gap:8px;cursor:pointer;"><input type="radio" name="aimodel" value="claude" style="accent-color:#00ffaa;width:15px;height:15px;" onchange="selectCognisphereModel('claude')"><span style="font-size:0.8rem;color:#fff;">Select</span></label>` },
           { id: 'model-reasoning', icon: '🧠', label: 'GPT-OSS 120B — Deep Reasoning', desc: 'Massive 120B parameter model engineered for complex deduction, math & scientific logic.', control: `<label style="display:flex;align-items:center;gap:8px;cursor:pointer;"><input type="radio" name="aimodel" value="reasoning" style="accent-color:#00ffaa;width:15px;height:15px;" onchange="selectCognisphereModel('reasoning')"><span style="font-size:0.8rem;color:#fff;">Select</span></label>` },
           { id: 'model-code', icon: '💻', label: 'Qwen 3.8 27B — Code Architect Pro', desc: 'Specialized in full-stack architecture, syntax precision, and single-file web apps.', control: `<label style="display:flex;align-items:center;gap:8px;cursor:pointer;"><input type="radio" name="aimodel" value="code" style="accent-color:#00ffaa;width:15px;height:15px;" onchange="selectCognisphereModel('code')"><span style="font-size:0.8rem;color:#fff;">Select</span></label>` },
           { id: 'model-turbo', icon: '⚡', label: 'Compound Mini — 0.3s Real-Time Turbo', desc: 'Sub-300ms speed for instant definitions, translations, and summaries.', control: `<label style="display:flex;align-items:center;gap:8px;cursor:pointer;"><input type="radio" name="aimodel" value="turbo" style="accent-color:#00ffaa;width:15px;height:15px;" onchange="selectCognisphereModel('turbo')"><span style="font-size:0.8rem;color:#fff;">Select</span></label>` },
@@ -12639,6 +13217,19 @@
         desc: 'Auto-routes query to fastest grounded engine (~900 tok/s).',
         placeholder: 'Ask Cognisphere AI anything — Smart Compound Router Active…',
         studioBadge: '✨ Groq Compound AI &amp; Smart Router'
+      },
+      claude: {
+        id: 'claude',
+        apiModel: 'anthropic/claude-3-7-sonnet-20250219',
+        name: 'Claude 3.7 Sonnet Hybrid',
+        shortName: 'Claude 3.7 Sonnet',
+        icon: '🎭',
+        badge: 'HYBRID REASONER',
+        provider: 'Anthropic',
+        speed: '~400 tok/s',
+        desc: 'Anthropic Claude 3.7 Sonnet with extended thinking & live artifacts.',
+        placeholder: 'Ask Claude 3.7 Sonnet — Code synthesis, deep thinking, web apps…',
+        studioBadge: '🎭 Claude 3.7 Sonnet · Hybrid Reasoning &amp; Artifacts'
       },
       reasoning: {
         id: 'reasoning',
@@ -12854,35 +13445,38 @@
       URL.revokeObjectURL(url);
     };
 
+    window.downloadCurrentPreviewHtml = function () {
+      if (!currentPreviewCode) return;
+      const blob = new Blob([currentPreviewCode], { type: 'text/html;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `cognisphere-artifact-${Date.now()}.html`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    };
+
+    window.openCurrentPreviewInNewTab = function () {
+      if (!currentPreviewCode) return;
+      const blob = new Blob([currentPreviewCode], { type: 'text/html;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      window.open(url, '_blank');
+      setTimeout(() => URL.revokeObjectURL(url), 10000);
+    };
+
     window.openLiveCodePreview = function (encodedCode, isHtml, fileName, fileType) {
-      // Open HTML live preview in a new browser tab as a blob URL
+      // Open HTML live preview directly in Claude-style Artifact modal (no blank popup windows)
       const htmlCode = decodeURIComponent(encodedCode);
       currentPreviewCode = htmlCode;
-      try {
-        const blob = new Blob([htmlCode], { type: 'text/html' });
-        const blobUrl = URL.createObjectURL(blob);
-        const tab = window.open(blobUrl, '_blank');
-        // Revoke the object URL after the tab has loaded
-        if (tab) {
-          setTimeout(() => URL.revokeObjectURL(blobUrl), 10000);
-        } else {
-          // Fallback: popup blocked — open in modal
-          const modal = document.getElementById('liveCodePreviewModal');
-          const titleEl = document.getElementById('cloudPreviewTitle');
-          if (!modal) return;
-          document.body.style.overflow = 'hidden';
-          if (titleEl) titleEl.textContent = `${fileName || 'Preview'} · ${(fileType || 'HTML').toUpperCase()}`;
-          switchCloudPreviewTab('eye');
-          modal.classList.add('open');
-        }
-      } catch (e) {
-        // Fallback to modal on error
-        const modal = document.getElementById('liveCodePreviewModal');
-        if (!modal) return;
-        document.body.style.overflow = 'hidden';
-        switchCloudPreviewTab('eye');
-        modal.classList.add('open');
-      }
+      const modal = document.getElementById('liveCodePreviewModal');
+      const titleEl = document.getElementById('cloudPreviewTitle');
+      if (!modal) return;
+      document.body.style.overflow = 'hidden';
+      if (titleEl) titleEl.textContent = `${fileName || 'Interactive Web App'} · ${(fileType || 'HTML').toUpperCase()}`;
+      switchCloudPreviewTab('eye');
+      modal.classList.add('open');
     };
 
     window.switchCloudPreviewTab = function (tab) {
@@ -13380,6 +13974,42 @@
     function parseMarkdown(text) {
       if (!text) return '';
 
+      // Claude AI-Style Thinking Accordion
+      let thinkingHtml = '';
+      if (typeof text === 'string' && text.includes('<think>')) {
+        const closedMatch = text.match(/<think>([\s\S]*?)<\/think>/i);
+        if (closedMatch) {
+          const thinkContent = closedMatch[1].trim();
+          thinkingHtml = `
+            <details class="claude-thinking-block" style="margin: 0 0 16px 0; border: 1px solid rgba(255,255,255,0.12); background: rgba(255,255,255,0.03); border-radius: 10px; padding: 10px 14px; font-size: 0.88rem; color: #a1a1aa; box-shadow: 0 4px 16px rgba(0,0,0,0.2);">
+              <summary style="cursor: pointer; font-weight: 600; color: #cbd5e1; user-select: none; display: flex; align-items: center; gap: 8px;">
+                <span style="font-size: 1.05rem;">💭</span>
+                <span>Thought for a few seconds</span>
+                <span style="margin-left: auto; font-size: 0.72rem; color: #64748b; background: rgba(255,255,255,0.06); padding: 2px 6px; border-radius: 4px;">Reasoning</span>
+              </summary>
+              <div class="claude-thinking-body" style="margin-top: 10px; padding-top: 8px; border-top: 1px solid rgba(255,255,255,0.06); font-size: 0.84rem; line-height: 1.6; color: #94a3b8; white-space: pre-wrap;">${escapeHtml(thinkContent)}</div>
+            </details>
+          `;
+          text = text.replace(/<think>[\s\S]*?<\/think>/i, '').trim();
+        } else {
+          const openMatch = text.match(/<think>([\s\S]*)$/i);
+          if (openMatch) {
+            const currentThink = openMatch[1].trim();
+            thinkingHtml = `
+              <details class="claude-thinking-block" open style="margin: 0 0 16px 0; border: 1px solid rgba(217,119,87,0.35); background: rgba(217,119,87,0.05); border-radius: 10px; padding: 10px 14px; font-size: 0.88rem; color: #a1a1aa; box-shadow: 0 4px 16px rgba(217,119,87,0.1);">
+                <summary style="cursor: pointer; font-weight: 600; color: var(--gold-soft, #f59e0b); user-select: none; display: flex; align-items: center; gap: 8px;">
+                  <span class="thinking-spinner" style="display:inline-block; width:8px; height:8px; border-radius:50%; background:#f59e0b; box-shadow: 0 0 10px #f59e0b;"></span>
+                  <span>Thinking process...</span>
+                  <span style="margin-left: auto; font-size: 0.72rem; color: #f59e0b; background: rgba(245,158,11,0.12); padding: 2px 6px; border-radius: 4px;">Live</span>
+                </summary>
+                <div class="claude-thinking-body" style="margin-top: 10px; padding-top: 8px; border-top: 1px solid rgba(255,255,255,0.06); font-size: 0.84rem; line-height: 1.6; color: #94a3b8; white-space: pre-wrap;">${escapeHtml(currentThink)}</div>
+              </details>
+            `;
+            text = '';
+          }
+        }
+      }
+
       // Pre-process: Auto-wrap loose node arrow lines (e.g. A["..."] → B["..."]) into ```mermaid blocks
       if (typeof text === 'string' && !/```(?:mermaid|flowchart|graph)/i.test(text)) {
         text = text.replace(/((?:^[A-Za-z0-9_]+\s*\[[^\]]+\]\s*(?:--> | ->|==>|→) \s * [A - Za - z0 -9_] + [^\n] *\n ?) +)/gm, (match) => {
@@ -13394,7 +14024,7 @@
       });
     }
 
-    if (!window.marked) return text;
+    if (!window.marked) return (thinkingHtml + text);
 
     const renderer = new marked.Renderer();
 
@@ -13571,15 +14201,53 @@
       const isWebCode = ['html', 'htm', 'xml', 'svg', 'jsx'].includes(validLang) ||
         /<!DOCTYPE\s+html|<html[\s>]|<head[\s>]|<body[\s>]|<div[\s>]|<style[\s>]|<script[\s>]/i.test(code);
 
-      const previewBtnHTML = isWebCode ? `
-        <button onclick="openLiveCodePreview('${encodedCode}', true, 'Interactive Web App', 'HTML')" title="Live Preview Website" style="all:unset;box-sizing:border-box;display:inline-flex;align-items:center;gap:6px;cursor:pointer;color:#00ffcc;font-size:0.75rem;font-weight:600;font-family:'Inter',sans-serif;padding:3px 10px;border-radius:6px;border:1px solid rgba(0,255,204,0.4);background:rgba(0,255,204,0.12);box-shadow:0 0 10px rgba(0,255,204,0.2);transition:all 0.15s ease;" onmouseover="this.style.background='rgba(0,255,204,0.25)';" onmouseout="this.style.background='rgba(0,255,204,0.12)';">
-          <span style="white-space:nowrap;">▶ Live Preview Website</span>
-        </button>
-      ` : '';
-
       const blockId = 'cb-' + Math.random().toString(36).slice(2, 9);
       const isRunnable = !isMermaidDiagram && !isExampleBlock && !isOutputBlock && (hasCodeKeywords || ['c', 'cpp', 'c++', 'python', 'py', 'javascript', 'js', 'java', 'go', 'rust', 'ruby', 'php', 'bash', 'sh'].includes(validLang));
       const safeCodeAttr = encodeURIComponent(code).replace(/'/g, '%27');
+
+      // Smart Artifact Title for Web Development
+      let webAppTitle = 'Interactive Web Application';
+      if (isWebCode) {
+        const titleMatch = code.match(/<title[^>]*>([^<]+)<\/title>/i) || code.match(/<h1[^>]*>([^<]+)<\/h1>/i);
+        if (titleMatch && titleMatch[1]) {
+          webAppTitle = titleMatch[1].replace(/&amp;/g, '&').trim();
+        }
+      }
+
+      const claudeArtifactCardHTML = isWebCode ? `
+        <div class="claude-artifact-banner" onclick="openLiveCodePreview('${safeCodeAttr}', true, '${webAppTitle.replace(/'/g, "\\'")}', 'HTML')" title="Click to launch interactive preview on screen">
+          <div class="claude-artifact-left">
+            <div class="claude-artifact-icon-box">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
+                <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+                <line x1="8" y1="21" x2="16" y2="21"></line>
+                <line x1="12" y1="17" x2="12" y2="21"></line>
+              </svg>
+            </div>
+            <div class="claude-artifact-meta">
+              <div class="claude-artifact-title">${webAppTitle}</div>
+              <div class="claude-artifact-subtitle">
+                <span class="claude-pill-badge">CLAUDE ARTIFACT</span>
+                <span>Interactive Web Application · Click to Run &amp; Preview</span>
+              </div>
+            </div>
+          </div>
+          <div class="claude-artifact-right">
+            <button type="button" class="claude-artifact-btn" onclick="event.stopPropagation(); openLiveCodePreview('${safeCodeAttr}', true, '${webAppTitle.replace(/'/g, "\\'")}', 'HTML')">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14">
+                <polygon points="5 3 19 12 5 21 5 3"></polygon>
+              </svg>
+              <span>Preview App</span>
+            </button>
+          </div>
+        </div>
+      ` : '';
+
+      const previewBtnHTML = isWebCode ? `
+        <button onclick="openLiveCodePreview('${encodedCode}', true, '${webAppTitle.replace(/'/g, "\\'")}', 'HTML')" title="Live Preview Website" style="all:unset;box-sizing:border-box;display:inline-flex;align-items:center;gap:6px;cursor:pointer;color:#00ffcc;font-size:0.75rem;font-weight:600;font-family:'Inter',sans-serif;padding:3px 10px;border-radius:6px;border:1px solid rgba(0,255,204,0.4);background:rgba(0,255,204,0.12);box-shadow:0 0 10px rgba(0,255,204,0.2);transition:all 0.15s ease;" onmouseover="this.style.background='rgba(0,255,204,0.25)';" onmouseout="this.style.background='rgba(0,255,204,0.12)';">
+          <span style="white-space:nowrap;">▶ Live Preview Website</span>
+        </button>
+      ` : '';
 
       const compilerBtnHTML = isRunnable ? `
         <button type="button" class="live-compiler-toggle-btn" id="comp-btn-${blockId}" data-code="${safeCodeAttr}" data-lang="${validLang}" onclick="openCodeTerminalModal(this.getAttribute('data-code'), this.getAttribute('data-lang'))" title="Click to open Code Terminal on screen">
@@ -13593,7 +14261,7 @@
       // ── Clean Code Card Rendering without line numbering in message card ──
       const cleanHighlighted = highlighted.replace(/\r\n/g, '\n').replace(/\r/g, '\n').replace(/\n+$/, '');
 
-      return `<div class="code-card-wrap" style="margin:16px 0;border-radius:12px;background:#0d0d0d;border:1px solid #2d3139;overflow:hidden;width:100%;box-sizing:border-box;font-family:'Inter',sans-serif;box-shadow:0 8px 30px rgba(0,0,0,0.5);">
+      return claudeArtifactCardHTML + `<div class="code-card-wrap" style="margin:16px 0;border-radius:12px;background:#0d0d0d;border:1px solid #2d3139;overflow:hidden;width:100%;box-sizing:border-box;font-family:'Inter',sans-serif;box-shadow:0 8px 30px rgba(0,0,0,0.5);">
   <div style="display:flex;flex-direction:row;align-items:center;justify-content:space-between;padding:10px 16px;background:#161b22;border-bottom:1px solid #2d3139;flex-wrap:wrap;gap:8px;">
     <div style="display:flex;align-items:center;gap:6px;font-size:0.76rem;font-weight:600;color:#8b949e;text-transform:uppercase;font-family:'JetBrains Mono',monospace;">${headerTitle}</div>
     <div style="display:flex;align-items:center;gap:8px;">
@@ -13626,7 +14294,10 @@
       gfm: true
     });
 
-    let html = marked.parse(text);
+    let html = (text ? marked.parse(text) : '');
+    if (thinkingHtml) {
+      html = thinkingHtml + html;
+    }
 
     // Group adjacent or isolated gallery-image-card elements into a horizontal scroll gallery container (Left-to-Right)
     html = html.replace(/(?:<p>\s*)?(<div class="gallery-image-card"[\s\S]*?<\/div>\s*)+(?:<\/p>)?/gi, function (match) {
@@ -14056,73 +14727,6 @@
 
       const results = { summary: '', bullets: [], articles: [], images: [], videos: [] };
 
-      // 2. Wikipedia Fallback
-      try {
-        const wikiSearch = await fetch(
-          `https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodedWiki}&srlimit=4&utf8=&format=json&origin=*`
-        ).then(r => r.json());
-        if (wikiSearch.query && wikiSearch.query.search.length > 0) {
-          const top = wikiSearch.query.search[0];
-          const wikiExtract = await fetch(
-            `https://en.wikipedia.org/w/api.php?action=query&prop=extracts|pageimages&exintro=true&explaintext=true&piprop=thumbnail&pithumbsize=400&titles=${encodeURIComponent(top.title)}&format=json&origin=*`
-          ).then(r => r.json());
-          const pages = wikiExtract.query.pages;
-          const page = pages[Object.keys(pages)[0]];
-          if (page.extract) {
-            results.summary = page.extract.slice(0, 1200);
-            // Build bullet points from sentences
-            const sentences = page.extract.split(/(?<=[.!?])\s+/).filter(s => s.length > 30 && s.length < 200).slice(0, 6);
-            results.bullets = sentences;
-          }
-          if (page.thumbnail) results.images.push({ src: page.thumbnail.source, alt: page.title, link: `https://en.wikipedia.org/wiki/${encodeURIComponent(page.title)}` });
-          results.articles = wikiSearch.query.search.slice(0, 3).map(r => ({
-            title: r.title,
-            snippet: r.snippet.replace(/<\/?[^>]+(>|$)/g, ''),
-            url: `https://en.wikipedia.org/wiki/${encodeURIComponent(r.title)}`,
-            source: 'wikipedia.org'
-          }));
-        }
-
-        // Fetch additional topic images from Wikipedia generator pageimages
-        try {
-          const wikiImgs = await fetch(
-            `https://en.wikipedia.org/w/api.php?action=query&generator=search&gsrsearch=${encodedWiki}&gsrlimit=6&prop=pageimages&pithumbsize=800&format=json&origin=*`
-          ).then(r => r.json());
-          if (wikiImgs && wikiImgs.query && wikiImgs.query.pages) {
-            Object.values(wikiImgs.query.pages).forEach(p => {
-              if (p.thumbnail && p.thumbnail.source && !results.images.some(img => img.src === p.thumbnail.source)) {
-                results.images.push({
-                  src: p.thumbnail.source,
-                  alt: p.title,
-                  link: `https://en.wikipedia.org/wiki/${encodeURIComponent(p.title)}`
-                });
-              }
-            });
-          }
-        } catch (imgErr) { }
-
-        // Fetch high-res photos from Wikimedia Commons
-        try {
-          const commonsRes = await fetch(
-            `https://commons.wikimedia.org/w/api.php?action=query&generator=search&gsrsearch=${encodedWiki}&gsrnamespace=6&gsrlimit=8&prop=imageinfo&iiprop=url&iiurlwidth=800&format=json&origin=*`
-          ).then(r => r.json());
-          if (commonsRes && commonsRes.query && commonsRes.query.pages) {
-            Object.values(commonsRes.query.pages).forEach(p => {
-              if (p.imageinfo && p.imageinfo[0] && p.imageinfo[0].thumburl) {
-                const src = p.imageinfo[0].thumburl;
-                if (!results.images.some(img => img.src === src)) {
-                  results.images.push({
-                    src,
-                    alt: p.title.replace(/^File:/i, '').replace(/\.[^/.]+$/, ''),
-                    link: p.imageinfo[0].descriptionurl || src
-                  });
-                }
-              }
-            });
-          }
-        } catch (commonsErr) { }
-      } catch (e) { }
-
       // 3. Wikidata Fallback (CORS safe with origin=*)
       try {
         const wd = await fetch(
@@ -14196,73 +14800,64 @@
         return getScore(b) - getScore(a);
       });
 
-      const top = scoredArticles[0];
-      if (!top || !top.url) return '';
-
-      let domain = 'web source';
-      try { domain = new URL(top.url).hostname.replace(/^www\./, ''); } catch (e) { }
-      const faviconUrl = `https://www.google.com/s2/favicons?domain=${encodeURIComponent(domain)}&sz=32`;
-      let label = top.title || domain;
-      // Clean up label to be short and readable
-      label = label.replace(/\s*[-–—|].*$/, '').replace(/^(📄|🔬|🩺|📑)\s*/, '').slice(0, 24).trim() || domain;
-      const remainingCount = scoredArticles.length - 1;
-      const countBadge = remainingCount > 0 ? `<span class="citation-pill-count">+${remainingCount}</span>` : '';
-      const safeUrl = escapeHtml(top.url);
-      const safeFullTitle = escapeHtml(top.title || domain);
-      return `<a href="${safeUrl}" target="_blank" rel="noopener noreferrer" class="chat-citation-pill" title="${safeFullTitle} — ${safeUrl}"><img src="${faviconUrl}" class="citation-pill-icon" alt="" onerror="this.style.display='none'" /><span class="citation-pill-name">${escapeHtml(label)}</span>${countBadge}</a>`;
+      const validScored = scoredArticles.filter(a => {
+        if (!a || !a.url) return false;
+        const u = a.url.toLowerCase();
+        return !u.includes('wikipedia.org') && !u.includes('wikimedia.org');
+      });
+      return validScored;
     }
 
-    function buildRelatedSourceLinks(articles) {
-      // Retained for explicit source queries only, never auto-dumped
+    function buildChatGptStyleSources(articles) {
       if (!articles || !articles.length) return '';
-      const topArticles = articles.slice(0, 3);
-      let html = '<div class="chat-related-url-row">';
-      topArticles.forEach(art => {
-        if (!art || !art.url) return;
-        let urlObj;
-        try { urlObj = new URL(art.url); } catch (e) { return; }
-        const domain = urlObj.hostname.replace(/^www\./, '');
-        let cleanTitle = (art.title || domain)
-          .replace(/\s*[-–—|]\s*(DuckDuckGo|Wikipedia).*$/i, '')
-          .trim();
-        if (!cleanTitle || cleanTitle.length < 3) cleanTitle = domain;
+      const validArticles = articles.filter(a => {
+        if (!a || !a.url) return false;
+        const u = a.url.toLowerCase();
+        return !u.includes('wikipedia.org') &&
+               !u.includes('wikimedia.org') &&
+               !u.includes('duckduckgo.com') &&
+               !u.includes('bing.com') &&
+               !u.includes('google.com');
+      }).slice(0, 5);
+      if (!validArticles.length) return '';
 
-        const isOfficial = domain.endsWith('.edu') || domain.endsWith('.ac.in') || domain.endsWith('.gov') || domain.endsWith('.edu.in') || cleanTitle.toLowerCase().includes('official');
-        const badgeIcon = isOfficial ? '🏛️' : (domain.includes('wikipedia') ? '📚' : (domain.includes('youtube') ? '🎬' : '🌐'));
-        const displayLabel = `${badgeIcon} ${cleanTitle}`;
-
-        html += `<a href="${escapeHtml(art.url)}" target="_blank" rel="noopener noreferrer" class="chat-related-url-link" title="${escapeHtml(art.snippet || cleanTitle)} — ${escapeHtml(art.url)}"><u>${escapeHtml(displayLabel)}</u> <span class="url-arrow">↗</span></a>`;
+      let html = '<div class="chat-sources-shelf"><div class="chat-sources-title"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg> Sources</div><div class="chat-sources-grid">';
+      validArticles.forEach(art => {
+        let domain = '';
+        try { domain = new URL(art.url).hostname.replace(/^www\./, ''); } catch (e) { domain = 'web source'; }
+        const favicon = `https://www.google.com/s2/favicons?domain=${encodeURIComponent(domain)}&sz=32`;
+        let title = (art.title || domain)
+          .replace(/&#x27;/g, "'")
+          .replace(/&#39;/g, "'")
+          .replace(/&quot;/g, '"')
+          .replace(/&amp;/g, '&')
+          .replace(/\s*[-–—|].*$/, '')
+          .slice(0, 32).trim() || domain;
+        html += `<a href="${escapeHtml(art.url)}" target="_blank" rel="noopener noreferrer" class="chat-source-item" title="${escapeHtml(art.title || domain)} — ${escapeHtml(art.url)}">
+          <img src="${favicon}" class="source-item-fav" alt="" onerror="this.style.display='none'" />
+          <span class="source-item-text">${escapeHtml(title)}</span>
+          <span class="source-item-arrow">↗</span>
+        </a>`;
       });
-      html += '</div>';
+      html += '</div></div>';
       return html;
     }
 
+    function buildInlineCitationPill(articles) {
+      // Legacy compatibility stub — no intrusive static pills injected inside text
+      return '';
+    }
+
+    function buildRelatedSourceLinks(articles) {
+      if (!articles || !articles.length) return '';
+      return buildChatGptStyleSources(articles);
+    }
+
     function injectCitationsIntoHtml(generativeHtml, articles) {
-      if (!generativeHtml || !articles || !articles.length) return generativeHtml;
-      const pillHtml = buildInlineCitationPill(articles);
-      if (!pillHtml) return generativeHtml;
-
-      // Strategy 1: Place pill at the end of the first paragraph </p>
-      if (generativeHtml.includes('</p>')) {
-        let replaced = false;
-        generativeHtml = generativeHtml.replace(/<\/p>/, (match) => {
-          if (!replaced) {
-            replaced = true;
-            return ` ${pillHtml}</p>`;
-          }
-          return match;
-        });
-        return generativeHtml;
-      }
-
-      // Strategy 2: If no <p> tag, find the end of the first sentence (. ! ? followed by space or newline)
-      const firstSentenceMatch = generativeHtml.match(/^([\s\S]*?[.!?])(\s+[\s\S]*)$/);
-      if (firstSentenceMatch) {
-        return `${firstSentenceMatch[1]} ${pillHtml}\n\n${firstSentenceMatch[2]}`;
-      }
-
-      // Strategy 3: Append cleanly
-      return `${generativeHtml} ${pillHtml}`;
+      if (!generativeHtml) return '';
+      const sourcesHtml = buildChatGptStyleSources(articles);
+      if (!sourcesHtml) return generativeHtml;
+      return `${generativeHtml}\n${sourcesHtml}`;
     }
 
     function videoCardHTML(v) {
@@ -14377,23 +14972,28 @@
     function buildWebResultHTML(data, query, langCode = '') {
       let html = '';
 
+      // Compact Class Bar Pill (opens dedicated Classes Page on click)
+      const hasVideos = data && data.videos && data.videos.length > 0;
+      const isSimpleGreeting = /^\s*(hi|hello|hey|who are you|what is your name)\b/i.test(query || '');
+
+      if (!isSimpleGreeting) {
+        const videoCount = (hasVideos && data.videos.length) ? data.videos.length : 20;
+        const displayCount = videoCount >= 5 ? 20 : videoCount;
+        const fullVideoCardsMarkup = hasVideos ? buildVideoCardsHTML(data.videos, query, langCode) : '';
+
+        html += `<div class="video-pill-wrap" style="margin-top:16px; margin-bottom:8px; display:inline-flex; align-items:center;">
+          <button type="button" class="open-videos-page-btn" data-query="${escapeHtml(query)}" title="Watch ${displayCount} Classes in Telugu & English">
+            <span style="pointer-events:none; font-size:1.1rem; line-height:1;">🎓</span>
+            <span style="pointer-events:none;">Watch ${displayCount} Classes (Telugu & English) ➔</span>
+          </button>
+          <div class="preloaded-video-markup" style="display:none !important;">${fullVideoCardsMarkup}</div>
+        </div>`;
+      }
+
       // Only render image gallery if user explicitly requested images AND images exist
       const wantsImages = /\b(image|images|photo|photos|picture|pictures|pic|pics|gallery|wallpaper|look like|show me images)\b/i.test(query || '');
       if (wantsImages && data && data.images && data.images.length) {
         html += buildImageGalleryHTML(data.images, query);
-      }
-
-      // Compact Class Bar Pill (only shown when user explicitly asks for videos, classes, or lectures)
-      const wantsVideos = /\b(video|videos|class|classes|watch|lecture|lectures|course|tutorial|youtube)\b/i.test(query || '');
-      if (wantsVideos && data && data.videos && data.videos.length) {
-        const fullVideoCardsMarkup = buildVideoCardsHTML(data.videos, query, langCode);
-        html += `<div class="video-pill-wrap" style="margin-top:12px; margin-bottom:4px; display:inline-flex; align-items:center;">
-        <button type="button" class="open-videos-page-btn" data-query="${escapeHtml(query)}">
-          <svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor" style="pointer-events:none; vertical-align:middle; margin-right:4px;"><path d="M12 3L1 9l11 6 9-4.91V17h2V9L12 3zM5 13.18v4L12 21l7-3.82v-4L12 17l-7-3.82z"/></svg>
-          <span style="pointer-events:none;">Watch ${data.videos.length} Classes (Telugu & English) ➔</span>
-        </button>
-        <div class="preloaded-video-markup" style="display:none !important;">${fullVideoCardsMarkup}</div>
-      </div>`;
       }
 
       return html;
@@ -14751,8 +15351,8 @@ Building interactive websites, HTML applications, and frontend UI dashboards is 
 
       // ── CLAUDE AI STYLE WEBSITE/WEB APP BUILDING CONTEXT ──
       let websitePromptContext = '';
-      const isWebsiteQuery = /\b(website|webpage|web app|html|landing page|ui|dashboard|frontend|portfolio|calculator|game|component|page|css|js|build a site|create a website|make a webpage|design a page)\b/i.test(fullQuery);
-      if (isWebsiteQuery) {
+      const isExplicitWebsiteQuery = /^\s*(build|create|make|design|code|develop)\s+(?:a\s+)?(?:website|webpage|landing page|web app|html page)\b/i.test(fullQuery);
+      if (isExplicitWebsiteQuery) {
         websitePromptContext = `\n\n[WEBSITE/APP CREATION DIRECTIVE — Claude AI Style]:
 1. Provide a single, complete, fully-functional HTML document (with embedded CSS in style tags and JS in script tags).
 2. Use modern visual aesthetics (sleek dark mode, modern typography, glassmorphism, flex/grid responsive layout, micro-animations).
@@ -14777,40 +15377,17 @@ Building interactive websites, HTML applications, and frontend UI dashboards is 
         } catch (e) { }
       }
 
-      // Contextualize follow-up queries by linking Query 2 to Query 1 subject
+      // Keep user query clean and direct without artificial topic mutation
       const searchQuery = query.trim() || (attList.length ? (attList[0].label || 'attached file') : 'general learning');
       let effectiveQuery = fullQuery;
       let liveWebQuery = searchQuery;
-
-      if (structuredTurns.length > 0) {
-        const lastUserTurn = [...structuredTurns].reverse().find(t => t.role === 'user');
-        if (lastUserTurn && lastUserTurn.content) {
-          const cleanLast = lastUserTurn.content.replace(/\[(?:PREVIOUS|USER|WEBSITE|ATTACHED)[^\]]*\]/gi, '').trim();
-          const mainSubject = cleanLast
-            .replace(/^(?:can\s+you\s+)?(?:please\s+)?(?:who\s+(?:is|was|are|were)|what\s+(?:is|was|are|were|'s)|tell\s+(?:me\s+)?(?:about)?|explain\s+(?:me\s+)?(?:about)?|give\s+(?:me\s+)?(?:details?\s+(?:of|about)?)?|show\s+(?:me\s+)?|search\s+(?:for\s+)?|find|details?\s+(?:of|about)?|info(?:rmation)?\s+(?:on|about)?|about|meaning\s+of|definition\s+of)\s+/i, '')
-            .replace(/\b(?:meaning|definition|code|give\s+code|in\s+telugu|in\s+hindi|in\s+c|in\s+python|images|photos|pics|pictures|diagrams|details|info)\b/gi, '')
-            .replace(/[?.!:]+$/, '')
-            .trim();
-
-          const isExplicitPronoun = /^\s*(his|her|its|their|this|that|these|those)\b/i.test(fullQuery);
-          const isExplicitFollowUpPhrase = /^\s*(what\s*is\s*the\s*use|use\s*of\s*it|why\s*use\s*it|what\s*are\s*its\s*uses|its\s*benefits|its\s*advantages|give\s*code\s*for\s*it|show\s*output\s*for\s*it|in\s*telugu|in\s*hindi|uses|benefits|advantages|disadvantages|applications)\b/i.test(fullQuery) ||
-            /^\s*(movies|films|filmography|brothers|family|siblings|songs|books|career|achievements|list\s*movies|his\s*movies|his\s*films)\b/i.test(fullQuery);
-
-          const isFollowUp = (isExplicitPronoun || isExplicitFollowUpPhrase) && fullQuery.length < 90;
-          if (mainSubject && mainSubject.length > 2 && isFollowUp) {
-            effectiveQuery = `${mainSubject} ${fullQuery}`;
-            liveWebQuery = `${mainSubject} ${searchQuery}`;
-            console.log(`🔗 Multi-Turn Context Link: Linked Query 2 [${fullQuery}] to Query 1 Subject [${mainSubject}]`);
-          }
-        }
-      }
 
       let astraContext = '';
       if (currentAppMode === 'astra' || /\b(astra\s*6|astra\s*mode|chatgpt\s*6\s*asthra|chatgpt\s*6\s*astra|sharp\s*brain|brain\s*sharp|deep\s*reasoning)\b/i.test(fullQuery)) {
         astraContext = `\n\n[MODE: ASTRA 6.0 SUPERHUMAN REASONING ENGINE — FIRST-PRINCIPLES DECONSTRUCTION, LOGICAL RIGOR, ANALYTICAL BREAKDOWN, AND RAZOR-SHARP PRECISION]`;
       }
 
-      const payloadQuery = `${effectiveQuery}${websitePromptContext}${academicContext}${historyContext}${astraContext}`;
+      const payloadQuery = `${effectiveQuery}${websitePromptContext}${academicContext}${structuredTurns.length === 0 ? historyContext : ''}${astraContext}`;
 
       // Strip any leaked base64, raw file content, or system context blocks from AI output before display
       function cleanLLMOutput(text) {
@@ -14831,6 +15408,13 @@ Building interactive websites, HTML applications, and frontend UI dashboards is 
         text = text.replace(/Base64\s*\([^)]+\)\s*:[^\n]*/gi, '');
         // Remove inline or blockquote source citations from output text
         text = text.replace(/^(?:>\s*)?(?:📖\s*)?\*?\*?Source\*?\*?\s*:[^\n]*/gmi, '');
+        // Remove any accidental leaked RULE headers or internal instructions
+        text = text.replace(/^(?:#+\s*)?RULE\s*#?\d+[^\n]*/gmi, '');
+        text = text.replace(/⚠️\s*CRITICAL\s*OVERRIDE[^\n]*/gi, '');
+        text = text.replace(/PRIMARY\s*(?:PRESENTATION\s*)?DIRECTIVE[^\n]*/gi, '');
+        text = text.replace(/CRITICAL\s*INSTRUCTION[^\n]*/gi, '');
+        text = text.replace(/5-LAYER\s*OPERATING\s*ARCHITECTURE:[^\n]*/gi, '');
+        text = text.replace(/CORE\s*PRINCIPLES\s*&\s*BEHAVIOR:[^\n]*/gi, '');
         return text.trim();
       }
 
@@ -14933,35 +15517,38 @@ Building interactive websites, HTML applications, and frontend UI dashboards is 
             if (decodedSentences && decodedSentences.length > 0) {
               llmText = `### 📄 Attached File Analysis\n\nI have received your attached document/image.\n\n${decodedSentences.join('\n\n')}\n\n*Please specify any targeted questions you have about this content!*`;
             } else {
-              try {
-                const cleanFallbackQ = (searchQuery || '').replace(/^(can you\s+)?(please\s+)?(explain|what is|what'?s|tell me about|tell me|how does|how do|how to|define|describe|overview of|give me|show me|detail about|details of|detail|about|write about|search for|find|what are|what was|what were|list|list out)\s+/i, '').replace(/[?.!]+$/g, '').trim() || searchQuery;
-                const wikiRes = await fetch(`https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(cleanFallbackQ)}&srlimit=1&utf8=&format=json&origin=*`)
-                  .then(r => r.json()).catch(() => null);
-                if (wikiRes && wikiRes.query && wikiRes.query.search && wikiRes.query.search[0]) {
-                  const top = wikiRes.query.search[0];
-                  const pageRes = await fetch(`https://en.wikipedia.org/w/api.php?action=query&prop=extracts&exintro=true&explaintext=true&titles=${encodeURIComponent(top.title)}&format=json&origin=*`)
-                    .then(r => r.json()).catch(() => null);
-                  if (pageRes && pageRes.query && pageRes.query.pages) {
-                    const page = pageRes.query.pages[Object.keys(pageRes.query.pages)[0]];
-                    if (page.extract) {
-                      const sentences = page.extract.split(/(?<=[.!?])\s+/).filter(s => s.length > 20);
-                      const intro = sentences.slice(0, 2).join(' ');
-                      const bullets = sentences.slice(2, 8).map(s => `- ${s}`).join('\n');
-                      llmText = `## ${top.title}\n\n${intro}\n\n### Key Points\n${bullets}`;
-                    }
-                  }
-                }
-              } catch (wikiErr) { }
+              llmText = `## 🤖 Cognisphere AI\n\nI encountered a momentary connection interruption while processing your request for **"${escapeHtml(searchQuery || 'your question')}"**.\n\n` +
+                `Please try submitting your query again — our high-speed reasoning engine will provide a complete, deep, and structured answer.`;
             }
           }
         }
 
-        // Build final HTML: LLM markdown answer + citations + web result pills below
+        // Build final HTML: LLM markdown answer + dynamic images (if visual topic) + citations
         await webResultsPromise;
         let generativeHtml = '';
         const displayText = cleanLLMOutput(llmText);
         if (displayText && displayText.trim().length > 0) {
           generativeHtml = '<div>' + parseMarkdown(displayText) + '</div>';
+
+          // If visual query and webData returned high-res images, and AI didn't already include images:
+          if (webData && webData.images && webData.images.length > 0 && !generativeHtml.includes('ai-inline-image-grid') && !generativeHtml.includes('class="ai-inline-img-card"')) {
+            const isVisualQ = /\b(probe|satellite|spacecraft|telescope|mars|pluto|jupiter|saturn|nebula|galaxy|star|black hole|supernova|apollo|artemis|voyager|new horizons|curiosity|perseverance|rover|monument|tower|temple|palace|bridge|building|pyramid|castle|statue|museum|animal|bird|reptile|mammal|species|plant|flower|cell|organ|dna|anatomy|car|aircraft|airplane|rocket|ship|train|engine|gpu|cpu|microscope|drone|who is|actor|actress|president|scientist|inventor|politician|player|singer|director|image|images|photo|photos|picture|pictures|pic|pics|look like|show me)\b/i.test(searchQuery);
+            if (isVisualQ) {
+              const validImgs = webData.images.filter(img => img.src && !img.src.includes('wikipedia') && !img.src.includes('wikimedia')).slice(0, 3);
+              if (validImgs.length > 0) {
+                let imgGrid = '<div class="ai-inline-image-grid">';
+                validImgs.forEach(img => {
+                  imgGrid += `<a href="${escapeHtml(img.link || img.src)}" target="_blank" rel="noopener noreferrer" class="ai-inline-img-card" title="${escapeHtml(img.alt || 'Visual reference')}">
+                    <img src="${escapeHtml(img.src)}" alt="${escapeHtml(img.alt || 'Visual')}" loading="lazy" onerror="this.parentElement.style.display='none'" />
+                    <span class="ai-inline-img-caption">${escapeHtml((img.alt || 'Visual Reference').slice(0, 48))}</span>
+                  </a>`;
+                });
+                imgGrid += '</div>';
+                generativeHtml += imgGrid;
+              }
+            }
+          }
+
           if (webData && webData.articles && webData.articles.length > 0) {
             generativeHtml = injectCitationsIntoHtml(generativeHtml, webData.articles);
           }
@@ -15066,7 +15653,7 @@ Building interactive websites, HTML applications, and frontend UI dashboards is 
             generativeHtml = injectCitationsIntoHtml(generativeHtml, webData.articles);
           }
         }
-        const finalHtml = (topGalleryHtml || '') + generativeHtml + (topGalleryHtml ? '' : (webHtml || ''));
+        const finalHtml = (topGalleryHtml || '') + generativeHtml + (webHtml || '');
 
         if (window.saveChatToNeonDb && accText) window.saveChatToNeonDb(query, accText, convToUpdate ? convToUpdate.id : null);
         return { text: finalHtml, sources: null, isHtml: true, rawMarkdown: displayText };
@@ -15404,19 +15991,7 @@ Building interactive websites, HTML applications, and frontend UI dashboards is 
       const text = input.value.trim();
       if (!text && attachments.length === 0) return;
 
-      // ── Language Picker: only show when user asks for a "program" without specifying language ──
-      // Examples that trigger: "write a program", "create a program for fibonacci"
-      // Does NOT trigger: "write code", "write a function", "c program", "python program"
-      const askingForProgram = /\b(write|create|give|make|build|show)\b.{0,50}\bprogram\b/i.test(text) ||
-        /\bprogram\b.{0,30}\b(for|to|that|which)\b/i.test(text);
-      const hasLanguageAlready = /\b(c language|in c\b|using c\b|c program\b|python|java(?:script)?|c\+\+|cpp|golang|\bgo\b|rust|typescript|kotlin|swift|ruby|php|dart)\b/i.test(text);
-
-      if (askingForProgram && !hasLanguageAlready) {
-        window._pendingCodingQuery = text;
-        const popup = document.getElementById('langPickerPopup');
-        if (popup) { popup.style.display = 'flex'; }
-        return; // Wait for language selection
-      }
+      // Autonomous compound execution — directly answers all questions, code, and programs without modal blocking
 
       const msgAttachments = attachments.map(a => ({
         kind: a.kind,
@@ -17986,15 +18561,268 @@ d----        13-09-2026     10:30                api
       askInput.focus();
     });
 
+    // ── RAZOR-SHARP OMNI COMPOSER LOGIC (SURPASSING CHATGPT & CLAUDE) ──
+    const omniSuggestionsDrop = document.getElementById('omniSuggestionsDrop');
+    const omniSuggestionsList = document.getElementById('omniSuggestionsList');
+    const askClearBtn = document.getElementById('askClearBtn');
+    const omniWordCount = document.getElementById('omniWordCount');
+    let omniSelectedIndex = -1;
+
+    const OMNI_STARTERS = [
+      { icon: '💻', text: 'Synthesize full-stack web application with responsive UI & API', tag: 'Code' },
+      { icon: '🌐', text: 'What are the top breaking global tech and AI breakthroughs today?', tag: 'Web Live' },
+      { icon: '🧠', text: 'Explain quantum computing & superposition with first-principles mathematical rigor', tag: 'Reasoning' },
+      { icon: '🔬', text: 'Summarize latest peer-reviewed clinical breakthroughs in CRISPR genomics', tag: 'Science' },
+      { icon: '📊', text: 'Construct a discounted cash flow (DCF) valuation & sensitivity analysis model', tag: 'Finance' },
+      { icon: '⌨️', text: '/web Force live internet search with real-time citations & sources', tag: 'Command' },
+      { icon: '⌨️', text: '/code Generate, debug, and run code with live sandbox compiler', tag: 'Command' },
+      { icon: '⌨️', text: '/deep Activate multi-step chain-of-thought deep reasoning', tag: 'Command' },
+      { icon: '⌨️', text: '/math Solve advanced calculus, linear algebra, and scientific proofs', tag: 'Command' },
+      { icon: '⌨️', text: '/clear Reset current chat thread and begin fresh conversation', tag: 'Command' }
+    ];
+
+    function updateOmniInputState() {
+      const val = askInput ? askInput.value : '';
+      if (askClearBtn) {
+        askClearBtn.style.display = val.length > 0 ? 'flex' : 'none';
+      }
+      if (omniWordCount) {
+        if (!val.trim()) {
+          omniWordCount.textContent = 'Ready';
+        } else {
+          const words = val.trim().split(/\s+/).filter(Boolean).length;
+          omniWordCount.textContent = words + (words === 1 ? ' word' : ' words');
+        }
+      }
+    }
+
+    if (askClearBtn) {
+      askClearBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (askInput) {
+          askInput.value = '';
+          autosizeInput();
+          askInput.focus();
+          hideOmniSuggestions();
+        }
+      });
+    }
+
+    window.enhanceCurrentPrompt = function(e) {
+      if (e) e.stopPropagation();
+      if (!askInput) return;
+      const val = askInput.value.trim();
+      const btn = document.getElementById('enhancePromptBtn');
+      if (btn) {
+        btn.style.transform = 'scale(0.95)';
+        setTimeout(() => { btn.style.transform = ''; }, 150);
+      }
+
+      if (!val) {
+        askInput.value = 'Synthesize an autonomous, high-performance web application with modern responsive glassmorphism UI, real-time API integrations, and robust state management.';
+      } else if (val.length < 50) {
+        askInput.value = `Provide a comprehensive, rigorous first-principles breakdown and complete production-ready implementation for: "${val}".\n\nInclude step-by-step reasoning, architectural considerations, edge cases, and performance optimizations.`;
+      } else {
+        askInput.value = `[AUTONOMOUS DEEP SYNTHESIS]\n${val}\n\nDeconstruct with extreme precision, verifiable facts, structured sections, and clear actionable takeaways.`;
+      }
+      autosizeInput();
+      askInput.focus();
+
+      if (btn) {
+        const origText = btn.innerHTML;
+        btn.innerHTML = '<span class="sparkle-icon">✨</span> Enhanced!';
+        btn.style.background = 'rgba(0, 255, 170, 0.2)';
+        btn.style.borderColor = 'rgba(0, 255, 170, 0.5)';
+        btn.style.color = '#00ffaa';
+        setTimeout(() => {
+          btn.innerHTML = origText;
+          btn.style.background = '';
+          btn.style.borderColor = '';
+          btn.style.color = '';
+        }, 1600);
+      }
+      hideOmniSuggestions();
+    };
+
+    function renderOmniSuggestions(query = '') {
+      if (!omniSuggestionsList) return;
+      omniSuggestionsList.innerHTML = '';
+      omniSelectedIndex = -1;
+      const cleanQ = query.toLowerCase().trim();
+
+      const items = cleanQ ? OMNI_STARTERS.filter(item => 
+        item.text.toLowerCase().includes(cleanQ) || item.tag.toLowerCase().includes(cleanQ)
+      ) : OMNI_STARTERS.slice(0, 6);
+
+      if (items.length === 0) {
+        if (omniSuggestionsDrop) omniSuggestionsDrop.style.display = 'none';
+        return;
+      }
+
+      items.forEach((item, idx) => {
+        const el = document.createElement('div');
+        el.className = 'omni-suggestion-item';
+        el.dataset.idx = idx;
+        el.innerHTML = `
+          <span class="omni-item-icon">${item.icon}</span>
+          <span class="omni-item-text">${item.text}</span>
+          <span class="omni-item-tag">${item.tag}</span>
+        `;
+        el.addEventListener('mousedown', (e) => {
+          e.preventDefault();
+          selectOmniItem(item.text);
+        });
+        omniSuggestionsList.appendChild(el);
+      });
+      if (omniSuggestionsDrop) omniSuggestionsDrop.style.display = 'block';
+    }
+
+    function selectOmniItem(text) {
+      if (!askInput) return;
+      if (text.startsWith('/clear')) {
+        if (typeof startNewChat === 'function') startNewChat();
+        askInput.value = '';
+        autosizeInput();
+        hideOmniSuggestions();
+        return;
+      }
+      if (text.startsWith('/web ')) text = text.replace('/web ', '');
+      else if (text.startsWith('/code ')) text = text.replace('/code ', '');
+      else if (text.startsWith('/deep ')) text = text.replace('/deep ', '');
+      else if (text.startsWith('/math ')) text = text.replace('/math ', '');
+
+      askInput.value = text;
+      autosizeInput();
+      hideOmniSuggestions();
+      askInput.focus();
+      if (!text.startsWith('/')) {
+        setTimeout(() => {
+          if (askFormEl) askFormEl.requestSubmit();
+        }, 100);
+      }
+    }
+
+    function showOmniSuggestions() {
+      if (document.body.classList.contains('shared-view')) return;
+      renderOmniSuggestions(askInput ? askInput.value : '');
+    }
+
+    function hideOmniSuggestions() {
+      if (omniSuggestionsDrop) omniSuggestionsDrop.style.display = 'none';
+      omniSelectedIndex = -1;
+    }
+
     function autosizeInput() {
       askInput.style.height = 'auto';
-      askInput.style.height = Math.max(44, Math.min(askInput.scrollHeight, 260)) + 'px';
+      askInput.style.height = Math.max(46, Math.min(askInput.scrollHeight, 260)) + 'px';
+      updateOmniInputState();
     }
-    askInput.addEventListener('input', autosizeInput);
+    askInput.addEventListener('input', () => {
+      autosizeInput();
+      if (askInput.value.startsWith('/')) {
+        renderOmniSuggestions(askInput.value);
+      } else if (!askInput.value.trim()) {
+        renderOmniSuggestions('');
+      } else {
+        hideOmniSuggestions();
+      }
+    });
+
+    askInput.addEventListener('focus', () => {
+      if (!askInput.value.trim()) {
+        showOmniSuggestions();
+      }
+    });
+
+    document.addEventListener('click', (e) => {
+      if (omniSuggestionsDrop && !askFormEl.contains(e.target)) {
+        hideOmniSuggestions();
+      }
+    });
+
+    // Global shortcut: Ctrl+K or Cmd+K focuses omni search bar instantly
+    window.addEventListener('keydown', (e) => {
+      if ((e.ctrlKey || e.metaKey) && (e.key.toLowerCase() === 'k')) {
+        e.preventDefault();
+        if (askInput) {
+          askInput.focus();
+          askInput.select();
+          showOmniSuggestions();
+          askFormEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }
+    });
+
+    // Drag and drop onto search form
+    const searchDragOverlay = document.getElementById('searchDragOverlay');
+    if (askFormEl && searchDragOverlay) {
+      let dragCounter = 0;
+      askFormEl.addEventListener('dragenter', (e) => {
+        e.preventDefault();
+        dragCounter++;
+        searchDragOverlay.style.display = 'flex';
+      });
+      askFormEl.addEventListener('dragover', (e) => {
+        e.preventDefault();
+      });
+      askFormEl.addEventListener('dragleave', (e) => {
+        e.preventDefault();
+        dragCounter--;
+        if (dragCounter <= 0) {
+          searchDragOverlay.style.display = 'none';
+          dragCounter = 0;
+        }
+      });
+      askFormEl.addEventListener('drop', (e) => {
+        e.preventDefault();
+        dragCounter = 0;
+        searchDragOverlay.style.display = 'none';
+        const files = Array.from(e.dataTransfer?.files || []);
+        if (files.length) {
+          addFileAttachments(files);
+          askInput.focus();
+        }
+      });
+    }
 
     askInput.addEventListener('keydown', (e) => {
+      const items = omniSuggestionsList ? omniSuggestionsList.querySelectorAll('.omni-suggestion-item') : [];
+      const isDropVisible = omniSuggestionsDrop && omniSuggestionsDrop.style.display === 'block' && items.length > 0;
+
+      if (isDropVisible) {
+        if (e.key === 'ArrowDown') {
+          e.preventDefault();
+          omniSelectedIndex = (omniSelectedIndex + 1) % items.length;
+          items.forEach((it, idx) => it.classList.toggle('selected', idx === omniSelectedIndex));
+          return;
+        } else if (e.key === 'ArrowUp') {
+          e.preventDefault();
+          omniSelectedIndex = (omniSelectedIndex - 1 + items.length) % items.length;
+          items.forEach((it, idx) => it.classList.toggle('selected', idx === omniSelectedIndex));
+          return;
+        } else if ((e.key === 'Enter' || e.key === 'Tab') && omniSelectedIndex >= 0) {
+          e.preventDefault();
+          const selectedText = items[omniSelectedIndex].querySelector('.omni-item-text')?.textContent;
+          if (selectedText) selectOmniItem(selectedText);
+          return;
+        } else if (e.key === 'Escape') {
+          e.preventDefault();
+          hideOmniSuggestions();
+          return;
+        }
+      }
+
+      if (e.key === 'Escape') {
+        if (askInput.value) {
+          askInput.value = '';
+          autosizeInput();
+        }
+        return;
+      }
+
       if (e.key === 'Enter' && !e.shiftKey) {
         e.preventDefault();
+        hideOmniSuggestions();
         askFormEl.requestSubmit();
       }
     });
@@ -19114,7 +19942,17 @@ d----        13-09-2026     10:30                api
       } catch (e) { }
     })();
 
-    // ---------- Clickable Domains ----------
+    // ---------- Clickable Sharp Domain Explorer Chips & Legacy Links ----------
+    document.querySelectorAll('.sharp-domain-chip').forEach(chip => {
+      chip.addEventListener('click', (e) => {
+        e.preventDefault();
+        const q = chip.getAttribute('data-query');
+        if (q) {
+          window.submitPresetQuery(q);
+        }
+      });
+    });
+
     document.querySelectorAll('.domain-link').forEach(link => {
       link.addEventListener('click', () => {
         window.submitPresetQuery('Tell me about ' + link.dataset.domain);
