@@ -12,6 +12,17 @@
   <link
     href="https://fonts.googleapis.com/css2?family=Spectral:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap"
     rel="stylesheet">
+  <script>
+    (function() {
+      try {
+        var token = localStorage.getItem('csToken');
+        var user = localStorage.getItem('csUser');
+        if (!token || !user) {
+          window.location.replace('login.html');
+        }
+      } catch (e) {}
+    })();
+  </script>
   <style>
     /* ═══════════════════════════════════════════
      COGNISPHERE — Claude-style premium redesign
@@ -12206,9 +12217,9 @@
       </div>
 
       <button class="account-trigger" id="accountTrigger">
-        <span class="account-avatar">A</span>
+        <span class="account-avatar">U</span>
         <span class="account-info">
-          <span class="account-name">Aarav Sharma</span>
+          <span class="account-name">User Account</span>
           <span class="account-plan">Free plan</span>
         </span>
         <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
@@ -14261,11 +14272,11 @@
       };
     }
 
-    // ── UNIVERSAL CODE EXECUTION API (Tries API -> Local 3088 -> Sandbox Fallback) ──
+    // ── UNIVERSAL CODE EXECUTION API (Tries API -> Local 3088 -> Piston Cloud -> Sandbox Fallback) ──
     async function executeCodeUniversal(action, code, lang, stdin) {
       let data = null;
 
-      // 1. Try relative /api/run-code
+      // 1. Try relative /api/run-code (local server)
       try {
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 8000);
@@ -14301,7 +14312,62 @@
         } catch (e) { }
       }
 
-      // 3. Resilient Sandbox Fallback (for Vercel or when server is unavailable)
+      // 3. Piston API – free public cloud code execution (works on Vercel, mobile & everywhere)
+      if (!data && action === 'run') {
+        try {
+          const pistonLangMap = {
+            'python': { language: 'python', version: '3.10.0' },
+            'py': { language: 'python', version: '3.10.0' },
+            'javascript': { language: 'javascript', version: '18.15.0' },
+            'js': { language: 'javascript', version: '18.15.0' },
+            'c': { language: 'c', version: '10.2.0' },
+            'cpp': { language: 'cpp', version: '10.2.0' },
+            'c++': { language: 'cpp', version: '10.2.0' },
+            'java': { language: 'java', version: '15.0.2' },
+            'go': { language: 'go', version: '1.16.2' },
+            'rust': { language: 'rust', version: '1.50.0' },
+            'ruby': { language: 'ruby', version: '3.0.1' },
+            'php': { language: 'php', version: '8.2.3' },
+            'bash': { language: 'bash', version: '5.2.0' },
+            'sh': { language: 'bash', version: '5.2.0' },
+          };
+          const cleanLang = (lang || 'c').toLowerCase();
+          const pistonInfo = pistonLangMap[cleanLang];
+          if (pistonInfo) {
+            const fileNameMap = { python: 'main.py', javascript: 'main.js', c: 'main.c', cpp: 'main.cpp', java: 'Main.java', go: 'main.go', rust: 'main.rs', ruby: 'main.rb', php: 'main.php', bash: 'main.sh' };
+            const fileName = fileNameMap[pistonInfo.language] || 'main.txt';
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 12000);
+            const resp = await fetch('https://emkc.org/api/v2/piston/execute', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                language: pistonInfo.language,
+                version: pistonInfo.version,
+                files: [{ name: fileName, content: code }],
+                stdin: stdin || ''
+              }),
+              signal: controller.signal
+            });
+            clearTimeout(timeoutId);
+            if (resp.ok) {
+              const json = await resp.json();
+              const run = json.run || {};
+              const output = ((run.stdout || '') + (run.stderr ? (run.stdout ? '\n' : '') + run.stderr : '')).trim();
+              const isSuccess = (run.code === 0 || run.code === null) && !run.signal;
+              data = {
+                success: isSuccess,
+                platform: `Piston Cloud Runtime (${pistonInfo.language} ${pistonInfo.version})`,
+                output: output || '(Program completed with exit code 0, no output)',
+                time: `${run.cpu_time || 0}ms`,
+                exitCode: run.code ?? (isSuccess ? 0 : 1)
+              };
+            }
+          }
+        } catch (e) { }
+      }
+
+      // 4. Resilient Client-Side Sandbox Fallback (JS only, or pattern-matched C/Python)
       if (!data) {
         data = runClientSideCodeSandbox(action, code, lang, stdin);
       }
@@ -14309,6 +14375,7 @@
       return data;
     }
     window.executeCodeUniversal = executeCodeUniversal;
+
 
     // ── DEDICATED CODE TERMINAL & COMPILER WORKSPACE MODAL (On Screen) ──
     function syncModalEditorGutter() {

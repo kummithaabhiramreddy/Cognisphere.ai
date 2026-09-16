@@ -4,6 +4,7 @@ const express = require('express');
 const cors = require('cors');
 const { Pool } = require('pg');
 const fs = require('fs');
+const https = require('https');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const JWT_SECRET = process.env.JWT_SECRET || 'cognisphere_secret_key_2024_worldbrain';
@@ -576,9 +577,6 @@ async function initializeDb() {
 }
 initializeDb();
 
-// In-memory fallback user store for local development when DB is offline
-const localUsers = new Map();
-
 // ─── AUTH: Register ──────────────────────────────────────────────────
 app.post('/api/auth/register', async (req, res) => {
   try {
@@ -588,29 +586,26 @@ app.post('/api/auth/register', async (req, res) => {
     const cleanName = (name || cleanEmail.split('@')[0]).trim();
     const initials = cleanName.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2) || 'CS';
 
-    try {
-      const exists = await pool.query('SELECT * FROM users WHERE email = $1', [cleanEmail]);
-      if (exists.rows.length > 0) {
-        return res.status(400).json({ error: 'Email already registered. Please log in instead.' });
-      }
-      const hash = await bcrypt.hash(password, 10);
-      const result = await pool.query(
-        'INSERT INTO users (name, email, password_hash, plan, avatar_initials) VALUES ($1, $2, $3, $4, $5) RETURNING id, name, email, plan, avatar_initials, created_at',
-        [cleanName, cleanEmail, hash, 'Free', initials]
-      );
-      const user = result.rows[0];
-      const token = jwt.sign({ id: user.id, email: user.email, name: user.name }, JWT_SECRET, { expiresIn: '7d' });
-      return res.json({ success: true, token, user });
-    } catch (dbErr) {
-      console.warn('DB Register Fallback:', dbErr.message);
-      const hash = await bcrypt.hash(password, 10);
-      const user = { id: 'usr_' + Date.now(), name: cleanName, email: cleanEmail, password_hash: hash, plan: 'Free', avatar_initials: initials };
-      localUsers.set(cleanEmail, user);
-      const token = jwt.sign({ id: user.id, email: user.email, name: user.name }, JWT_SECRET, { expiresIn: '7d' });
-      return res.json({ success: true, token, user: { id: user.id, name: user.name, email: user.email, plan: user.plan, avatar_initials: initials } });
+    // 1. Check if user already exists in Neon DB
+    const exists = await pool.query('SELECT id FROM users WHERE email = $1', [cleanEmail]);
+    if (exists.rows.length > 0) {
+      return res.status(400).json({ error: 'Email already registered. Please log in instead.' });
     }
+
+    // 2. Hash password securely
+    const hash = await bcrypt.hash(password, 10);
+
+    // 3. Insert new user into Neon DB
+    const result = await pool.query(
+      'INSERT INTO users (name, email, password_hash, plan, avatar_initials) VALUES ($1, $2, $3, $4, $5) RETURNING id, name, email, plan, avatar_initials, created_at',
+      [cleanName, cleanEmail, hash, 'Free', initials]
+    );
+    const user = result.rows[0];
+    const token = jwt.sign({ id: user.id, email: user.email, name: user.name }, JWT_SECRET, { expiresIn: '7d' });
+    return res.json({ success: true, token, user });
   } catch (err) {
-    res.status(400).json({ error: err.message });
+    console.error('Neon DB Registration error:', err.message);
+    res.status(500).json({ error: 'Registration failed: ' + err.message });
   }
 });
 
@@ -621,122 +616,77 @@ app.post('/api/auth/login', async (req, res) => {
     if (!email || !password) return res.status(400).json({ error: 'Email and password required' });
     const cleanEmail = email.toLowerCase().trim();
 
-    let user = null;
-    try {
-      const result = await pool.query('SELECT * FROM users WHERE email = $1', [cleanEmail]);
-      if (result.rows.length > 0) user = result.rows[0];
-    } catch (dbErr) {
-      console.warn('DB Login Fallback:', dbErr.message);
+    // 1. Query Neon PostgreSQL database for user
+    const result = await pool.query('SELECT * FROM users WHERE email = $1', [cleanEmail]);
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'No account found with this email. Please sign up to create an account.' });
     }
 
-    if (!user) {
-      user = localUsers.get(cleanEmail);
+    const user = result.rows[0];
+
+    // 2. Verify password
+    if (!user.password_hash) {
+      return res.status(401).json({ error: 'Please sign in using your OAuth provider (Google or GitHub).' });
     }
 
-    if (!user) {
-      // Auto-create local user profile on first login attempt when DB is offline
-      const cleanName = cleanEmail.split('@')[0].replace(/[^a-zA-Z]/g, ' ');
-      const initials = cleanName.trim().slice(0, 2).toUpperCase() || 'CS';
-      const hash = await bcrypt.hash(password, 10);
-      user = { id: 'usr_' + Date.now(), name: cleanName, email: cleanEmail, password_hash: hash, plan: 'Free', avatar_initials: initials };
-      localUsers.set(cleanEmail, user);
-    }
-
-    const valid = user.password_hash ? await bcrypt.compare(password, user.password_hash) : true;
+    const valid = await bcrypt.compare(password, user.password_hash);
     if (!valid) {
-      return res.status(401).json({ error: 'Incorrect password. Please try again.' });
+      return res.status(401).json({ error: 'Incorrect password. Please check and try again.' });
     }
 
+    // 3. Generate real JWT session token
     const token = jwt.sign({ id: user.id, email: user.email, name: user.name }, JWT_SECRET, { expiresIn: '7d' });
-    res.json({ success: true, token, user: { id: user.id, name: user.name || 'User', email: user.email, plan: user.plan || 'Free', avatar_initials: user.avatar_initials || 'U' } });
+    res.json({
+      success: true,
+      token,
+      user: {
+        id: user.id,
+        name: user.name || 'User',
+        email: user.email,
+        plan: user.plan || 'Free',
+        avatar_initials: user.avatar_initials || 'U'
+      }
+    });
   } catch (err) {
-    console.error('Login error:', err.message);
+    console.error('Neon DB Login error:', err.message);
     res.status(500).json({ error: 'Login failed: ' + err.message });
-  }
-});
-// ─── LIVE NEON DB TELEMETRY STATS ────────────────────────────────────
-app.get('/api/stats', async (req, res) => {
-  try {
-    let queriesCount = 14850;
-    let usersCount = 3940;
-
-    if (pool) {
-      try {
-        const qRes = await pool.query('SELECT COUNT(*) FROM search_history');
-        if (qRes && qRes.rows && qRes.rows[0]) {
-          const dbQ = parseInt(qRes.rows[0].count, 10) || 0;
-          queriesCount = Math.max(queriesCount, 14850 + dbQ);
-        }
-      } catch (e) {}
-
-      try {
-        const uRes = await pool.query('SELECT COUNT(*) FROM users');
-        if (uRes && uRes.rows && uRes.rows[0]) {
-          const dbU = parseInt(uRes.rows[0].count, 10) || 0;
-          usersCount = Math.max(usersCount, 3940 + dbU);
-        }
-      } catch (e) {}
-    }
-
-    res.json({
-      success: true,
-      queries_processed: queriesCount,
-      active_users: usersCount,
-      uptime_percent: 99.99,
-      avg_response_ms: 38
-    });
-  } catch (err) {
-    res.json({
-      success: true,
-      queries_processed: 14850,
-      active_users: 3940,
-      uptime_percent: 99.98,
-      avg_response_ms: 42
-    });
   }
 });
 
 // ─── Helper: upsert OAuth user into DB and return JWT ─────────────────
 async function upsertOAuthUser({ name, email, avatar_url, provider }) {
   const cleanEmail = (email || '').toLowerCase().trim();
+  if (!cleanEmail) throw new Error('Valid email required for authentication');
   const cleanName = (name || cleanEmail.split('@')[0] || 'User').trim();
   const initials = cleanName.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2) || 'CS';
 
   let user = null;
-  if (pool) {
-    try {
-      let result = await pool.query('SELECT * FROM users WHERE email = $1', [cleanEmail]);
-      if (result.rows.length === 0) {
-        const hash = await bcrypt.hash('oauth_' + provider + '_' + Date.now(), 10);
-        const ins = await pool.query(
-          'INSERT INTO users (name, email, password_hash, plan, avatar_initials) VALUES ($1, $2, $3, $4, $5) RETURNING id, name, email, plan, avatar_initials',
-          [cleanName, cleanEmail, hash, 'Pro', initials]
-        );
-        user = ins.rows[0];
-      } else {
-        user = result.rows[0];
-        await pool.query('UPDATE users SET name=$1, avatar_initials=$2 WHERE id=$3', [cleanName, initials, user.id]);
-        user.name = cleanName;
-        user.avatar_initials = initials;
-      }
-    } catch (dbErr) {
-      console.warn('DB OAuth Upsert Fallback:', dbErr.message);
-    }
-  }
-
-  if (!user) {
-    user = {
-      id: 'usr_' + Date.now(),
-      name: cleanName,
-      email: cleanEmail,
-      plan: 'Pro',
-      avatar_initials: initials
-    };
-    localUsers.set(cleanEmail, user);
+  const result = await pool.query('SELECT * FROM users WHERE email = $1', [cleanEmail]);
+  if (result.rows.length === 0) {
+    const hash = await bcrypt.hash('oauth_' + provider + '_' + Date.now(), 10);
+    const ins = await pool.query(
+      'INSERT INTO users (name, email, password_hash, plan, avatar_initials) VALUES ($1, $2, $3, $4, $5) RETURNING id, name, email, plan, avatar_initials',
+      [cleanName, cleanEmail, hash, 'Pro', initials]
+    );
+    user = ins.rows[0];
+  } else {
+    user = result.rows[0];
+    await pool.query('UPDATE users SET name=$1, avatar_initials=$2 WHERE id=$3', [cleanName, initials, user.id]);
+    user.name = cleanName;
+    user.avatar_initials = initials;
   }
 
   const token = jwt.sign({ id: user.id, email: user.email, name: user.name }, JWT_SECRET, { expiresIn: '7d' });
-  return { token, user: { id: user.id, name: user.name, email: user.email, plan: user.plan || 'Pro', avatar_initials: user.avatar_initials || initials } };
+  return {
+    token,
+    user: {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      plan: user.plan || 'Pro',
+      avatar_initials: user.avatar_initials || initials
+    }
+  };
 }
 
 function getAppUrl(req) {
@@ -749,54 +699,87 @@ function getAppUrl(req) {
 // ─── AUTH: Google ID Token / GIS Credential Verification ─────────────────
 app.post('/api/auth/google/verify', async (req, res) => {
   try {
-    const { credential } = req.body;
-    if (!credential) {
-      return res.status(400).json({ error: 'Google credential is required' });
+    const { credential, access_token } = req.body;
+    if (!credential && !access_token) {
+      return res.status(400).json({ error: 'Google credential or access token is required' });
     }
 
     let payload = null;
-    // 1. Try Google Tokeninfo API for token verification
-    try {
-      const verifyRes = await new Promise((resolve, reject) => {
-        const r = https.get(`https://oauth2.googleapis.com/tokeninfo?id_token=${encodeURIComponent(credential)}`, res2 => {
-          let d = '';
-          res2.on('data', c => d += c);
-          res2.on('end', () => {
-            try { resolve(JSON.parse(d)); } catch (e) { reject(e); }
-          });
-        });
-        r.on('error', reject);
-        r.setTimeout(4000, () => { r.destroy(); reject(new Error('Google verification timeout')); });
-      });
 
-      if (verifyRes && verifyRes.email) {
-        payload = verifyRes;
+    // 1. If access_token is provided (from Google OAuth2 popup client)
+    if (access_token) {
+      try {
+        const userInfo = await new Promise((resolve, reject) => {
+          const r = https.get('https://www.googleapis.com/oauth2/v3/userinfo', {
+            headers: {
+              'Authorization': `Bearer ${access_token}`,
+              'User-Agent': 'Cognisphere-AI'
+            }
+          }, res2 => {
+            let d = '';
+            res2.on('data', c => d += c);
+            res2.on('end', () => {
+              try { resolve(JSON.parse(d)); } catch (e) { reject(e); }
+            });
+          });
+          r.on('error', reject);
+          r.setTimeout(5000, () => { r.destroy(); reject(new Error('Google userinfo timeout')); });
+        });
+
+        if (userInfo && userInfo.email) {
+          payload = userInfo;
+        }
+      } catch (tokenErr) {
+        console.warn('Google userinfo fetch error:', tokenErr.message);
       }
-    } catch (vErr) {
-      console.warn('Google tokeninfo fetch fallback:', vErr.message);
     }
 
-    // 2. Direct JWT decode fallback if tokeninfo endpoint is unreachable
-    if (!payload) {
+    // 2. If credential (ID token) is provided
+    if (!payload && credential) {
+      // Try Google Tokeninfo API for ID token verification
       try {
-        const parts = credential.split('.');
-        if (parts.length === 3) {
-          const rawPayload = Buffer.from(parts[1], 'base64').toString('utf8');
-          payload = JSON.parse(rawPayload);
+        const verifyRes = await new Promise((resolve, reject) => {
+          const r = https.get(`https://oauth2.googleapis.com/tokeninfo?id_token=${encodeURIComponent(credential)}`, res2 => {
+            let d = '';
+            res2.on('data', c => d += c);
+            res2.on('end', () => {
+              try { resolve(JSON.parse(d)); } catch (e) { reject(e); }
+            });
+          });
+          r.on('error', reject);
+          r.setTimeout(5000, () => { r.destroy(); reject(new Error('Google verification timeout')); });
+        });
+
+        if (verifyRes && verifyRes.email) {
+          payload = verifyRes;
         }
-      } catch (jwtErr) {
-        console.error('JWT parse error:', jwtErr.message);
+      } catch (vErr) {
+        console.warn('Google tokeninfo fetch fallback:', vErr.message);
+      }
+
+      // Direct JWT decode fallback
+      if (!payload) {
+        try {
+          const parts = credential.split('.');
+          if (parts.length === 3) {
+            const rawPayload = Buffer.from(parts[1], 'base64').toString('utf8');
+            payload = JSON.parse(rawPayload);
+          }
+        } catch (jwtErr) {
+          console.error('JWT parse error:', jwtErr.message);
+        }
       }
     }
 
     if (!payload || !payload.email) {
-      return res.status(400).json({ error: 'Invalid Google credential token' });
+      return res.status(400).json({ error: 'Could not retrieve verified Google profile. Please try again.' });
     }
 
     const email = payload.email.toLowerCase().trim();
     const name = payload.name || payload.given_name || email.split('@')[0];
     const picture = payload.picture || '';
 
+    // Upsert into Neon DB
     const authResult = await upsertOAuthUser({
       name,
       email,
@@ -819,14 +802,7 @@ app.post('/api/auth/google/verify', async (req, res) => {
 app.get('/api/auth/google', async (req, res) => {
   const clientId = process.env.GOOGLE_CLIENT_ID || '587514151509-ffmej4mml0re8ascku86u2tnlb09tbnm.apps.googleusercontent.com';
   if (!clientId || clientId === 'YOUR_GOOGLE_CLIENT_ID') {
-    // Dynamically authenticate as Google account from user device
-    const { token, user } = await upsertOAuthUser({
-      name: 'Google User',
-      email: 'user.google@cognisphere.ai',
-      avatar_url: '',
-      provider: 'google'
-    });
-    return res.redirect(`/oauth-callback.html?token=${encodeURIComponent(token)}&user=${encodeURIComponent(JSON.stringify(user))}`);
+    return res.redirect(`/oauth-callback.html?error=${encodeURIComponent('Google Client ID not configured in .env')}`);
   }
   const APP_URL = getAppUrl(req);
   const redirectUri = encodeURIComponent(`${APP_URL}/api/auth/google/callback`);
@@ -848,14 +824,7 @@ app.get('/api/auth/google/callback', async (req, res) => {
     const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
 
     if (!clientSecret) {
-      // If client secret is not configured on server, authenticate user profile gracefully
-      const { token, user } = await upsertOAuthUser({
-        name: 'Google User',
-        email: 'user.google@cognisphere.ai',
-        avatar_url: '',
-        provider: 'google'
-      });
-      return res.redirect(`/oauth-callback.html?token=${encodeURIComponent(token)}&user=${encodeURIComponent(JSON.stringify(user))}`);
+      return res.redirect(`/oauth-callback.html?error=${encodeURIComponent('GOOGLE_CLIENT_SECRET is not configured on server. Please use the Google Sign-in button on the login page.')}`);
     }
 
     // Exchange code for tokens
@@ -907,14 +876,7 @@ app.get('/api/auth/google/callback', async (req, res) => {
 app.get('/api/auth/github', async (req, res) => {
   const clientId = process.env.GITHUB_CLIENT_ID;
   if (!clientId || clientId === 'YOUR_GITHUB_CLIENT_ID') {
-    // Dynamically authenticate as GitHub account from user device
-    const { token, user } = await upsertOAuthUser({
-      name: 'GitHub Developer',
-      email: 'dev.github@cognisphere.ai',
-      avatar_url: '',
-      provider: 'github'
-    });
-    return res.redirect(`/oauth-callback.html?token=${encodeURIComponent(token)}&user=${encodeURIComponent(JSON.stringify(user))}`);
+    return res.redirect(`/oauth-callback.html?error=${encodeURIComponent('GitHub OAuth requires GITHUB_CLIENT_ID and GITHUB_CLIENT_SECRET configured in .env. Please sign in with Google or Email.')}`);
   }
   const APP_URL = getAppUrl(req);
   const redirectUri = encodeURIComponent(`${APP_URL}/api/auth/github/callback`);
@@ -1453,7 +1415,6 @@ function searchDomains(query) {
 }
 
 // Helper function to perform GET requests returning JSON
-const https = require('https');
 function getJson(url, headers = {}, timeout = 3500) {
   return new Promise((resolve, reject) => {
     let req;
