@@ -1618,7 +1618,7 @@
       line-height: 1.65;
       word-break: break-word;
       overflow-wrap: break-word;
-      overflow-x: hidden;
+      overflow-x: visible;
       position: relative;
     }
 
@@ -5955,65 +5955,146 @@
       margin-top: 10px;
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
     }
-    /* Platform pill: favicon + name + +N */
+    /* Platform pill: favicon + name + +N (Perplexity / Claude style inline citation) */
     .src-platform-pill {
       position: relative;
       display: inline-flex;
       align-items: center;
-      gap: 4px;
-      padding: 2px 8px 2px 5px;
-      background: rgba(255, 255, 255, 0.055);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 20px;
-      font-size: 0.7rem;
+      gap: 3px;
+      padding: 2px 7px 2px 6px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 14px;
+      font-size: 0.74rem;
       font-weight: 500;
-      color: rgba(255,255,255,0.72);
+      color: #cbd5e1;
       cursor: pointer;
       user-select: none;
-      transition: all 0.15s ease;
+      transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
       white-space: nowrap;
+      vertical-align: middle;
+      margin-left: 5px;
+      line-height: 1.4;
+      text-decoration: none !important;
     }
     .src-platform-pill:hover {
-      background: rgba(255,255,255,0.1);
-      border-color: rgba(255,255,255,0.22);
+      background: rgba(255, 255, 255, 0.18);
+      border-color: rgba(0, 255, 170, 0.45);
+      color: #fff;
+    }
+    .src-pill-main-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      color: inherit;
+      text-decoration: none !important;
+      cursor: pointer;
+    }
+    .src-pill-main-link:hover {
       color: #fff;
     }
     .src-platform-pill img {
-      width: 12px;
-      height: 12px;
-      border-radius: 2px;
+      width: 13px;
+      height: 13px;
+      border-radius: 3px;
       object-fit: contain;
       flex-shrink: 0;
     }
+    .src-platform-pill .src-pill-name {
+      font-size: 0.74rem;
+      font-weight: 500;
+      color: inherit;
+    }
     .src-platform-pill .src-pill-count {
+      font-size: 0.68rem;
+      font-weight: 600;
+      color: #00ffaa;
+      margin-left: 2px;
+      padding: 1px 5px;
+      background: rgba(0, 255, 170, 0.14);
+      border: 1px solid rgba(0, 255, 170, 0.3);
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .src-platform-pill .src-pill-count:hover {
+      background: rgba(0, 255, 170, 0.3);
+      border-color: rgba(0, 255, 170, 0.6);
+      color: #fff;
+      transform: scale(1.05);
+    }
+    .src-platform-pill .src-pill-arrow {
       font-size: 0.65rem;
-      font-weight: 700;
-      color: rgba(255,255,255,0.45);
+      opacity: 0.6;
       margin-left: 1px;
     }
-    /* Popover that appears when pill clicked */
+    /* Popover that appears when pill clicked or hovered */
+    .src-platform-pill.is-open {
+      background: rgba(0, 255, 170, 0.2) !important;
+      border-color: rgba(0, 255, 170, 0.6) !important;
+      color: #fff !important;
+      box-shadow: 0 0 12px rgba(0, 255, 170, 0.25) !important;
+    }
     .src-pill-popover {
       display: none;
       position: absolute;
-      top: calc(100% + 6px);
+      top: calc(100% + 4px);
       left: 0;
-      z-index: 9999;
-      min-width: 260px;
-      max-width: 340px;
-      background: #1a1f2e;
-      border: 1px solid rgba(255,255,255,0.12);
+      z-index: 999999 !important;
+      min-width: 280px;
+      max-width: 360px;
+      background: #151924 !important;
+      border: 1px solid rgba(0, 255, 170, 0.35) !important;
       border-radius: 12px;
-      box-shadow: 0 12px 36px rgba(0,0,0,0.55);
-      padding: 8px 0;
+      box-shadow: 0 16px 48px rgba(0,0,0,0.85), 0 0 20px rgba(0, 255, 170, 0.15) !important;
+      padding: 6px 0 4px;
       overflow: hidden;
+      pointer-events: auto !important;
     }
+    /* Invisible hover bridge to prevent popover closing when moving cursor */
+    .src-pill-popover::before {
+      content: '';
+      position: absolute;
+      top: -10px;
+      left: 0;
+      right: 0;
+      height: 10px;
+      background: transparent;
+    }
+    .src-platform-pill:hover .src-pill-popover,
+    .src-pill-popover:hover,
     .src-pill-popover.open {
-      display: block;
-      animation: popoverIn 0.18s cubic-bezier(0.16,1,0.3,1);
+      display: block !important;
+      animation: popoverIn 0.15s cubic-bezier(0.16,1,0.3,1);
     }
     @keyframes popoverIn {
       from { opacity:0; transform: translateY(-4px) scale(0.97); }
       to   { opacity:1; transform: translateY(0) scale(1); }
+    }
+    .src-popover-close-btn {
+      margin-left: auto;
+      background: transparent;
+      border: none;
+      outline: none;
+      color: rgba(255, 255, 255, 0.5);
+      font-size: 0.78rem;
+      cursor: pointer;
+      padding: 2px 6px;
+      border-radius: 4px;
+      line-height: 1;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.15s, color 0.15s;
+    }
+    .src-popover-close-btn:hover {
+      background: rgba(255, 255, 255, 0.15);
+      color: #fff;
+    }
+    .src-popover-list {
+      max-height: 270px;
+      overflow-y: auto;
+      overscroll-behavior: contain;
     }
     .src-popover-header {
       display: flex;
@@ -6076,6 +6157,35 @@
       opacity: 0.35;
       flex-shrink: 0;
       margin-top: 2px;
+    }
+
+    /* ====== INTERACTIVE CHAT EMAIL & PHONE CHIPS ====== */
+    .chat-email-chip, .chat-phone-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      color: #38bdf8 !important;
+      text-decoration: none !important;
+      font-weight: 500;
+      padding: 2px 8px;
+      border-radius: 6px;
+      background: rgba(56, 189, 248, 0.1);
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      transition: all 0.18s ease;
+      vertical-align: middle;
+      font-size: 0.86rem;
+      line-height: 1.4;
+      cursor: pointer;
+    }
+    .chat-email-chip:hover, .chat-phone-chip:hover {
+      background: rgba(56, 189, 248, 0.22);
+      border-color: rgba(56, 189, 248, 0.6);
+      color: #ffffff !important;
+      box-shadow: 0 0 10px rgba(56, 189, 248, 0.25);
+    }
+    .chat-email-chip .chip-icon, .chat-phone-chip .chip-icon {
+      font-size: 0.85rem;
+      line-height: 1;
     }
 
     /* ====== INLINE DYNAMIC VISUAL IMAGE GALLERY ====== */
@@ -8777,6 +8887,40 @@
         grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)) !important;
         gap: 6px !important;
       }
+
+      /* Mobile compression: Inline source pills & suggestion questions */
+      .inline-suggestions-row {
+        display: flex !important;
+        flex-wrap: nowrap !important;
+        overflow-x: auto !important;
+        -webkit-overflow-scrolling: touch !important;
+        gap: 6px !important;
+        padding: 5px 0 4px 0 !important;
+        margin-top: 8px !important;
+        scrollbar-width: none !important;
+      }
+      .inline-suggestions-row::-webkit-scrollbar {
+        display: none !important;
+      }
+      .inline-suggestion-chip {
+        padding: 3px 8px !important;
+        font-size: 0.7rem !important;
+        border-radius: 12px !important;
+        white-space: nowrap !important;
+        flex-shrink: 0 !important;
+      }
+      .src-platform-pill {
+        padding: 1px 5px !important;
+        font-size: 0.65rem !important;
+        margin-left: 3px !important;
+        max-width: 145px !important;
+      }
+      .src-platform-pill .src-pill-name {
+        max-width: 85px !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+        white-space: nowrap !important;
+      }
     }
 
     /* ── COGNISPHERE STUDIO PRO INTELLIGENCE & LAYOUT STYLES ── */
@@ -9012,9 +9156,9 @@
       display: flex !important;
       flex-wrap: wrap !important;
       align-items: center !important;
-      gap: 8px !important;
-      margin-top: 14px !important;
-      padding-top: 10px !important;
+      gap: 6px !important;
+      margin-top: 10px !important;
+      padding-top: 8px !important;
       border-top: 1px solid rgba(255, 255, 255, 0.07) !important;
       width: 100% !important;
     }
@@ -9024,18 +9168,18 @@
       box-sizing: border-box !important;
       display: inline-flex !important;
       align-items: center !important;
-      gap: 6px !important;
-      padding: 5px 12px !important;
-      border-radius: 18px !important;
+      gap: 5px !important;
+      padding: 3.5px 10px !important;
+      border-radius: 14px !important;
       background: rgba(255, 255, 255, 0.04) !important;
-      border: 1px solid rgba(255, 255, 255, 0.12) !important;
+      border: 1px solid rgba(255, 255, 255, 0.1) !important;
       color: #e2e8f0 !important;
-      font-size: 0.79rem !important;
+      font-size: 0.74rem !important;
       font-family: 'Inter', system-ui, sans-serif !important;
       font-weight: 500 !important;
       cursor: pointer !important;
-      transition: all 0.18s ease !important;
-      line-height: 1.4 !important;
+      transition: all 0.15s ease !important;
+      line-height: 1.35 !important;
       opacity: 0;
       transform: translateY(4px);
       animation: chipFadeIn 0.3s ease forwards !important;
@@ -12576,15 +12720,6 @@
             </button>
           </div>
         </div>
-
-        <!-- Omni Suggestions & Slash Command Dropdown -->
-        <div id="omniSuggestionsDrop" class="omni-suggestions-drop" style="display:none;">
-          <div class="omni-drop-header">
-            <span>⚡ Superhuman Starters &amp; Commands</span>
-            <span class="omni-drop-tip">Tab or ↑ ↓ to navigate</span>
-          </div>
-          <div class="omni-drop-list" id="omniSuggestionsList"></div>
-        </div>
       </form>
 
       <!-- Hidden compatibility anchors for legacy handlers -->
@@ -14042,9 +14177,45 @@
       return `${icon} ${typePrefix}${titleSuffix}`;
     }
 
+    // ====== UNIVERSAL ABSOLUTE URL SANITIZER ======
+    function ensureAbsoluteUrl(url) {
+      if (!url || typeof url !== 'string') return '';
+      url = url.trim();
+      if (!url) return '';
+      // DOI matching: e.g. 10.1145/3377325.3377500 or https://doi.org/10.xxxx
+      if (/^(?:https?:\/\/doi\.org\/)?(10\.\d{4,9}\/[-._;()/:A-Za-z0-9]+)/i.test(url)) {
+        const m = url.match(/(10\.\d{4,9}\/[-._;()/:A-Za-z0-9]+)/i);
+        return 'https://doi.org/' + (m ? m[1] : url);
+      }
+      url = url.replace(/^<|>$/g, '').replace(/^['"]|['"]$/g, '');
+      if (/^javascript:/i.test(url)) return '#';
+      if (/^https?:\/\//i.test(url)) return url;
+      if (url.startsWith('//')) return 'https:' + url;
+      if (url.startsWith('mailto:') || url.startsWith('tel:') || url.startsWith('#')) return url;
+      return 'https://' + url.replace(/^\/+/, '');
+    }
+
+    // ====== HTML ENTITY DECODER ======
+    function decodeHtmlEntities(str) {
+      if (!str || typeof str !== 'string') return str || '';
+      return str
+        .replace(/&#x([0-9a-fA-F]+);/g, (_, hex) => String.fromCharCode(parseInt(hex, 16)))
+        .replace(/&#(\d+);/g, (_, dec) => String.fromCharCode(parseInt(dec, 10)))
+        .replace(/&amp;/g, '&')
+        .replace(/&lt;/g, '<')
+        .replace(/&gt;/g, '>')
+        .replace(/&quot;/g, '"')
+        .replace(/&#39;/g, "'");
+    }
+
     // ---------- Markdown Parser (Marked + Prism + Mermaid) ----------
     function parseMarkdown(text) {
       if (!text) return '';
+
+      // Decode any numeric or hex HTML entities in incoming text (e.g. obfuscated emails &#105;&#x6e;...)
+      if (typeof text === 'string') {
+        text = decodeHtmlEntities(text);
+      }
 
       // Claude AI-Style Thinking Accordion
       let thinkingHtml = '';
@@ -14084,64 +14255,74 @@
 
       // Pre-process: Auto-wrap loose node arrow lines (e.g. A["..."] → B["..."]) into ```mermaid blocks
       if (typeof text === 'string' && !/```(?:mermaid|flowchart|graph)/i.test(text)) {
-        text = text.replace(/((?:^[A-Za-z0-9_]+\s*\[[^\]]+\]\s*(?:--> | ->|==>|→) \s * [A - Za - z0 -9_] + [^\n] *\n ?) +)/gm, (match) => {
-        const cleanLines = match.split('\n')
-          .map(l => l.trim().replace(/→/g, '-->').replace(/\.$/, ''))
-          .filter(Boolean)
-          .join('\n');
-        if (cleanLines) {
-          return `\n\`\`\`mermaid\nflowchart TD\n${cleanLines}\n\`\`\`\n`;
-        }
-        return match;
-      });
-    }
-
-    if (!window.marked) return (thinkingHtml + text);
-
-    const renderer = new marked.Renderer();
-
-    renderer.image = function (href, title, text) {
-      if (href && typeof href === 'object') {
-        text = href.text || href.title || text || '';
-        title = href.title || title || '';
-        href = href.href || '';
+        text = text.replace(/((?:^[A-Za-z0-9_]+\s*\[[^\]]+\]\s*(?:-->|->|==>|→)\s*[A-Za-z0-9_]+[^\n]*\n?)+)/gm, (match) => {
+          const cleanLines = match.split('\n')
+            .map(l => l.trim().replace(/→/g, '-->').replace(/\.$/, ''))
+            .filter(Boolean)
+            .join('\n');
+          if (cleanLines) {
+            return `\n\`\`\`mermaid\nflowchart TD\n${cleanLines}\n\`\`\`\n`;
+          }
+          return match;
+        });
       }
-      const cleanHref = (href || '').trim();
-      const altText = (text || title || 'Visual Model / Image').trim();
-      if (!cleanHref) return '';
 
-      const encUrl = encodeURIComponent(cleanHref);
-      const encLabel = encodeURIComponent(altText);
+      if (!window.marked) return (thinkingHtml + text);
 
-      return `
-        <div class="gallery-image-card" onclick="openMediaModal({url:decodeURIComponent('${encUrl}'), label:decodeURIComponent('${encLabel}'), isImage:true})">
-          <div class="gallery-img-wrap">
-            <img src="${cleanHref}" alt="${altText}" referrerpolicy="no-referrer" loading="lazy"
-                 onerror="if(!this.dataset.fb){this.dataset.fb=1; this.src='https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?w=600&q=80';}else{this.closest('.gallery-image-card').style.display='none';}" />
-            <div style="position:absolute; top:8px; left:8px; z-index:2; background:rgba(0,0,0,0.75); border:1px solid rgba(255,255,255,0.2); backdrop-filter:blur(6px); border-radius:6px; padding:2px 6px; font-size:0.62rem; font-weight:700; color:#38bdf8; letter-spacing:0.04em;">4K UHD</div>
-            <div style="position:absolute; top:8px; right:8px; z-index:2; background:rgba(0,0,0,0.75); border:1px solid rgba(245,158,11,0.4); backdrop-filter:blur(6px); border-radius:6px; padding:2px 6px; font-size:0.62rem; font-weight:700; color:#fbbf24; display:flex; align-items:center; gap:2px; box-shadow:0 2px 8px rgba(0,0,0,0.5);">★ 4.9 <span style="font-size:0.55rem; color:rgba(255,255,255,0.6); font-weight:500;">Top Rated</span></div>
-            <div class="gallery-img-overlay"><span>🔍 View Fullscreen & Convert</span></div>
-          </div>
-          <div class="gallery-img-caption" style="display:flex; align-items:center; justify-content:space-between; gap:6px;">
-            <span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap; flex:1;">🖼️ ${altText}</span>
-            <span style="font-size:0.65rem; color:#f59e0b; font-weight:600; flex-shrink:0;">★ 4.9</span>
-          </div>
-          <div style="padding:6px 10px 10px; display:flex; flex-wrap:wrap; gap:5px; justify-content:center; border-top:1px solid rgba(255,255,255,0.06);" onclick="event.stopPropagation();">
-            <button type="button" onclick="convertImageToFormat('${cleanHref.replace(/'/g, "\\'")}', 'pdf', '${altText.replace(/'/g, "\\'")}')" style="all:unset; box-sizing:border-box; padding:4px 8px; background:rgba(217,119,87,0.22); border:1px solid rgba(217,119,87,0.5); color:#fff; border-radius:5px; font-size:0.7rem; font-weight:500; cursor:pointer;">📄 Convert PDF</button>
-            <button type="button" onclick="convertImageToFormat('${cleanHref.replace(/'/g, "\\'")}', 'png', '${altText.replace(/'/g, "\\'")}')" style="all:unset; box-sizing:border-box; padding:4px 8px; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.15); color:#fff; border-radius:5px; font-size:0.7rem; font-weight:500; cursor:pointer;">🖼️ PNG</button>
-            <button type="button" onclick="convertImageToFormat('${cleanHref.replace(/'/g, "\\'")}', 'jpg', '${altText.replace(/'/g, "\\'")}')" style="all:unset; box-sizing:border-box; padding:4px 8px; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.15); color:#fff; border-radius:5px; font-size:0.7rem; font-weight:500; cursor:pointer;">📷 JPG</button>
-            <button type="button" onclick="convertImageToFormat('${cleanHref.replace(/'/g, "\\'")}', 'webp', '${altText.replace(/'/g, "\\'")}')" style="all:unset; box-sizing:border-box; padding:4px 8px; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.15); color:#fff; border-radius:5px; font-size:0.7rem; font-weight:500; cursor:pointer;">🎨 WEBP</button>
-          </div>
-        </div>
-      `;
-    };
+      const renderer = new marked.Renderer();
 
-    renderer.link = function (href, title, text) {
-      const url = (href || '').trim();
-      const label = (text || title || url).trim();
-      if (!url) return label;
-      return `<a href="${url}" target="_blank" rel="noopener noreferrer" class="chat-related-url-link" style="margin:2px 0;"><u>${escapeHtml(label)}</u> <span class="url-arrow">↗</span></a>`;
-    };
+      renderer.image = function (href, title, text) {
+        if (href && typeof href === 'object') {
+          text = href.text || href.title || text || '';
+          title = href.title || title || '';
+          href = href.href || '';
+        }
+        const cleanHref = (href || '').trim();
+        const altText = (text || title || 'Visual Model / Image').trim();
+        if (!cleanHref) return '';
+
+        const encUrl = encodeURIComponent(cleanHref);
+        const encLabel = encodeURIComponent(altText);
+
+        return `
+          <div class="gallery-image-card" onclick="openMediaModal({url:decodeURIComponent('${encUrl}'), label:decodeURIComponent('${encLabel}'), isImage:true})">
+            <div class="gallery-img-wrap">
+              <img src="${cleanHref}" alt="${altText}" referrerpolicy="no-referrer" loading="lazy"
+                   onerror="if(!this.dataset.fb){this.dataset.fb=1; this.src='https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?w=600&q=80';}else{this.closest('.gallery-image-card').style.display='none';}" />
+              <div style="position:absolute; top:8px; left:8px; z-index:2; background:rgba(0,0,0,0.75); border:1px solid rgba(255,255,255,0.2); backdrop-filter:blur(6px); border-radius:6px; padding:2px 6px; font-size:0.62rem; font-weight:700; color:#38bdf8; letter-spacing:0.04em;">4K UHD</div>
+              <div style="position:absolute; top:8px; right:8px; z-index:2; background:rgba(0,0,0,0.75); border:1px solid rgba(245,158,11,0.4); backdrop-filter:blur(6px); border-radius:6px; padding:2px 6px; font-size:0.62rem; font-weight:700; color:#fbbf24; display:flex; align-items:center; gap:2px; box-shadow:0 2px 8px rgba(0,0,0,0.5);">★ 4.9 <span style="font-size:0.55rem; color:rgba(255,255,255,0.6); font-weight:500;">Top Rated</span></div>
+              <div class="gallery-img-overlay"><span>🔍 View Fullscreen</span></div>
+            </div>
+            <div class="gallery-img-caption" style="display:flex; align-items:center; justify-content:space-between; gap:6px;">
+              <span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap; flex:1;">🖼️ ${altText}</span>
+              <span style="font-size:0.65rem; color:#f59e0b; font-weight:600; flex-shrink:0;">★ 4.9</span>
+            </div>
+          </div>
+        `;
+      };
+
+      renderer.link = function (href, title, text) {
+        let rawUrl = decodeHtmlEntities((href || '').trim());
+        let label = decodeHtmlEntities((text || title || rawUrl).trim());
+
+        // Handle mailto: and email patterns
+        if (rawUrl.startsWith('mailto:') || /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/i.test(rawUrl)) {
+          const email = rawUrl.replace(/^mailto:/i, '');
+          const cleanEmail = decodeHtmlEntities(email);
+          const cleanLabel = decodeHtmlEntities(label.replace(/^mailto:/i, ''));
+          return `<a href="mailto:${cleanEmail}" class="chat-email-chip" title="Send email to ${cleanEmail}"><span class="chip-icon">✉️</span> <u>${escapeHtml(cleanLabel || cleanEmail)}</u></a>`;
+        }
+
+        // Handle tel: and phone patterns
+        if (rawUrl.startsWith('tel:')) {
+          const phone = rawUrl.replace(/^tel:/i, '');
+          return `<a href="tel:${phone}" class="chat-phone-chip" title="Call ${phone}"><span class="chip-icon">📞</span> <u>${escapeHtml(label || phone)}</u></a>`;
+        }
+
+        const url = ensureAbsoluteUrl(rawUrl);
+        if (!url) return escapeHtml(label);
+        return `<a href="${url}" target="_blank" rel="noopener noreferrer" class="chat-related-url-link" style="margin:2px 0;"><u>${escapeHtml(label)}</u> <span class="url-arrow">↗</span></a>`;
+      };
     renderer.code = function (code, language) {
       // Handle both marked v4 (code, language) and v5+ (token object) calling convention
       if (code && typeof code === 'object') {
@@ -14784,59 +14965,79 @@
 
       let results = { summary: '', bullets: [], articles: [], images: [], videos: [] };
 
-      // Helper for fetching client-side articles (100% CORS-friendly)
-      const fetchClientArticles = async () => {
-        const clientArticles = [];
-        const seenUrls = new Set();
-        const addArt = (title, snippet, url, source) => {
-          if (!url || !url.startsWith('http') || seenUrls.has(url)) return;
-          seenUrls.add(url);
-          let host = source || '';
-          try { if (!host) host = new URL(url).hostname.replace(/^www\./, ''); } catch (e) { }
-          clientArticles.push({
-            title: (title || host).replace(/<[^>]+>/g, '').trim(),
-            snippet: (snippet || '').replace(/<[^>]+>/g, '').slice(0, 160).trim(),
-            url,
-            source: host
-          });
-        };
+    // ====== UNIVERSAL ABSOLUTE URL SANITIZER ======
+    function ensureAbsoluteUrl(url) {
+      if (!url || typeof url !== 'string') return '';
+      url = url.trim();
+      if (!url) return '';
+      // DOI matching: e.g. 10.1145/3377325.3377500 or https://doi.org/10.xxxx
+      if (/^(?:https?:\/\/doi\.org\/)?(10\.\d{4,9}\/[-._;()/:A-Za-z0-9]+)/i.test(url)) {
+        const m = url.match(/(10\.\d{4,9}\/[-._;()/:A-Za-z0-9]+)/i);
+        return 'https://doi.org/' + (m ? m[1] : url);
+      }
+      url = url.replace(/^<|>$/g, '').replace(/^['"]|['"]$/g, '');
+      if (/^javascript:/i.test(url)) return '#';
+      if (/^https?:\/\//i.test(url)) return url;
+      if (url.startsWith('//')) return 'https:' + url;
+      if (url.startsWith('mailto:') || url.startsWith('tel:') || url.startsWith('#')) return url;
+      return 'https://' + url.replace(/^\/+/, '');
+    }
 
-        const wikiP = fetch(`https://en.wikipedia.org/w/api.php?action=opensearch&search=${encodedWiki}&limit=4&namespace=0&format=json&origin=*`, {
-          signal: safeTimeoutSignal(4000)
-        }).then(r => r.json()).then(data => {
-          const titles = data[1] || [];
-          const snippets = data[2] || [];
-          const links = data[3] || [];
-          for (let i = 0; i < titles.length; i++) {
-            if (titles[i] && links[i]) addArt(titles[i], snippets[i] || `Encyclopedia reference for ${titles[i]}`, links[i], 'wikipedia.org');
-          }
-        }).catch(() => { });
-
-        const hnP = fetch(`https://hn.algolia.com/api/v1/search?query=${encoded}&tags=story&hitsPerPage=4`, {
-          signal: safeTimeoutSignal(4000)
-        }).then(r => r.json()).then(data => {
-          if (data && data.hits) {
-            for (const hit of data.hits) {
-              if (hit.title && hit.url) addArt(hit.title, `Technical analysis & community discussion (${hit.points || 0} pts)`, hit.url);
-            }
-          }
-        }).catch(() => { });
-
-        const oaP = fetch(`https://api.openalex.org/works?search=${encoded}&per-page=3`, {
-          signal: safeTimeoutSignal(4000)
-        }).then(r => r.json()).then(data => {
-          if (data && data.results) {
-            for (const work of data.results) {
-              if (work.title && (work.doi || work.id)) {
-                addArt(work.title, `Academic Paper (${work.publication_year || 'Research'}) — ${work.host_venue?.display_name || 'OpenAlex'}`, work.doi || work.id, 'openalex.org');
-              }
-            }
-          }
-        }).catch(() => { });
-
-        await Promise.allSettled([wikiP, hnP, oaP]);
-        return clientArticles;
+    // Helper for fetching client-side articles (100% CORS-friendly)
+    const fetchClientArticles = async () => {
+      const clientArticles = [];
+      const seenUrls = new Set();
+      const addArt = (title, snippet, url, source) => {
+        if (!url) return;
+        const validUrl = ensureAbsoluteUrl(url);
+        if (!validUrl || seenUrls.has(validUrl)) return;
+        seenUrls.add(validUrl);
+        let host = source || '';
+        try { if (!host) host = new URL(validUrl).hostname.replace(/^www\./, ''); } catch (e) { }
+        clientArticles.push({
+          title: (title || host).replace(/<[^>]+>/g, '').trim(),
+          snippet: (snippet || '').replace(/<[^>]+>/g, '').slice(0, 160).trim(),
+          url: validUrl,
+          source: host
+        });
       };
+
+      const wikiP = fetch(`https://en.wikipedia.org/w/api.php?action=opensearch&search=${encodedWiki}&limit=4&namespace=0&format=json&origin=*`, {
+        signal: safeTimeoutSignal(4000)
+      }).then(r => r.json()).then(data => {
+        const titles = data[1] || [];
+        const snippets = data[2] || [];
+        const links = data[3] || [];
+        for (let i = 0; i < titles.length; i++) {
+          if (titles[i] && links[i]) addArt(titles[i], snippets[i] || `Encyclopedia reference for ${titles[i]}`, links[i], 'wikipedia.org');
+        }
+      }).catch(() => { });
+
+      const hnP = fetch(`https://hn.algolia.com/api/v1/search?query=${encoded}&tags=story&hitsPerPage=4`, {
+        signal: safeTimeoutSignal(4000)
+      }).then(r => r.json()).then(data => {
+        if (data && data.hits) {
+          for (const hit of data.hits) {
+            if (hit.title && hit.url) addArt(hit.title, `Technical analysis & community discussion (${hit.points || 0} pts)`, hit.url);
+          }
+        }
+      }).catch(() => { });
+
+      const oaP = fetch(`https://api.openalex.org/works?search=${encoded}&per-page=3`, {
+        signal: safeTimeoutSignal(4000)
+      }).then(r => r.json()).then(data => {
+        if (data && data.results) {
+          for (const work of data.results) {
+            if (work.title && (work.doi || work.id)) {
+              addArt(work.title, `Academic Paper (${work.publication_year || 'Research'}) — ${work.host_venue?.display_name || 'OpenAlex'}`, work.doi || work.id, 'openalex.org');
+            }
+          }
+        }
+      }).catch(() => { });
+
+      await Promise.allSettled([wikiP, hnP, oaP]);
+      return clientArticles;
+    };
 
       // 1. Try backend proxy first (fast, reliable, view sorted)
       try {
@@ -14967,8 +15168,10 @@
       // Group articles by platform (hostname without www)
       const platformMap = new Map();
       valid.forEach(art => {
+        const absUrl = ensureAbsoluteUrl(art.url);
+        art.url = absUrl;
         let domain = 'web';
-        try { domain = new URL(art.url).hostname.replace(/^www\./, ''); } catch(e) {}
+        try { domain = new URL(absUrl).hostname.replace(/^www\./, ''); } catch(e) {}
         const parts = domain.split('.');
         const groupKey = parts.length >= 2 ? parts.slice(-2).join('.') : domain;
         if (!platformMap.has(groupKey)) platformMap.set(groupKey, { domain, articles: [] });
@@ -14990,45 +15193,63 @@
       platforms.forEach(([groupKey, { domain, articles: grpArts }]) => {
         const pillId = `srcp-${++_srcPillId}`;
         const favicon = `https://www.google.com/s2/favicons?domain=${encodeURIComponent(domain)}&sz=32`;
-        // Platform display name: capitalize first part
         const nameParts = domain.split('.');
         const platformName = (nameParts[0] || domain)
           .replace(/-/g,' ')
           .replace(/^(\w)/, c => c.toUpperCase())
           .slice(0, 18);
-        const extraCount = grpArts.length - 1;
-        const countLabel = extraCount > 0 ? ` +${extraCount}` : '';
+        const globeSvg = `data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2300ffaa' stroke-width='2'><circle cx='12' cy='12' r='10'/><path d='M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20'/><path d='M2 12h20'/></svg>`;
 
-        // Build popover items
-        let popoverItems = grpArts.slice(0, 8).map(art => {
-          let artDomain = domain;
-          try { artDomain = new URL(art.url).hostname.replace(/^www\./,''); } catch(e) {}
-          const artFav = `https://www.google.com/s2/favicons?domain=${encodeURIComponent(artDomain)}&sz=32`;
-          const artTitle = (art.title || artDomain)
-            .replace(/&amp;/g,'&').replace(/&quot;/g,'"').replace(/&#39;/g,"'")
-            .replace(/\s*[-–—|][^-–—|]*$/, '').slice(0, 70).trim();
-          const artSnippet = (art.snippet || '').replace(/<[^>]+>/g,'').slice(0, 80).trim();
-          return `<a href="${escapeHtml(art.url)}" target="_blank" rel="noopener noreferrer" class="src-popover-item">
-            <img src="${artFav}" alt="" onerror="this.style.display='none'"/>
-            <div class="src-popover-item-body">
-              <span class="src-popover-item-title">${escapeHtml(artTitle)}</span>
-              ${artSnippet ? `<span class="src-popover-item-snippet">${escapeHtml(artSnippet)}</span>` : ''}
-            </div>
-            <span class="src-popover-arrow">↗</span>
+        if (grpArts.length === 1) {
+          const art = grpArts[0];
+          const finalUrl = ensureAbsoluteUrl(art.url);
+          html += `<a href="${escapeHtml(finalUrl)}" target="_blank" rel="noopener noreferrer" class="src-platform-pill" id="${pillId}" title="Open source: ${escapeHtml(art.title || domain)}">
+            <img src="${favicon}" alt="" loading="lazy" onerror="this.onerror=null;this.src='${globeSvg}';"/>
+            <span class="src-pill-name">${escapeHtml(platformName)}</span>
+            <span style="font-size:0.65rem;opacity:0.6;margin-left:1px;">↗</span>
           </a>`;
-        }).join('');
+        } else {
+          const firstArt = grpArts[0];
+          const primaryUrl = ensureAbsoluteUrl(firstArt.url);
+          const extraCount = grpArts.length - 1;
+          const countLabel = `+${extraCount}`;
+          let popoverItems = grpArts.slice(0, 8).map(art => {
+            const finalUrl = ensureAbsoluteUrl(art.url);
+            let artDomain = domain;
+            try { artDomain = new URL(finalUrl).hostname.replace(/^www\./,''); } catch(e) {}
+            const artFav = `https://www.google.com/s2/favicons?domain=${encodeURIComponent(artDomain)}&sz=32`;
+            const artTitle = (art.title || artDomain)
+              .replace(/&amp;/g,'&').replace(/&quot;/g,'"').replace(/&#39;/g,"'")
+              .replace(/\s*[-–—|][^-–—|]*$/, '').slice(0, 70).trim();
+            const artSnippet = (art.snippet || '').replace(/<[^>]+>/g,'').slice(0, 80).trim();
+            return `<a href="${escapeHtml(finalUrl)}" target="_blank" rel="noopener noreferrer" class="src-popover-item">
+              <img src="${artFav}" alt="" loading="lazy" onerror="this.onerror=null;this.src='${globeSvg}';"/>
+              <div class="src-popover-item-body">
+                <span class="src-popover-item-title">${escapeHtml(artTitle)}</span>
+                ${artSnippet ? `<span class="src-popover-item-snippet">${escapeHtml(artSnippet)}</span>` : ''}
+              </div>
+              <span class="src-popover-arrow">↗</span>
+            </a>`;
+          }).join('');
 
-        html += `<span class="src-platform-pill" id="${pillId}" onclick="toggleSrcPopover(event,'${pillId}')" role="button" tabindex="0" aria-expanded="false">
-          <img src="${favicon}" alt="" onerror="this.style.display='none'"/>
-          ${escapeHtml(platformName)}${countLabel ? `<span class="src-pill-count">${escapeHtml(countLabel)}</span>` : ''}
-          <div class="src-pill-popover" id="pop-${pillId}">
-            <div class="src-popover-header">
-              <img src="${favicon}" alt="" style="width:12px;height:12px;border-radius:2px;" onerror="this.style.display='none'"/>
-              ${escapeHtml(platformName)} &mdash; ${grpArts.length} source${grpArts.length > 1 ? 's' : ''}
+          html += `<span class="src-platform-pill" id="${pillId}" onclick="toggleSrcPopover(event,'${pillId}')" role="button" tabindex="0" title="View all ${grpArts.length} sources from ${escapeHtml(platformName)}">
+            <img src="${favicon}" alt="" loading="lazy" onerror="this.onerror=null;this.src='${globeSvg}';"/>
+            <span class="src-pill-name">${escapeHtml(platformName)}</span>
+            <span class="src-pill-count">${escapeHtml(countLabel)}</span>
+            <div class="src-pill-popover" id="pop-${pillId}" onclick="event.stopPropagation();" ontouchstart="event.stopPropagation();">
+              <div class="src-popover-header">
+                <div style="display:flex;align-items:center;gap:6px;min-width:0;flex:1;">
+                  <img src="${favicon}" alt="" style="width:12px;height:12px;border-radius:2px;flex-shrink:0;" loading="lazy" onerror="this.onerror=null;this.src='${globeSvg}';"/>
+                  <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escapeHtml(platformName)} &mdash; ${grpArts.length} sources</span>
+                </div>
+                <button type="button" class="src-popover-close-btn" onclick="closeSrcPopover(event,'${pillId}')" title="Close" aria-label="Close">✕</button>
+              </div>
+              <div class="src-popover-list">
+                ${popoverItems}
+              </div>
             </div>
-            ${popoverItems}
-          </div>
-        </span>`;
+          </span>`;
+        }
       });
 
       html += '</div>';
@@ -15037,7 +15258,10 @@
 
     // Toggle source pill popover — close others, open clicked
     function toggleSrcPopover(event, pillId) {
-      event.stopPropagation();
+      if (event) {
+        event.stopPropagation();
+        event.preventDefault();
+      }
       const pill = document.getElementById(pillId);
       const pop = document.getElementById('pop-' + pillId);
       if (!pill || !pop) return;
@@ -15045,21 +15269,109 @@
       document.querySelectorAll('.src-pill-popover.open').forEach(p => {
         p.classList.remove('open');
         const parentPill = p.closest('.src-platform-pill');
-        if (parentPill) parentPill.setAttribute('aria-expanded', 'false');
+        if (parentPill) {
+          parentPill.classList.remove('is-open');
+          parentPill.setAttribute('aria-expanded', 'false');
+        }
       });
       if (!isOpen) {
         pop.classList.add('open');
+        pill.classList.add('is-open');
         pill.setAttribute('aria-expanded', 'true');
       }
     }
+
+    // Close specific popover
+    function closeSrcPopover(event, pillId) {
+      if (event) {
+        event.stopPropagation();
+        event.preventDefault();
+      }
+      const pill = document.getElementById(pillId);
+      const pop = document.getElementById('pop-' + pillId);
+      if (pop) pop.classList.remove('open');
+      if (pill) {
+        pill.classList.remove('is-open');
+        pill.setAttribute('aria-expanded', 'false');
+      }
+    }
+
     // Close popovers when clicking outside
-    document.addEventListener('click', () => {
+    document.addEventListener('click', (e) => {
+      // If clicking inside a popover or inside a platform pill, do not close here
+      if (e.target.closest('.src-pill-popover') || e.target.closest('.src-platform-pill')) {
+        return;
+      }
+
+      // Clicked outside — close all open popovers
       document.querySelectorAll('.src-pill-popover.open').forEach(p => {
         p.classList.remove('open');
         const parentPill = p.closest('.src-platform-pill');
-        if (parentPill) parentPill.setAttribute('aria-expanded', 'false');
+        if (parentPill) {
+          parentPill.classList.remove('is-open');
+          parentPill.setAttribute('aria-expanded', 'false');
+        }
       });
     });
+
+    function buildSinglePlatformPill(groupKey, platformName, domain, grpArts) {
+      const pillId = `srcp-${++_srcPillId}`;
+      const favicon = `https://www.google.com/s2/favicons?domain=${encodeURIComponent(domain)}&sz=32`;
+      const globeSvg = `data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2300ffaa' stroke-width='2'><circle cx='12' cy='12' r='10'/><path d='M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20'/><path d='M2 12h20'/></svg>`;
+
+      if (!grpArts || grpArts.length === 0) return '';
+      if (grpArts.length === 1) {
+        const art = grpArts[0];
+        const finalUrl = ensureAbsoluteUrl(art.url);
+        return `<a href="${escapeHtml(finalUrl)}" target="_blank" rel="noopener noreferrer" class="src-platform-pill inline-src-pill" id="${pillId}" title="Open source: ${escapeHtml(art.title || platformName)}">
+          <img src="${favicon}" alt="" loading="lazy" onerror="this.onerror=null;this.src='${globeSvg}';"/>
+          <span class="src-pill-name">${escapeHtml(platformName)}</span>
+          <span style="font-size:0.65rem;opacity:0.6;margin-left:1px;">↗</span>
+        </a>`;
+      }
+
+      const firstArt = grpArts[0];
+      const primaryUrl = ensureAbsoluteUrl(firstArt.url);
+      const extraCount = grpArts.length - 1;
+      const countLabel = `+${extraCount}`;
+
+      let popoverItems = grpArts.slice(0, 8).map(art => {
+        const finalUrl = ensureAbsoluteUrl(art.url);
+        let artDomain = domain;
+        try { artDomain = new URL(finalUrl).hostname.replace(/^www\./,''); } catch(e) {}
+        const artFav = `https://www.google.com/s2/favicons?domain=${encodeURIComponent(artDomain)}&sz=32`;
+        const artTitle = (art.title || artDomain)
+          .replace(/&amp;/g,'&').replace(/&quot;/g,'"').replace(/&#39;/g,"'")
+          .replace(/\s*[-–—|][^-–—|]*$/, '').slice(0, 70).trim();
+        const artSnippet = (art.snippet || '').replace(/<[^>]+>/g,'').slice(0, 80).trim();
+        return `<a href="${escapeHtml(finalUrl)}" target="_blank" rel="noopener noreferrer" class="src-popover-item">
+          <img src="${artFav}" alt="" loading="lazy" onerror="this.onerror=null;this.src='${globeSvg}';"/>
+          <div class="src-popover-item-body">
+            <span class="src-popover-item-title">${escapeHtml(artTitle)}</span>
+            ${artSnippet ? `<span class="src-popover-item-snippet">${escapeHtml(artSnippet)}</span>` : ''}
+          </div>
+          <span class="src-popover-arrow">↗</span>
+        </a>`;
+      }).join('');
+
+      return `<span class="src-platform-pill inline-src-pill" id="${pillId}" onclick="toggleSrcPopover(event,'${pillId}')" role="button" tabindex="0" title="View all ${grpArts.length} sources from ${escapeHtml(platformName)}">
+        <img src="${favicon}" alt="" loading="lazy" onerror="this.onerror=null;this.src='${globeSvg}';"/>
+        <span class="src-pill-name">${escapeHtml(platformName)}</span>
+        <span class="src-pill-count">${escapeHtml(countLabel)}</span>
+        <div class="src-pill-popover" id="pop-${pillId}" onclick="event.stopPropagation();" ontouchstart="event.stopPropagation();">
+          <div class="src-popover-header">
+            <div style="display:flex;align-items:center;gap:6px;min-width:0;flex:1;">
+              <img src="${favicon}" alt="" style="width:12px;height:12px;border-radius:2px;flex-shrink:0;" loading="lazy" onerror="this.onerror=null;this.src='${globeSvg}';"/>
+              <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escapeHtml(platformName)} &mdash; ${grpArts.length} sources</span>
+            </div>
+            <button type="button" class="src-popover-close-btn" onclick="closeSrcPopover(event,'${pillId}')" title="Close" aria-label="Close">✕</button>
+          </div>
+          <div class="src-popover-list">
+            ${popoverItems}
+          </div>
+        </div>
+      </span>`;
+    }
 
     function buildRelatedSourceLinks(articles) {
       if (!articles || !articles.length) return '';
@@ -15068,9 +15380,123 @@
 
     function injectCitationsIntoHtml(generativeHtml, articles) {
       if (!generativeHtml) return '';
-      const sourcesHtml = buildChatGptStyleSources(articles);
-      if (!sourcesHtml) return generativeHtml;
-      return `${generativeHtml}\n${sourcesHtml}`;
+      if (!articles || !articles.length) return generativeHtml;
+
+      const BLOCKLIST = ['duckduckgo.com/y.js','bing.com/aclick','google.com/aclk'];
+      const valid = articles.filter(a => {
+        if (!a || !a.url) return false;
+        const u = a.url.toLowerCase();
+        return !BLOCKLIST.some(b => u.includes(b));
+      });
+      if (!valid.length) return generativeHtml;
+
+      // Group by platform
+      const platformMap = new Map();
+      valid.forEach(art => {
+        const absUrl = ensureAbsoluteUrl(art.url);
+        art.url = absUrl;
+        let domain = 'web';
+        try { domain = new URL(absUrl).hostname.replace(/^www\./, ''); } catch(e) {}
+        const parts = domain.split('.');
+        const groupKey = parts.length >= 2 ? parts.slice(-2).join('.') : domain;
+        if (!platformMap.has(groupKey)) platformMap.set(groupKey, { domain, articles: [] });
+        platformMap.get(groupKey).articles.push(art);
+      });
+
+      const sortedPlatforms = [...platformMap.entries()].sort(([ka, va], [kb, vb]) => {
+        const ta = TRUSTED_PLATFORMS.some(p => ka.includes(p) || p.includes(ka)) ? 1 : 0;
+        const tb = TRUSTED_PLATFORMS.some(p => kb.includes(p) || p.includes(kb)) ? 1 : 0;
+        if (tb !== ta) return tb - ta;
+        return vb.articles.length - va.articles.length;
+      }).slice(0, 8);
+
+      if (!sortedPlatforms.length) return generativeHtml;
+
+      // Build platform pill objects
+      const pillData = sortedPlatforms.map(([groupKey, { domain, articles: grpArts }]) => {
+        const nameParts = domain.split('.');
+        let platformName = (nameParts[0] || domain)
+          .replace(/-/g,' ')
+          .replace(/^(\w)/, c => c.toUpperCase())
+          .slice(0, 18);
+        if (domain.includes('anthropic.com') || domain.includes('claude.ai')) platformName = 'Claude Platform';
+        if (domain.includes('merge.dev')) platformName = 'Merge.dev';
+        if (domain.includes('openai.com')) platformName = 'OpenAI';
+        if (domain.includes('wikipedia.org')) platformName = 'Wikipedia';
+        if (domain.includes('github.com')) platformName = 'GitHub';
+        if (domain.includes('google.com')) platformName = 'Google';
+        if (domain.includes('bloomberg.com')) platformName = 'Bloomberg';
+        if (domain.includes('reuters.com')) platformName = 'Reuters';
+        if (domain.includes('techcrunch.com')) platformName = 'TechCrunch';
+
+        const pillHtml = buildSinglePlatformPill(groupKey, platformName, domain, grpArts);
+        const keywords = [platformName.toLowerCase(), domain.toLowerCase(), ...grpArts.map(a => (a.title || '').toLowerCase().split(/[\s\-–—|:,]+/)).flat()].filter(w => w && w.length > 2);
+        return { groupKey, platformName, domain, grpArts, pillHtml, keywords, used: false };
+      });
+
+      let modifiedHtml = generativeHtml;
+
+      // Check if we have <li> items (numbered/bullet lists like in Anthropic API guide)
+      const liMatches = [...modifiedHtml.matchAll(/<li\b[^>]*>([\s\S]*?)<\/li>/gi)];
+      if (liMatches.length > 0) {
+        let offset = 0;
+        let pillIdx = 0;
+        liMatches.forEach((match) => {
+          const fullLi = match[0];
+          const liInner = match[1];
+          const liTextLower = liInner.replace(/<[^>]+>/g, '').toLowerCase();
+
+          // Find best matching platform pill or next sequential platform
+          let matchedPill = pillData.find(p => !p.used && p.keywords.some(kw => kw.length > 3 && liTextLower.includes(kw)));
+          if (!matchedPill && pillIdx < pillData.length) {
+            matchedPill = pillData[pillIdx];
+          }
+
+          if (matchedPill && !matchedPill.used) {
+            matchedPill.used = true;
+            pillIdx++;
+            const newLi = fullLi.replace(/<\/li>$/i, ` ${matchedPill.pillHtml}</li>`);
+            const pos = match.index + offset;
+            modifiedHtml = modifiedHtml.slice(0, pos) + newLi + modifiedHtml.slice(pos + fullLi.length);
+            offset += (newLi.length - fullLi.length);
+          }
+        });
+      } else {
+        // Distribute across <p> paragraphs
+        const pMatches = [...modifiedHtml.matchAll(/<p\b[^>]*>([\s\S]*?)<\/p>/gi)];
+        if (pMatches.length > 0) {
+          let offset = 0;
+          let pillIdx = 0;
+          pMatches.forEach((match) => {
+            const fullP = match[0];
+            const pInner = match[1];
+            const pTextLower = pInner.replace(/<[^>]+>/g, '').toLowerCase();
+
+            let matchedPill = pillData.find(p => !p.used && p.keywords.some(kw => kw.length > 3 && pTextLower.includes(kw)));
+            if (!matchedPill && pillIdx < pillData.length) {
+              matchedPill = pillData[pillIdx];
+            }
+
+            if (matchedPill && !matchedPill.used) {
+              matchedPill.used = true;
+              pillIdx++;
+              const newP = fullP.replace(/<\/p>$/i, ` ${matchedPill.pillHtml}</p>`);
+              const pos = match.index + offset;
+              modifiedHtml = modifiedHtml.slice(0, pos) + newP + modifiedHtml.slice(pos + fullP.length);
+              offset += (newP.length - fullP.length);
+            }
+          });
+        }
+      }
+
+      // If any remaining unused platforms, append a compact shelf at the end
+      const unusedPills = pillData.filter(p => !p.used);
+      if (unusedPills.length > 0 && pillData.filter(p => p.used).length === 0) {
+        let shelfHtml = '<div class="chat-sources-shelf">' + unusedPills.map(p => p.pillHtml).join('') + '</div>';
+        modifiedHtml += '\n' + shelfHtml;
+      }
+
+      return modifiedHtml;
     }
 
     function videoCardHTML(v) {
@@ -15154,11 +15580,6 @@
                 ★ ${rating}
               </span>
             </div>
-          </div>
-          <div style="padding:4px 6px; display:flex; gap:3px; justify-content:center; background:#0d1118; border-top:1px solid rgba(255,255,255,0.06);" onclick="event.stopPropagation();">
-            <button type="button" onclick="convertImageToFormat('${safeSrc}', 'pdf', '${safeAlt.replace(/'/g, "\\'")}')" style="all:unset; box-sizing:border-box; padding:2px 5px; background:rgba(217,119,87,0.2); border:1px solid rgba(217,119,87,0.4); color:#fff; border-radius:4px; font-size:0.6rem; font-weight:600; cursor:pointer;" onmouseover="this.style.background='rgba(217,119,87,0.4)';" onmouseout="this.style.background='rgba(217,119,87,0.2)';">📄 PDF</button>
-            <button type="button" onclick="convertImageToFormat('${safeSrc}', 'png', '${safeAlt.replace(/'/g, "\\'")}')" style="all:unset; box-sizing:border-box; padding:2px 5px; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.15); color:#fff; border-radius:4px; font-size:0.6rem; font-weight:600; cursor:pointer;" onmouseover="this.style.background='rgba(255,255,255,0.18)';" onmouseout="this.style.background='rgba(255,255,255,0.08)';">🖼️ PNG</button>
-            <button type="button" onclick="convertImageToFormat('${safeSrc}', 'jpg', '${safeAlt.replace(/'/g, "\\'")}')" style="all:unset; box-sizing:border-box; padding:2px 5px; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.15); color:#fff; border-radius:4px; font-size:0.6rem; font-weight:600; cursor:pointer;" onmouseover="this.style.background='rgba(255,255,255,0.18)';" onmouseout="this.style.background='rgba(255,255,255,0.08)';">📷 JPG</button>
           </div>
         </div>
       `;
@@ -15287,12 +15708,10 @@ Building interactive websites, HTML applications, and frontend UI dashboards is 
       }
 
       // ── COGNISPHERE URL INTERCEPT ──
-      // If user asks for the website URL/link, always return the correct Vercel URL instantly.
-      const isUrlQuery = /\b(url|link|website|site|web\s*address|address|visit|open|access|go\s*to)\b.{0,40}\bcognisphere\b/i.test(userQuestion) ||
-        /\bcognisphere\b.{0,40}\b(url|link|website|site|web\s*address|address|visit|open|access)\b/i.test(userQuestion) ||
-        /\b(what|give|share|send|tell).{0,20}\b(url|link|website|site|address)\b/i.test(userQuestion);
+      // Strictly trigger ONLY if the user explicitly asks for Cognisphere's own website
+      const isExplicitCognisphereSiteQuery = /^\s*(?:what(?:'s|\s+is)\s+(?:the\s+)?)?(?:cognisphere(?:\.ai)?|your)\s+(?:official\s+)?(?:website|link|url|site)\s*[?!.]*\s*$/i.test(userQuestion.trim());
 
-      if (isUrlQuery) {
+      if (isExplicitCognisphereSiteQuery) {
         const urlReply = `The official **Cognisphere AI** website is:\n\n🔗 **[https://cognisphereai.vercel.app/](https://cognisphereai.vercel.app/)**\n\nClick the link above to open it directly.`;
         if (msgToUpdate) {
           msgToUpdate.text = urlReply;
@@ -15305,20 +15724,19 @@ Building interactive websites, HTML applications, and frontend UI dashboards is 
         return { text: urlReply, sources: [], isHtml: false };
       }
 
-      // ── CONVERSION INTERCEPT: Check BEFORE decodedSentences so image→PDF/PNG/JPG is caught immediately
+      // ── CONVERSION INTERCEPT: ONLY trigger if user explicitly requests file format conversion ──
       if (attList && attList.length) {
-        const uq = userQuestion.toLowerCase();
+        const uq = userQuestion.toLowerCase().trim();
 
-        // Check if user is asking an explicit question about content rather than requesting file conversion
-        const isExplicitQuestion = /^(what|how|why|explain|read|summarize|analyze|tell|check|describe|review|where|who|when|is there|does this)\b/i.test(uq);
+        // Strict check: User must explicitly request format conversion (e.g. "convert to pdf", "export as png", "turn into docx", "save as pdf")
+        const hasExplicitConversionVerb = /\b(convert|converted|converting|conversion|export\s+(?:it|this|file|image)?\s*as|save\s+(?:it|this|file|image)?\s*as|turn\s+(?:it|this|file|image)?\s*into|transform\s+(?:it|this|file|image)?\s*into|download\s+(?:it|this|file|image)?\s*as)\b/i.test(uq);
+        const isContentQuestion = /^(what|how|why|explain|read|summarize|analyze|tell|check|describe|review|where|who|when|solve|solution|calculate|is there|does this|help me with|can you check|can you tell)\b/i.test(uq);
 
         // Match target format in prompt — all supported formats including PPT, Excel
         const fmtMatch = uq.match(/\b(pdf|png|jpg|jpeg|webp|docx|doc|word|txt|text|csv|json|html|htm|md|markdown|ppt|pptx|powerpoint|xls|xlsx|excel|spreadsheet|zip)\b/i);
 
-        // Match conversion verb/action
-        const actionMatch = /\b(convert|converted|converting|conversion|make|making|turn|turned|turning|export|exported|exporting|save|saved|saving|change|changed|changing|transform|transformed|transforming|generate|generated|generating|create|created|creating)\b/i.test(uq);
-
-        if (!isExplicitQuestion && (actionMatch || fmtMatch)) {
+        // ONLY intercept if user explicitly asks for conversion and is NOT asking a content question
+        if (hasExplicitConversionVerb && !isContentQuestion) {
           let targetFmt = null;
           if (fmtMatch) {
             const rawFmt = fmtMatch[1].toLowerCase();
@@ -15566,13 +15984,19 @@ Building interactive websites, HTML applications, and frontend UI dashboards is 
 
       // ── CLAUDE AI STYLE WEBSITE/WEB APP BUILDING CONTEXT ──
       let websitePromptContext = '';
-      const isExplicitWebsiteQuery = /^\s*(build|create|make|design|code|develop)\s+(?:a\s+)?(?:website|webpage|landing page|web app|html page)\b/i.test(fullQuery);
+      const isEntityWebsiteLookup = /^\s*([a-zA-Z0-9.\-_]+|\b[a-zA-Z0-9\s]{2,30}\b)\s+website\s*$/i.test(fullQuery.trim()) ||
+        /\b(official\s+website|official\s+link|website\s+of|website\s+for|link\s+of|link\s+for|portal\s+of|portal\s+for)\b/i.test(fullQuery);
+      
+      const isExplicitWebsiteQuery = !isEntityWebsiteLookup && /^\s*(build|create|make|design|code|develop)\s+(?:me\s+)?(?:a\s+)?(?:website|webpage|landing page|web app|html page)\b/i.test(fullQuery);
+      
       if (isExplicitWebsiteQuery) {
         websitePromptContext = `\n\n[WEBSITE/APP CREATION DIRECTIVE — Claude AI Style]:
 1. Provide a single, complete, fully-functional HTML document (with embedded CSS in style tags and JS in script tags).
 2. Use modern visual aesthetics (sleek dark mode, modern typography, glassmorphism, flex/grid responsive layout, micro-animations).
 3. Put ALL code inside a single \`\`\`html code block so the user can preview and run it live with 1 click.
 4. If this is a follow-up request to modify an existing website, preserve the code structure and apply all requested changes smoothly.\n`;
+      } else if (isEntityWebsiteLookup) {
+        websitePromptContext = `\n\n[USER INTENT: Official Website & Directory Lookup — DO NOT write HTML/CSS code or web app mockups. Provide the real, verified official website link (e.g. https://...), official contact details, and institutional overview in clean Markdown.]\n`;
       }
 
       // ── ACADEMIC CONTEXT: only inject when the user is asking about education/study topics
@@ -17286,12 +17710,13 @@ d----        13-09-2026     10:30                api
     function generateStudioSuggestions(query) {
       let cleanQ = (query || '')
         .replace(/^[\s↳🔬💻⚡🪐🚀🧬🔍💡🔒📊🤖•\-\d.]+/gu, '')
-        .replace(/^(?:can you\s+)?(?:please\s+)?(?:explain|what is|what'?s|tell me about|how does|how do|how to|define|describe|overview of|details about|search for|give me|show me|what are|list|write about)\s+/i, '')
+        .replace(/^(?:can you\s+)?(?:please\s+)?(?:explain|what is|what'?s|tell me about|tell me|how does|how do i|how to get|how do you get|how to create|how to|where can i find|where to find|where to get|how do|define|describe|overview of|details about|search for|give me|show me|what are|list|write about)\s+/i, '')
+        .replace(/\b(how to get|how to find|how to create|where to get|how do i get)\b/gi, '')
         .replace(/[?.!]+$/g, '')
         .trim();
 
-      cleanQ = cleanQ.replace(/^of\s+/i, '').replace(/^in\s+/i, '').replace(/^for\s+/i, '').trim();
-      if (!cleanQ || cleanQ.length < 3) return [];
+      cleanQ = cleanQ.replace(/^(of|in|for|about|to|the|a|an)\s+/i, '').trim();
+      if (!cleanQ || cleanQ.length < 2) return [];
 
       const lower = cleanQ.toLowerCase();
 
@@ -17301,227 +17726,85 @@ d----        13-09-2026     10:30                api
       }
 
       // Extract the core topic (strip filler words to get the key noun/concept)
-      const topic = cleanQ
+      let topic = cleanQ
         .replace(/\b(the|a|an|its|their|this|that|these|those|my|your|our|very|really|just|also|more|most|best|how|why|when|where|which|what|who)\b/gi, '')
         .replace(/\s+/g, ' ')
         .trim()
-        .slice(0, 40);
+        .slice(0, 35) || cleanQ;
 
+      // Capitalize first letters of topic
+      topic = topic.replace(/\b\w/g, c => c.toUpperCase());
       const T = topic; // shorthand
 
-      // ── DOMAIN DETECTION → DOMAIN-SPECIFIC SHARP QUESTIONS ──────────────────
+      const qLower = (query || '').toLowerCase();
 
-      // Programming languages
+      // 1. Procedural / API / Credentials Queries
+      if (qLower.includes('api key') || qLower.includes('token') || qLower.includes('credentials') || qLower.includes('auth')) {
+        return [
+          `Pricing & rate limits for ${T}`,
+          `Python & Node.js code example for ${T}`,
+          `Secure storage in .env for ${T}`,
+          `Troubleshooting ${T} connection`
+        ];
+      }
+
+      if (qLower.includes('how to get') || qLower.includes('how to install') || qLower.includes('how to setup') || qLower.includes('how to create')) {
+        return [
+          `Best practices for ${T}`,
+          `Quick start code example for ${T}`,
+          `Common setup errors with ${T}`,
+          `Next steps with ${T}`
+        ];
+      }
+
+      // ── DOMAIN DETECTION → DYNAMIC QUERY-SPECIFIC QUESTIONS ──
       const isPython    = lower.includes('python');
-      const isJS        = lower.includes('javascript') || lower.includes(' js ') || lower.endsWith(' js');
-      const isReact     = lower.includes('react');
-      const isCpp       = lower.includes('c++') || lower.includes('cpp');
-      const isC         = !isCpp && (lower.includes(' c ') || lower.startsWith('c ') || lower === 'c');
-      const isJava      = lower.includes('java') && !lower.includes('javascript');
-      const isSQL       = lower.includes('sql') || lower.includes('database') || lower.includes('query');
-      const isHTML      = lower.includes('html') || lower.includes('css');
-
-      // CS concepts
-      const isAlgo      = lower.includes('algorithm') || lower.includes('complexity') || lower.includes('big o') || lower.includes('time complexity');
-      const isSort      = lower.includes('sort');
-      const isSearch    = lower.includes('search');
-      const isDS        = lower.includes('data structure') || lower.includes('linked list') || lower.includes('tree') || lower.includes('graph') || lower.includes('stack') || lower.includes('queue') || lower.includes('heap');
-      const isDP        = lower.includes('dynamic programming') || lower.includes(' dp ');
-
-      // AI / ML
-      const isAI        = lower.includes('artificial intelligence') || lower.includes('machine learning') || lower.includes(' ml ') || lower.includes('deep learning') || lower.includes('neural') || lower.includes('llm') || lower.includes('gpt') || lower.includes('ai ');
-      const isModel     = lower.includes(' model') || lower.includes('transformer') || lower.includes('diffusion');
-
-      // Web / system
-      const isWeb       = lower.includes('web') || lower.includes('html') || lower.includes('css') || lower.includes('frontend') || lower.includes('backend');
-      const isAPI       = lower.includes('api') || lower.includes('rest') || lower.includes('graphql');
-      const isCloud     = lower.includes('cloud') || lower.includes('aws') || lower.includes('docker') || lower.includes('kubernetes') || lower.includes('devops');
-
-      // Science
-      const isPhysics   = lower.includes('physics') || lower.includes('quantum') || lower.includes('relativity') || lower.includes('energy') || lower.includes('force') || lower.includes('wave');
-      const isBio       = lower.includes('biology') || lower.includes('dna') || lower.includes('cell') || lower.includes('protein') || lower.includes('gene') || lower.includes('evolution');
-      const isChem      = lower.includes('chemistry') || lower.includes('atom') || lower.includes('molecule') || lower.includes('reaction') || lower.includes('element') || lower.includes('bond');
-      const isMath      = lower.includes('math') || lower.includes('calculus') || lower.includes('algebra') || lower.includes('geometry') || lower.includes('equation') || lower.includes('theorem') || lower.includes('proof');
-
-      // History / geography
-      const isHistory   = lower.includes('history') || lower.includes('war') || lower.includes('empire') || lower.includes('revolution') || lower.includes('ancient') || lower.includes('century') || lower.includes('dynasty');
-      const isGeo       = lower.includes('country') || lower.includes('capital') || lower.includes('geography') || lower.includes('continent') || lower.includes('ocean') || lower.includes('river') || lower.includes('mountain');
-
-      // Business / finance
-      const isBiz       = lower.includes('business') || lower.includes('startup') || lower.includes('market') || lower.includes('finance') || lower.includes('economy') || lower.includes('investment') || lower.includes('revenue');
-
-      // Health / medicine
-      const isHealth    = lower.includes('health') || lower.includes('disease') || lower.includes('medicine') || lower.includes('symptom') || lower.includes('treatment') || lower.includes('medical') || lower.includes('virus');
-
-      // ── BUILD QUESTIONS BASED ON DETECTED DOMAIN ──────────────────────────
-
-      if (isSort) return [
-        `Time & space complexity of ${T}`,
-        `Stable vs unstable variant of ${T}`,
-        `${T} on nearly-sorted input`,
-        `When to prefer ${T} over QuickSort`
-      ];
-
-      if (isSearch) return [
-        `Worst-case trace of ${T}`,
-        `${T} on linked list vs array`,
-        `Sentinel optimization for ${T}`,
-        `${T} vs Binary Search — when to use`
-      ];
-
-      if (isDP) return [
-        `Memoization vs tabulation for ${T}`,
-        `State space reduction in ${T}`,
-        `Reconstructing solution from DP table`,
-        `${T} real interview problems`
-      ];
-
-      if (isDS) return [
-        `${T} CRUD operation complexities`,
-        `Memory layout of ${T}`,
-        `${T} real-world use cases`,
-        `Common bugs & edge cases in ${T}`
-      ];
-
-      if (isAlgo) return [
-        `${T} best / worst / average case`,
-        `${T} implementation step-by-step`,
-        `When NOT to use ${T}`,
-        `${T} optimization techniques`
-      ];
+      const isJS        = lower.includes('javascript') || lower.includes('react') || lower.includes('node') || lower.endsWith(' js');
+      const isAI        = lower.includes('ai') || lower.includes('gpt') || lower.includes('claude') || lower.includes('llm') || lower.includes('neural') || lower.includes('machine learning');
+      const isMath      = lower.includes('math') || lower.includes('calculus') || lower.includes('algebra') || lower.includes('equation') || lower.includes('theorem');
+      const isScience   = lower.includes('quantum') || lower.includes('physics') || lower.includes('biology') || lower.includes('chemistry') || lower.includes('cell') || lower.includes('space') || lower.includes('planet');
 
       if (isPython) return [
-        `${T} with type hints & PEP 8`,
-        `Memory profile ${T} with tracemalloc`,
-        `Unit test ${T} with pytest`,
-        `${T} — generator vs list comprehension`
+        `${T} code snippet & best practices`,
+        `Common bugs & errors in ${T}`,
+        `Testing ${T} with pytest`,
+        `${T} vs alternative libraries`
       ];
 
-      if (isCpp) return [
-        `${T} with STL & modern C++20`,
-        `Pointer & memory layout for ${T}`,
-        `Valgrind check for ${T}`,
-        `${T} constexpr at compile time`
+      if (isJS) return [
+        `${T} modern implementation pattern`,
+        `${T} performance & optimization`,
+        `Handling edge cases in ${T}`,
+        `${T} production best practice`
       ];
 
-      if (isC) return [
-        `${T} pointer arithmetic`,
-        `${T} struct memory layout`,
-        `${T} common undefined behavior`,
-        `${T} vs C++ equivalent`
-      ];
-
-      if (isJava) return [
-        `${T} in Java Collections Framework`,
-        `${T} thread safety & concurrency`,
-        `${T} generics & type bounds`,
-        `${T} JVM memory impact`
-      ];
-
-      if (isJS || isReact) return [
-        `${T} — event loop internals`,
-        `${T} performance optimization`,
-        `${T} responsive mobile layout`,
-        `${T} real-world production pattern`
-      ];
-
-      if (isHTML) return [
-        `${T} accessibility & ARIA`,
-        `${T} CSS animation example`,
-        `${T} responsive grid layout`,
-        `${T} semantic HTML best practice`
-      ];
-
-      if (isSQL) return [
-        `${T} query optimization & indexes`,
-        `${T} vs NoSQL — when to choose`,
-        `${T} JOIN types with examples`,
-        `${T} transactions & ACID`
-      ];
-
-      if (isAPI) return [
-        `${T} authentication — JWT vs OAuth`,
-        `${T} rate limiting & caching`,
-        `${T} versioning best practices`,
-        `${T} error handling & status codes`
-      ];
-
-      if (isCloud) return [
-        `${T} scalability architecture`,
-        `${T} cost optimization tips`,
-        `${T} CI/CD pipeline setup`,
-        `${T} monitoring & alerting`
-      ];
-
-      if (isAI || isModel) return [
-        `${T} training data & architecture`,
-        `${T} fine-tuning vs prompting`,
-        `${T} benchmark performance`,
-        `${T} real-world deployment challenges`
-      ];
-
-      if (isPhysics) return [
-        `${T} mathematical derivation`,
-        `${T} real-world applications`,
-        `${T} common misconceptions`,
-        `${T} connection to quantum mechanics`
-      ];
-
-      if (isBio) return [
-        `${T} mechanism at molecular level`,
-        `${T} diseases linked to it`,
-        `${T} recent research breakthroughs`,
-        `${T} role in evolution`
-      ];
-
-      if (isChem) return [
-        `${T} reaction mechanism`,
-        `${T} industrial applications`,
-        `${T} safety & hazards`,
-        `${T} comparison with similar compounds`
+      if (isAI) return [
+        `${T} architecture & benchmark`,
+        `Prompting tips for ${T}`,
+        `Fine-tuning vs RAG for ${T}`,
+        `Real-world deployment of ${T}`
       ];
 
       if (isMath) return [
-        `Proof of ${T}`,
-        `${T} real-world application`,
-        `${T} edge cases & exceptions`,
-        `${T} vs related theorems`
+        `Step-by-step proof of ${T}`,
+        `Real-world applications of ${T}`,
+        `Solved example problems for ${T}`,
+        `Intuition & visual explanation of ${T}`
       ];
 
-      if (isHistory) return [
-        `Root causes of ${T}`,
-        `Key figures in ${T}`,
-        `Long-term impact of ${T}`,
-        `${T} compared to similar events`
+      if (isScience) return [
+        `Core mechanism of ${T}`,
+        `Recent scientific breakthroughs in ${T}`,
+        `Real-world applications of ${T}`,
+        `Common misconceptions about ${T}`
       ];
 
-      if (isGeo) return [
-        `${T} climate & geography`,
-        `${T} economy & key industries`,
-        `${T} culture & people`,
-        `${T} current events & challenges`
-      ];
-
-      if (isBiz) return [
-        `${T} business model breakdown`,
-        `${T} market size & growth`,
-        `${T} biggest risks & challenges`,
-        `${T} successful case studies`
-      ];
-
-      if (isHealth) return [
-        `${T} symptoms & diagnosis`,
-        `${T} treatment & prevention`,
-        `${T} latest medical research`,
-        `${T} risk factors & causes`
-      ];
-
-      // ── UNIVERSAL FALLBACK — always query-specific ──────────────────────────
+      // ── UNIVERSAL DYNAMIC SMART QUESTIONS ──
       return [
-        `How does ${T} work internally?`,
-        `Real-world use cases of ${T}`,
-        `Common mistakes with ${T}`,
-        `${T} vs alternatives — comparison`
+        `How does ${T} work in practice?`,
+        `Key advantages & trade-offs of ${T}`,
+        `Common mistakes to avoid with ${T}`,
+        `${T} vs top alternatives`
       ];
     }
 
@@ -17564,8 +17847,16 @@ d----        13-09-2026     10:30                api
 
       const renderStreamContent = () => {
         if (!textEl) return;
-        // Solid steady cursor during active generation so it doesn't blink/flicker and distract user
-        textEl.innerHTML = parseMarkdown(msg.text) + '<span class="stream-cursor" style="color:var(--neon);font-weight:900;margin-left:2px;display:inline-block;opacity:0.9;">▍</span>';
+        let parsed = parseMarkdown(msg.text);
+        if (typeof parsed === 'string' && /<[^>]*$/.test(parsed)) {
+          parsed = parsed.replace(/<[^>]*$/, '');
+        }
+        textEl.innerHTML = parsed;
+        const cursorSpan = document.createElement('span');
+        cursorSpan.className = 'stream-cursor';
+        cursorSpan.style.cssText = 'color:var(--neon);font-weight:900;margin-left:2px;display:inline-block;opacity:0.9;';
+        cursorSpan.textContent = '▍';
+        textEl.appendChild(cursorSpan);
       };
 
       // Throttle Markdown parsing to ~90ms with trailing execution to keep main thread completely free, smooth and responsive
@@ -17890,6 +18181,24 @@ d----        13-09-2026     10:30                api
           // Sanitize any unescaped tags inside HTML data-query or data-title attributes from previously saved messages
           rawText = rawText.replace(/(data-(?:query|title|channel)=")([^"]*)(")/gi, (match, prefix, val, suffix) => {
             return prefix + escapeHtml(val.replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"')) + suffix;
+          });
+
+          // Replace old dead gstatic faviconV2 URLs from saved history with reliable s2/favicons or inline SVGs
+          rawText = rawText.replace(/https:\/\/(?:t\d*\.)?gstatic\.com\/faviconV2\?[^"'\s>]+/gi, (match) => {
+            try {
+              const urlParam = match.match(/url=([^&"'\s>]+)/i);
+              if (urlParam && urlParam[1]) {
+                const domain = decodeURIComponent(urlParam[1]).replace(/^https?:\/\//i, '').split('/')[0].replace(/^www\./i, '');
+                return `https://www.google.com/s2/favicons?domain=${encodeURIComponent(domain)}&sz=32`;
+              }
+            } catch(e) {}
+            return `data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2300ffaa' stroke-width='2'><circle cx='12' cy='12' r='10'/><path d='M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20'/><path d='M2 12h20'/></svg>`;
+          });
+
+          // Ensure all source pills, citations, and external links in saved HTML have valid absolute URLs
+          rawText = rawText.replace(/<a\b([^>]*?)href="([^"]+)"([^>]*?)class="([^"]*?(?:src-platform-pill|src-popover-item|chat-related-url-link|chat-citation-pill)[^"]*)"/gi, (match, pre, href, mid, cls) => {
+            const fixedHref = ensureAbsoluteUrl(href);
+            return `<a${pre}href="${escapeHtml(fixedHref)}"${mid}class="${cls}"`;
           });
         }
 
@@ -18913,25 +19222,9 @@ d----        13-09-2026     10:30                api
       askInput.focus();
     });
 
-    // ── RAZOR-SHARP OMNI COMPOSER LOGIC (SURPASSING CHATGPT & CLAUDE) ──
-    const omniSuggestionsDrop = document.getElementById('omniSuggestionsDrop');
-    const omniSuggestionsList = document.getElementById('omniSuggestionsList');
+    // ── RAZOR-SHARP OMNI COMPOSER LOGIC ──
     const askClearBtn = document.getElementById('askClearBtn');
     const omniWordCount = document.getElementById('omniWordCount');
-    let omniSelectedIndex = -1;
-
-    const OMNI_STARTERS = [
-      { icon: '💻', text: 'Synthesize full-stack web application with responsive UI & API', tag: 'Code' },
-      { icon: '🌐', text: 'What are the top breaking global tech and AI breakthroughs today?', tag: 'Web Live' },
-      { icon: '🧠', text: 'Explain quantum computing & superposition with first-principles mathematical rigor', tag: 'Reasoning' },
-      { icon: '🔬', text: 'Summarize latest peer-reviewed clinical breakthroughs in CRISPR genomics', tag: 'Science' },
-      { icon: '📊', text: 'Construct a discounted cash flow (DCF) valuation & sensitivity analysis model', tag: 'Finance' },
-      { icon: '⌨️', text: '/web Force live internet search with real-time citations & sources', tag: 'Command' },
-      { icon: '⌨️', text: '/code Generate, debug, and run code with live sandbox compiler', tag: 'Command' },
-      { icon: '⌨️', text: '/deep Activate multi-step chain-of-thought deep reasoning', tag: 'Command' },
-      { icon: '⌨️', text: '/math Solve advanced calculus, linear algebra, and scientific proofs', tag: 'Command' },
-      { icon: '⌨️', text: '/clear Reset current chat thread and begin fresh conversation', tag: 'Command' }
-    ];
 
     function updateOmniInputState() {
       const val = askInput ? askInput.value : '';
@@ -18955,7 +19248,6 @@ d----        13-09-2026     10:30                api
           askInput.value = '';
           autosizeInput();
           askInput.focus();
-          hideOmniSuggestions();
         }
       });
     }
@@ -18993,76 +19285,7 @@ d----        13-09-2026     10:30                api
           btn.style.color = '';
         }, 1600);
       }
-      hideOmniSuggestions();
     };
-
-    function renderOmniSuggestions(query = '') {
-      if (!omniSuggestionsList) return;
-      omniSuggestionsList.innerHTML = '';
-      omniSelectedIndex = -1;
-      const cleanQ = query.toLowerCase().trim();
-
-      const items = cleanQ ? OMNI_STARTERS.filter(item => 
-        item.text.toLowerCase().includes(cleanQ) || item.tag.toLowerCase().includes(cleanQ)
-      ) : OMNI_STARTERS.slice(0, 6);
-
-      if (items.length === 0) {
-        if (omniSuggestionsDrop) omniSuggestionsDrop.style.display = 'none';
-        return;
-      }
-
-      items.forEach((item, idx) => {
-        const el = document.createElement('div');
-        el.className = 'omni-suggestion-item';
-        el.dataset.idx = idx;
-        el.innerHTML = `
-          <span class="omni-item-icon">${item.icon}</span>
-          <span class="omni-item-text">${item.text}</span>
-          <span class="omni-item-tag">${item.tag}</span>
-        `;
-        el.addEventListener('mousedown', (e) => {
-          e.preventDefault();
-          selectOmniItem(item.text);
-        });
-        omniSuggestionsList.appendChild(el);
-      });
-      if (omniSuggestionsDrop) omniSuggestionsDrop.style.display = 'block';
-    }
-
-    function selectOmniItem(text) {
-      if (!askInput) return;
-      if (text.startsWith('/clear')) {
-        if (typeof startNewChat === 'function') startNewChat();
-        askInput.value = '';
-        autosizeInput();
-        hideOmniSuggestions();
-        return;
-      }
-      if (text.startsWith('/web ')) text = text.replace('/web ', '');
-      else if (text.startsWith('/code ')) text = text.replace('/code ', '');
-      else if (text.startsWith('/deep ')) text = text.replace('/deep ', '');
-      else if (text.startsWith('/math ')) text = text.replace('/math ', '');
-
-      askInput.value = text;
-      autosizeInput();
-      hideOmniSuggestions();
-      askInput.focus();
-      if (!text.startsWith('/')) {
-        setTimeout(() => {
-          if (askFormEl) askFormEl.requestSubmit();
-        }, 100);
-      }
-    }
-
-    function showOmniSuggestions() {
-      if (document.body.classList.contains('shared-view')) return;
-      renderOmniSuggestions(askInput ? askInput.value : '');
-    }
-
-    function hideOmniSuggestions() {
-      if (omniSuggestionsDrop) omniSuggestionsDrop.style.display = 'none';
-      omniSelectedIndex = -1;
-    }
 
     function autosizeInput() {
       askInput.style.height = 'auto';
@@ -19071,25 +19294,6 @@ d----        13-09-2026     10:30                api
     }
     askInput.addEventListener('input', () => {
       autosizeInput();
-      if (askInput.value.startsWith('/')) {
-        renderOmniSuggestions(askInput.value);
-      } else if (!askInput.value.trim()) {
-        renderOmniSuggestions('');
-      } else {
-        hideOmniSuggestions();
-      }
-    });
-
-    askInput.addEventListener('focus', () => {
-      if (!askInput.value.trim()) {
-        showOmniSuggestions();
-      }
-    });
-
-    document.addEventListener('click', (e) => {
-      if (omniSuggestionsDrop && !askFormEl.contains(e.target)) {
-        hideOmniSuggestions();
-      }
     });
 
     // Global shortcut: Ctrl+K or Cmd+K focuses omni search bar instantly
@@ -19099,8 +19303,7 @@ d----        13-09-2026     10:30                api
         if (askInput) {
           askInput.focus();
           askInput.select();
-          showOmniSuggestions();
-          askFormEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          if (askFormEl) askFormEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
       }
     });
@@ -20113,32 +20316,6 @@ d----        13-09-2026     10:30                api
         img.alt = fileName;
         img.style.cssText = 'width:100%; max-height:75vh; object-fit:contain; border-radius:10px; display:block; background:#05070a; box-shadow:0 12px 36px rgba(0,0,0,0.7); padding:8px;';
         mediaModalBody.appendChild(img);
-
-        // Add format converter toolbar in modal safely with addEventListener (no inline HTML string escaping issues)
-        const convToolbar = document.createElement('div');
-        convToolbar.style.cssText = 'margin-top:14px; display:flex; flex-wrap:wrap; gap:8px; align-items:center; justify-content:center; padding:10px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); border-radius:10px;';
-
-        const labelSpan = document.createElement('span');
-        labelSpan.style.cssText = 'font-size:0.78rem; font-weight:600; color:var(--gold); margin-right:4px;';
-        labelSpan.textContent = '🔄 Convert & Save:';
-        convToolbar.appendChild(labelSpan);
-
-        const convFormats = [
-          { fmt: 'pdf', label: '📄 Convert to PDF', bg: 'rgba(217,119,87,0.22)', border: 'rgba(217,119,87,0.5)' },
-          { fmt: 'png', label: '🖼️ Save PNG', bg: 'rgba(255,255,255,0.08)', border: 'rgba(255,255,255,0.15)' },
-          { fmt: 'jpg', label: '📷 Save JPG', bg: 'rgba(255,255,255,0.08)', border: 'rgba(255,255,255,0.15)' },
-          { fmt: 'webp', label: '🎨 Save WEBP', bg: 'rgba(255,255,255,0.08)', border: 'rgba(255,255,255,0.15)' }
-        ];
-
-        convFormats.forEach(f => {
-          const btn = document.createElement('button');
-          btn.type = 'button';
-          btn.style.cssText = `all:unset; box-sizing:border-box; padding:6px 12px; background:${f.bg}; border:1px solid ${f.border}; color:#fff; border-radius:6px; font-size:0.75rem; font-weight:500; cursor:pointer;`;
-          btn.textContent = f.label;
-          btn.addEventListener('click', () => convertImageToFormat(mediaUrl, f.fmt, fileName));
-          convToolbar.appendChild(btn);
-        });
-        mediaModalBody.appendChild(convToolbar);
       } else if (att.isVideo) {
         const video = document.createElement('video');
         video.src = mediaUrl;
