@@ -12905,9 +12905,9 @@
     let currentConversationId = null;
     let convIdSeq = conversations.length;
     let msgIdSeq = 0;
-    const isVercel = window.location.hostname.endsWith('vercel.app');
-    let API_BASE = (window.location.port === '3088' || isVercel) ? '' : 'http://127.0.0.1:3088';
-    if (!isVercel && window.location.port !== '3088') {
+    const isProduction = window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1';
+    let API_BASE = (window.location.port === '3088' || isProduction) ? '' : 'http://127.0.0.1:3088';
+    if (!isProduction && window.location.port !== '3088') {
       fetch('http://127.0.0.1:3088/api/health').then(r => {
         if (r.ok) API_BASE = 'http://127.0.0.1:3088';
       }).catch(() => {

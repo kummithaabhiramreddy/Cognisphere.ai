@@ -9,6 +9,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Spectral:wght@700;800&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/marked@4.3.0/marked.min.js"></script>
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg viewBox='0 0 32 32' xmlns='http://www.w3.org/2000/svg' fill='none'%3E%3Cpath d='M 6 16 A 10 10 0 1 0 26 16' stroke='%2300ffaa' stroke-width='2' stroke-linecap='round'/%3E%3Cellipse cx='16' cy='16' rx='11' ry='4.5' transform='rotate(-30 16 16)' stroke='%23e8c9a0' stroke-width='1.4' opacity='0.85'/%3E%3Ccircle cx='7' cy='12' r='1.8' fill='%2300ffaa'/%3E%3Ccircle cx='16' cy='16' r='3' fill='%23ffffff'/%3E%3C/svg%3E">
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -477,59 +478,284 @@
     box-shadow: 0 4px 16px rgba(0, 255, 170, 0.5);
   }
 
+  /* ═══════════════════════════════════════════════════════════════════
+     ── ULTRA-PREMIUM COSMIC AUTH MODAL & CARDS (CLAUDE / APPLE LEVEL) ──
+     ═══════════════════════════════════════════════════════════════════ */
+  .modal-bg {
+    position: fixed !important;
+    top: 0 !important; left: 0 !important; right: 0 !important; bottom: 0 !important;
+    width: 100vw !important; height: 100vh !important;
+    z-index: 9999 !important;
+    background: radial-gradient(circle at 50% 40%, rgba(13, 27, 24, 0.75) 0%, rgba(5, 7, 10, 0.95) 100%) !important;
+    backdrop-filter: blur(28px) saturate(180%) !important;
+    -webkit-backdrop-filter: blur(28px) saturate(180%) !important;
+    display: none;
+    align-items: center; justify-content: center;
+    padding: 20px;
+    animation: authOverlayFade 0.25s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+  @keyframes authOverlayFade {
+    0% { opacity: 0; }
+    100% { opacity: 1; }
+  }
+  .modal-bg.open {
+    display: flex !important;
+  }
+
+  .auth-card-wrap {
+    position: relative;
+    width: 100%;
+    max-width: 460px;
+    margin: 0 auto;
+  }
+
+  /* Radiant Ambient Aurora Glow Behind Modal */
+  .auth-aurora-glow {
+    position: absolute;
+    top: -24px; left: -24px; right: -24px; bottom: -24px;
+    background: radial-gradient(circle at 50% 20%, rgba(0, 255, 170, 0.24) 0%, rgba(217, 119, 87, 0.16) 45%, transparent 70%);
+    filter: blur(35px);
+    border-radius: 36px;
+    z-index: 0;
+    pointer-events: none;
+    animation: authAuroraPulse 4s ease-in-out infinite alternate;
+  }
+  @keyframes authAuroraPulse {
+    0% { opacity: 0.5; transform: scale(0.96); }
+    100% { opacity: 0.9; transform: scale(1.03); }
+  }
+
+  .auth-card {
+    position: relative;
+    z-index: 1;
+    background: linear-gradient(160deg, rgba(16, 21, 28, 0.96) 0%, rgba(8, 11, 15, 0.98) 100%);
+    border: 1px solid rgba(255, 255, 255, 0.13);
+    border-radius: 24px;
+    padding: 34px 28px 28px;
+    box-shadow: 0 30px 90px rgba(0, 0, 0, 0.9), 0 0 50px rgba(0, 255, 170, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    animation: authCardScale 0.32s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+  @keyframes authCardScale {
+    0% { opacity: 0; transform: scale(0.92) translateY(18px); }
+    100% { opacity: 1; transform: scale(1) translateY(0); }
+  }
+
   .auth-close-btn {
-    position: absolute; top: 16px; right: 16px;
+    position: absolute; top: 18px; right: 18px;
     background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12);
     color: var(--muted); border-radius: 50%; width: 32px; height: 32px;
-    font-size: 1rem; cursor: pointer; display: flex; align-items: center; justify-content: center;
+    font-size: 0.95rem; cursor: pointer; display: flex; align-items: center; justify-content: center;
     transition: all 0.2s ease; z-index: 10;
   }
-  .auth-close-btn:hover { color: #fff; background: rgba(255,255,255,0.14); }
+  .auth-close-btn:hover { color: #fff; background: rgba(255,255,255,0.18); transform: rotate(90deg); border-color: rgba(255,255,255,0.3); }
 
+  .auth-head { text-align: center; margin-bottom: 20px; }
+
+  /* Top Cyber Badge */
+  .auth-badge {
+    display: inline-flex; align-items: center; gap: 7px;
+    background: rgba(0, 255, 170, 0.08);
+    border: 1px solid rgba(0, 255, 170, 0.28);
+    color: var(--neon);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.65rem; font-weight: 700;
+    letter-spacing: 0.12em; text-transform: uppercase;
+    padding: 4px 12px; border-radius: 20px; margin-bottom: 12px;
+  }
+  .auth-badge-dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--neon); box-shadow: 0 0 8px var(--neon);
+    animation: pulse 1.5s infinite;
+  }
+
+  .auth-brand-icon {
+    width: 48px; height: 48px; border-radius: 14px;
+    background: linear-gradient(135deg, #0f251c 0%, #08120d 100%);
+    border: 1.5px solid rgba(0, 255, 170, 0.45);
+    box-shadow: 0 0 20px rgba(0, 255, 170, 0.3), inset 0 0 12px rgba(0, 255, 170, 0.15);
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 10px;
+    transition: transform 0.3s ease;
+  }
+  .auth-brand-icon:hover { transform: scale(1.08) rotate(5deg); }
+
+  .auth-title-gradient {
+    font-family: 'Spectral', Georgia, serif;
+    font-size: 1.42rem; font-weight: 800;
+    background: linear-gradient(135deg, #ffffff 40%, #00ffaa 100%);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    letter-spacing: 0.02em; margin-bottom: 4px;
+  }
+  .auth-subtitle {
+    font-size: 0.82rem; color: var(--muted);
+    letter-spacing: 0.01em; line-height: 1.35;
+  }
+
+  /* Segmented Sliding Tabs */
+  .auth-tabs {
+    display: flex; background: rgba(0, 0, 0, 0.45);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px; padding: 4px; margin-bottom: 18px;
+    position: relative;
+  }
+  .auth-tab {
+    flex: 1; text-align: center;
+    background: transparent; border: none;
+    color: var(--muted); font-size: 0.82rem; font-weight: 600;
+    padding: 8px 12px; border-radius: 9px; cursor: pointer;
+    transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .auth-tab:hover { color: #fff; }
+  .auth-tab.active {
+    background: rgba(255, 255, 255, 0.12);
+    color: #fff; font-weight: 700;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  }
+
+  /* Hero Google Button */
+  .soc-btn-hero {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    color: #ffffff;
+    padding: 12px 16px; border-radius: 12px;
+    font-size: 0.88rem; font-weight: 700;
+    cursor: pointer; display: flex; align-items: center; justify-content: space-between;
+    transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+    margin-bottom: 10px;
+    position: relative;
+  }
+  .soc-btn-hero:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(66, 133, 244, 0.65);
+    transform: translateY(-1.5px);
+    box-shadow: 0 8px 24px rgba(66, 133, 244, 0.22), 0 0 15px rgba(66, 133, 244, 0.15);
+  }
+  .soc-btn-hero-left {
+    display: flex; align-items: center; gap: 10px;
+  }
+  .soc-btn-badge {
+    font-size: 0.64rem; font-weight: 700; text-transform: uppercase;
+    padding: 3px 8px; border-radius: 6px;
+    background: rgba(66, 133, 244, 0.2);
+    border: 1px solid rgba(66, 133, 244, 0.4);
+    color: #8ab4f8; letter-spacing: 0.06em;
+  }
+
+  /* Secondary GitHub Button */
+  .soc-btn-secondary {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    color: #c9d1d9;
+    padding: 10px 16px; border-radius: 12px;
+    font-size: 0.82rem; font-weight: 600;
+    cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;
+    transition: all 0.2s ease;
+  }
+  .soc-btn-secondary:hover {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: rgba(255, 255, 255, 0.2);
+    color: #fff;
+  }
+
+  /* Divider */
+  .auth-divider {
+    display: flex; align-items: center; gap: 12px;
+    font-size: 0.72rem; color: #737b86;
+    margin: 18px 0 16px; text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+  .auth-divider::before, .auth-divider::after {
+    content: ''; flex: 1; height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.12), transparent);
+  }
+
+  /* Deluxe Form Inputs */
+  .auth-inp-wrap {
+    margin-bottom: 13px; text-align: left;
+  }
+  .auth-inp-label {
+    display: flex; justify-content: space-between; align-items: center;
+    font-size: 0.76rem; font-weight: 600; color: #cfd3dc;
+    margin-bottom: 6px;
+  }
+  .auth-input-box {
+    position: relative; display: flex; align-items: center;
+  }
+  .auth-inp-icon {
+    position: absolute; left: 13px;
+    color: #737b86; font-size: 0.95rem;
+    pointer-events: none; transition: color 0.2s;
+  }
+  .auth-inp {
+    width: 100%;
+    background: rgba(8, 12, 16, 0.75);
+    border: 1px solid rgba(255, 255, 255, 0.11);
+    color: #fff;
+    padding: 11px 14px 11px 38px;
+    border-radius: 11px;
+    font-size: 0.86rem; outline: none;
+    transition: all 0.2s ease;
+    font-family: inherit;
+  }
+  .auth-inp::placeholder { color: #555e6c; }
+  .auth-inp:focus {
+    border-color: #00ffaa;
+    background: rgba(10, 16, 22, 0.95);
+    box-shadow: 0 0 0 3px rgba(0, 255, 170, 0.16), 0 0 20px rgba(0, 255, 170, 0.12);
+  }
+  .auth-inp:focus + .auth-inp-icon,
+  .auth-input-box:focus-within .auth-inp-icon {
+    color: #00ffaa;
+  }
+
+  .auth-pwd-toggle {
+    position: absolute; right: 12px;
+    background: transparent; border: none;
+    color: #737b86; cursor: pointer; padding: 4px;
+    font-size: 0.85rem; display: flex; align-items: center; justify-content: center;
+    transition: color 0.15s;
+  }
+  .auth-pwd-toggle:hover { color: #fff; }
+
+  /* Submit Button with Radiant Sweep */
+  .auth-btn-primary {
+    width: 100%;
+    background: linear-gradient(135deg, #00ffaa 0%, #00d98b 50%, #00b377 100%);
+    color: #05080c; border: none;
+    padding: 12px; border-radius: 12px;
+    font-size: 0.9rem; font-weight: 800;
+    cursor: pointer; margin-top: 10px;
+    box-shadow: 0 4px 20px rgba(0, 255, 170, 0.35);
+    transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+    letter-spacing: 0.02em;
+    position: relative; overflow: hidden;
+  }
+  .auth-btn-primary:hover {
+    transform: translateY(-1.5px);
+    box-shadow: 0 6px 28px rgba(0, 255, 170, 0.55);
+    opacity: 0.98;
+  }
+  .auth-btn-primary:active { transform: translateY(0); }
+
+  /* Bottom Switcher & Security Guarantee */
+  .auth-card-footer {
+    text-align: center; font-size: 0.77rem; color: #737b86;
+    margin-top: 16px;
+  }
   .auth-toggle-link {
     background: none; border: none; padding: 0;
     color: var(--neon); cursor: pointer; font-size: 0.78rem; font-weight: 700;
     text-decoration: underline; font-family: inherit;
   }
   .auth-toggle-link:hover { color: #fff; }
-  .auth-card {
-    background: #0d0f13; border: 1px solid var(--line); border-radius: 16px;
-    width: 100%; max-width: 440px; padding: 32px 24px; box-shadow: 0 20px 50px rgba(0,0,0,0.9);
-    position: relative;
+
+  .auth-sec-pill {
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+    font-size: 0.68rem; color: #5a6270; margin-top: 12px;
   }
-  .auth-head { text-align: center; margin-bottom: 24px; }
-  .auth-head h2 { font-size: 1.4rem; font-weight: 800; color: #fff; margin-top: 10px; }
-  .auth-head p { font-size: 0.8rem; color: var(--muted); margin-top: 4px; }
-
-  .social-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 18px; }
-  .soc-btn {
-    background: #14171d; border: 1px solid var(--line); color: #fff;
-    padding: 9px; border-radius: 8px; font-size: 0.78rem; font-weight: 600;
-    cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;
-  }
-  .soc-btn:hover { background: #1b2028; border-color: rgba(255,255,255,0.2); }
-  .soc-btn svg { width: 16px; height: 16px; }
-
-  .divider { display: flex; align-items: center; gap: 10px; font-size: 0.72rem; color: var(--muted); margin: 16px 0; }
-  .divider::before, .divider::after { content:''; flex:1; height:1px; background:var(--line); }
-
-  .inp-group { margin-bottom: 12px; text-align: left; }
-  .inp-label { display: block; font-size: 0.78rem; font-weight: 600; color: #fff; margin-bottom: 4px; }
-  .inp-field {
-    width: 100%; background: #14171d; border: 1px solid var(--line); color: #fff;
-    padding: 10px 12px; border-radius: 8px; font-size: 0.85rem; outline: none;
-  }
-  .inp-field:focus { border-color: var(--neon); }
-
-  .btn-submit {
-    width: 100%; background: var(--text); color: #000; border: none;
-    padding: 11px; border-radius: 8px; font-size: 0.88rem; font-weight: 800;
-    cursor: pointer; margin-top: 10px;
-  }
-  .btn-submit:hover { opacity: 0.9; }
-
-  .auth-toggle { text-align: center; font-size: 0.78rem; color: var(--muted); margin-top: 16px; }
-  .auth-toggle a { color: var(--neon); cursor: pointer; text-decoration: none; font-weight: 700; }
 
   .err-msg {
     background: rgba(248,104,104,0.1); border: 1px solid rgba(248,104,104,0.3);
@@ -1328,50 +1554,91 @@
 
 <!-- AUTH MODAL -->
 <div class="modal-bg" id="authModal" onclick="if(event.target===this)closeAuth()">
-  <div class="auth-card">
-    <button type="button" class="auth-close-btn" onclick="closeAuth()" title="Close dialog">✕</button>
-    <div class="auth-head">
-      <div class="brand-icon-box" style="margin: 0 auto;">
-        <svg width="24" height="24" viewBox="0 0 32 32" fill="none">
-          <path d="M 6 16 A 10 10 0 1 0 26 16" stroke="#00ffaa" stroke-width="2"/>
-          <ellipse cx="16" cy="16" rx="11" ry="4.5" transform="rotate(-30 16 16)" stroke="#e8c9a0" stroke-width="1.4"/>
-          <circle cx="16" cy="16" r="3" fill="#ffffff"/>
-        </svg>
+  <div class="auth-card-wrap">
+    <div class="auth-aurora-glow"></div>
+    <div class="auth-card">
+      <button type="button" class="auth-close-btn" onclick="closeAuth()" title="Close dialog">✕</button>
+      
+      <div class="auth-head">
+        <div class="auth-badge">
+          <span class="auth-badge-dot"></span> SECURE AUTONOMOUS CLOUD
+        </div>
+        <div class="auth-brand-icon">
+          <svg width="26" height="26" viewBox="0 0 32 32" fill="none">
+            <path d="M 6 16 A 10 10 0 1 0 26 16" stroke="#00ffaa" stroke-width="2.2" stroke-linecap="round"/>
+            <ellipse cx="16" cy="16" rx="11" ry="4.5" transform="rotate(-30 16 16)" stroke="#e8c9a0" stroke-width="1.6" opacity="0.9"/>
+            <circle cx="7" cy="12" r="1.8" fill="#00ffaa"/>
+            <circle cx="16" cy="16" r="3.2" fill="#ffffff"/>
+          </svg>
+        </div>
+        <h2 id="authTitle" class="auth-title-gradient">Log in to Cognisphere</h2>
+        <p id="authSub" class="auth-subtitle">Autonomous intelligence engine & supercluster studio</p>
       </div>
-      <h2 id="authTitle">Log in to COGNISPHERE.AI</h2>
-      <p id="authSub">Superhuman Autonomous Intelligence</p>
-    </div>
 
-    <div class="social-grid">
-      <button class="soc-btn social-btn" data-provider="google" type="button" onclick="socialAuth('google')">
-        <svg viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/></svg> Continue with Google
+      <!-- Segmented Tabs Switcher -->
+      <div class="auth-tabs">
+        <button type="button" class="auth-tab active" id="tabLogin" onclick="toggleAuthMode('login')">Log in</button>
+        <button type="button" class="auth-tab" id="tabRegister" onclick="toggleAuthMode('register')">Create account</button>
+      </div>
+
+      <!-- Hero Google Continue Button -->
+      <button class="soc-btn-hero social-btn" data-provider="google" type="button" onclick="handleGoogleSignIn()">
+        <div class="soc-btn-hero-left">
+          <svg width="20" height="20" viewBox="0 0 24 24">
+            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+          </svg>
+          <span style="font-weight:700;">Continue with Google</span>
+        </div>
+        <span class="soc-btn-badge">Instant</span>
       </button>
-      <button class="soc-btn social-btn" data-provider="github" type="button" onclick="socialAuth('github')">
-        <svg viewBox="0 0 24 24" fill="white"><path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/></svg> Continue with GitHub
+
+      <!-- Secondary GitHub Button -->
+      <button class="soc-btn-secondary social-btn" data-provider="github" type="button" onclick="socialAuth('github')">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="white"><path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/></svg>
+        <span>Continue with GitHub</span>
       </button>
-    </div>
 
-    <div class="divider">Or continue with email</div>
-    <div class="err-msg" id="authError"></div>
+      <div class="auth-divider"><span>or with email</span></div>
+      <div class="err-msg" id="authError"></div>
 
-    <form id="authForm" onsubmit="handleAuthSubmit(event)">
-      <div class="inp-group" id="nameGroup" style="display:none;">
-        <label class="inp-label">Full Name</label>
-        <input type="text" class="inp-field" id="inpName" placeholder="Your Name">
-      </div>
-      <div class="inp-group">
-        <label class="inp-label">Email Address</label>
-        <input type="email" class="inp-field" id="inpEmail" placeholder="name@company.com" required>
-      </div>
-      <div class="inp-group">
-        <label class="inp-label">Password</label>
-        <input type="password" class="inp-field" id="inpPassword" placeholder="••••••••" required minlength="6">
-      </div>
-      <button type="submit" class="btn-submit" id="authSubmitBtn">Log in</button>
-    </form>
+      <form id="authForm" onsubmit="handleAuthSubmit(event)">
+        <div class="auth-inp-wrap" id="nameGroup" style="display:none;">
+          <label class="auth-inp-label">Full Name</label>
+          <div class="auth-input-box">
+            <span class="auth-inp-icon">👤</span>
+            <input type="text" class="auth-inp" id="inpName" placeholder="Alex Morgan">
+          </div>
+        </div>
+        <div class="auth-inp-wrap">
+          <label class="auth-inp-label">Email Address</label>
+          <div class="auth-input-box">
+            <span class="auth-inp-icon">✉️</span>
+            <input type="email" class="auth-inp" id="inpEmail" placeholder="name@company.com" required>
+          </div>
+        </div>
+        <div class="auth-inp-wrap">
+          <label class="auth-inp-label">
+            <span>Password</span>
+            <span style="font-size:0.7rem; color:#00ffaa; opacity:0.8; cursor:pointer;" onclick="toggleAuthMode(authMode==='login'?'register':'login')">Help?</span>
+          </label>
+          <div class="auth-input-box">
+            <span class="auth-inp-icon">🔒</span>
+            <input type="password" class="auth-inp" id="inpPassword" placeholder="••••••••" required minlength="6">
+            <button type="button" class="auth-pwd-toggle" onclick="togglePasswordVisibility('inpPassword')" title="Show/Hide Password">👁️</button>
+          </div>
+        </div>
+        <button type="submit" class="auth-btn-primary" id="authSubmitBtn">Log in to Workspace →</button>
+      </form>
 
-    <div class="auth-toggle" id="authToggleText">
-      New user? <button type="button" class="auth-toggle-link" onclick="toggleAuthMode('register')">Create account</button>
+      <div class="auth-card-footer" id="authToggleText">
+        New to Cognisphere? <button type="button" class="auth-toggle-link" onclick="toggleAuthMode('register')">Create an account</button>
+      </div>
+      <div class="auth-sec-pill">
+        <span>🛡️</span> <span>Enterprise Grade • 256-Bit SSL End-to-End Encryption</span>
+      </div>
     </div>
   </div>
 </div>
@@ -1421,10 +1688,22 @@
     initHeroTypewriter();
   }
 
-  const isVercel = window.location.hostname.endsWith('vercel.app');
-  let API_HOST = isVercel ? '' : (window.location.port === '3088' ? window.location.origin : 'http://127.0.0.1:3088');
+  const GOOGLE_CLIENT_ID = '587514151509-ffmej4mml0re8ascku86u2tnlb09tbnm.apps.googleusercontent.com';
+  const isVercel = window.location.hostname.endsWith('vercel.app') || (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1');
 
-  // Dynamic backend host auto-discovery & health probe
+  function getApiBaseUrl() {
+    if (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+      return '';
+    }
+    if (window.location.port === '3088') {
+      return '';
+    }
+    return 'http://127.0.0.1:3088';
+  }
+
+  let API_HOST = getApiBaseUrl();
+
+  // Dynamic backend host auto-discovery & health probe (for local development only)
   async function detectBackendHost() {
     if (isVercel) return '';
     const candidateOrigins = [
@@ -1453,7 +1732,7 @@
     }
     return API_HOST;
   }
-  detectBackendHost();
+  if (!isVercel) detectBackendHost();
   let authMode = 'login';
   let currentStats = { queries: 0, users: 0, latency: 0 };
 
@@ -1467,6 +1746,7 @@
     fetchStats();
     initMaster3DUniverse();
     init3DTiltEffects();
+    initGoogleIdentityServices();
     setInterval(fetchStats, 5000);
 
     const sInp = document.getElementById('landingSearchInput');
@@ -2282,8 +2562,8 @@
   // ── LIVE NEON DB TELEMETRY STATS ──
   async function fetchStats() {
     try {
-      const host = API_HOST || (window.location.port === '3088' ? '' : 'http://127.0.0.1:3088');
-      const r = await fetch((host ? host : '') + '/api/stats?_t=' + Date.now());
+      const base = getApiBaseUrl();
+      const r = await fetch((base ? base : '') + '/api/stats?_t=' + Date.now());
       const d = await r.json();
 
       if (typeof d.queries_processed === 'number' && d.queries_processed !== currentStats.queries) {
@@ -2411,14 +2691,13 @@
 
     try {
       // Resilient candidate probing: prevents HTTP 405 (Live Server :5500 or VS Code :3000)
+      const isLocalHost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
       let candidateHosts = [
-        API_HOST,
-        'http://127.0.0.1:3088',
-        'http://localhost:3088',
-        (window.location.protocol.startsWith('http') && window.location.origin) ? window.location.origin : '',
-        'http://127.0.0.1:3000',
-        ''
+        getApiBaseUrl()
       ];
+      if (isLocalHost) {
+        candidateHosts.push('http://127.0.0.1:3088', 'http://localhost:3088', (window.location.protocol.startsWith('http') && window.location.origin) ? window.location.origin : '', 'http://127.0.0.1:3000', '');
+      }
       candidateHosts = [...new Set(candidateHosts.filter(h => typeof h === 'string'))];
 
       let res = null;
@@ -2592,19 +2871,43 @@
 
   function toggleAuthMode(mode) {
     authMode = mode;
-    document.getElementById('authError').classList.remove('show');
+    const errEl = document.getElementById('authError');
+    if (errEl) errEl.classList.remove('show');
+
+    const tabLogin = document.getElementById('tabLogin');
+    const tabRegister = document.getElementById('tabRegister');
+    const nameGrp = document.getElementById('nameGroup');
+    const titleEl = document.getElementById('authTitle');
+    const subEl = document.getElementById('authSub');
+    const submitBtn = document.getElementById('authSubmitBtn');
+    const toggleText = document.getElementById('authToggleText');
+
     if (mode === 'register') {
-      document.getElementById('authTitle').textContent = 'Create Account';
-      document.getElementById('authSub').textContent = 'Superhuman Autonomous Intelligence Workspace';
-      document.getElementById('nameGroup').style.display = 'block';
-      document.getElementById('authSubmitBtn').textContent = 'Create Account';
-      document.getElementById('authToggleText').innerHTML = 'Already have an account? <button type="button" class="auth-toggle-link" onclick="toggleAuthMode(\'login\')">Log in</button>';
+      if (tabLogin) tabLogin.classList.remove('active');
+      if (tabRegister) tabRegister.classList.add('active');
+      if (titleEl) titleEl.textContent = 'Create your Account';
+      if (subEl) subEl.textContent = 'Get instant access to Cognisphere autonomous studio';
+      if (nameGrp) nameGrp.style.display = 'block';
+      if (submitBtn) submitBtn.textContent = 'Create Account & Enter Workspace →';
+      if (toggleText) toggleText.innerHTML = 'Already have an account? <button type="button" class="auth-toggle-link" onclick="toggleAuthMode(\'login\')">Log in</button>';
     } else {
-      document.getElementById('authTitle').textContent = 'Log in to COGNISPHERE.AI';
-      document.getElementById('authSub').textContent = 'Superhuman Autonomous Intelligence';
-      document.getElementById('nameGroup').style.display = 'none';
-      document.getElementById('authSubmitBtn').textContent = 'Log in';
-      document.getElementById('authToggleText').innerHTML = 'New user? <button type="button" class="auth-toggle-link" onclick="toggleAuthMode(\'register\')">Create account</button>';
+      if (tabRegister) tabRegister.classList.remove('active');
+      if (tabLogin) tabLogin.classList.add('active');
+      if (titleEl) titleEl.textContent = 'Log in to Cognisphere';
+      if (subEl) subEl.textContent = 'Autonomous intelligence engine & supercluster studio';
+      if (nameGrp) nameGrp.style.display = 'none';
+      if (submitBtn) submitBtn.textContent = 'Log in to Workspace →';
+      if (toggleText) toggleText.innerHTML = 'New to Cognisphere? <button type="button" class="auth-toggle-link" onclick="toggleAuthMode(\'register\')">Create an account</button>';
+    }
+  }
+
+  function togglePasswordVisibility(inputId) {
+    const inp = document.getElementById(inputId || 'inpPassword');
+    if (!inp) return;
+    if (inp.type === 'password') {
+      inp.type = 'text';
+    } else {
+      inp.type = 'password';
     }
   }
 
@@ -2631,30 +2934,33 @@
     const payload  = authMode === 'register' ? { name, email, password } : { email, password };
 
     try {
-      let host = API_HOST || (window.location.port === '3088' ? '' : 'http://127.0.0.1:3088');
+      const base = getApiBaseUrl();
       let r = null;
       try {
-        r = await fetch((host ? host : '') + endpoint, {
+        r = await fetch((base ? base : '') + endpoint, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload)
         });
       } catch(e) {}
 
-      // If rejected with 405 (e.g. Live Server), automatically fallback to port 3088
+      // If rejected with 405 on local static server (e.g. Live Server), try 3088
       if (!r || r.status === 405 || r.status === 404) {
-        host = 'http://127.0.0.1:3088';
-        API_HOST = host;
-        r = await fetch(host + endpoint, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
-        });
+        if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+          try {
+            r = await fetch('http://127.0.0.1:3088' + endpoint, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(payload)
+            });
+          } catch(err2) {}
+        }
       }
+
+      if (!r) throw new Error('Could not connect to authentication service. Please check your connection.');
       const data = await r.json();
 
       if (!r.ok || !data.success) {
-        // ── User tried to log in but is not registered in Neon DB ──
         if (authMode === 'login') {
           const errMsg = (data.error || '').toLowerCase();
           if (errMsg.includes('not found') || errMsg.includes('no user') ||
@@ -2683,7 +2989,126 @@
     }
   }
 
-  // ── REAL OAUTH POPUP FLOW ──────────────────────────────────────────────
+  // ── RESET SOCIAL BUTTONS HELPER ─────────────────────────────────────────
+  function resetSocialButtons() {
+    document.querySelectorAll('.social-btn').forEach(b => { b.disabled = false; });
+    const gBtn = document.querySelector('.social-btn[data-provider="google"]');
+    const ghBtn = document.querySelector('.social-btn[data-provider="github"]');
+    if (gBtn) gBtn.innerHTML = '<svg viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/></svg> Continue with Google';
+    if (ghBtn) ghBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="white"><path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/></svg> Continue with GitHub';
+  }
+
+  // ── GOOGLE IDENTITY SERVICES & ACCOUNT SELECTION ────────────────────────
+  function initGoogleIdentityServices() {
+    if (window.google && window.google.accounts && window.google.accounts.id) {
+      try {
+        google.accounts.id.initialize({
+          client_id: GOOGLE_CLIENT_ID,
+          callback: handleGoogleCredentialResponse,
+          auto_select: false,
+          cancel_on_tap_outside: true,
+          context: 'signin'
+        });
+      } catch (err) {
+        console.warn('Google Identity Services initialization warning:', err);
+      }
+    }
+  }
+
+  function handleGoogleSignIn() {
+    const errEl = document.getElementById('authError');
+    if (errEl) errEl.classList.remove('show');
+
+    const btn = document.querySelector('.social-btn[data-provider="google"]');
+    if (btn) {
+      btn.disabled = true;
+      btn.innerHTML = `<span class="social-spinner"></span> Connecting Google...`;
+    }
+
+    if (window.google && window.google.accounts && window.google.accounts.id) {
+      try {
+        google.accounts.id.initialize({
+          client_id: GOOGLE_CLIENT_ID,
+          callback: handleGoogleCredentialResponse,
+          auto_select: false,
+          cancel_on_tap_outside: true,
+          context: 'signin'
+        });
+
+        google.accounts.id.prompt((notification) => {
+          if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
+            console.log('Google prompt not displayed, falling back to OAuth popup:', notification.getNotDisplayedReason());
+            socialAuth('google');
+          }
+        });
+      } catch (e) {
+        socialAuth('google');
+      }
+    } else {
+      socialAuth('google');
+    }
+  }
+
+  async function handleGoogleCredentialResponse(response) {
+    const errEl = document.getElementById('authError');
+    const btn = document.querySelector('.social-btn[data-provider="google"]');
+
+    if (!response || !response.credential) {
+      if (errEl) {
+        errEl.textContent = 'Google sign-in was not completed.';
+        errEl.classList.add('show');
+      }
+      resetSocialButtons();
+      return;
+    }
+
+    if (btn) {
+      btn.disabled = true;
+      btn.innerHTML = `<span class="social-spinner"></span> Authenticating...`;
+    }
+
+    try {
+      const base = getApiBaseUrl();
+      const res = await fetch((base ? base : '') + '/api/auth/google/verify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ credential: response.credential })
+      });
+
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || 'Google authentication failed');
+      }
+
+      localStorage.setItem('csToken', data.token);
+      localStorage.setItem('csUser', JSON.stringify(data.user));
+
+      if (errEl) {
+        errEl.style.color = '#00ffaa';
+        errEl.style.borderColor = 'rgba(0,255,170,.3)';
+        errEl.style.background = 'rgba(0,255,170,.07)';
+        errEl.textContent = `✅ Authenticated as ${data.user.name}! Entering workspace…`;
+        errEl.classList.add('show');
+      }
+
+      setTimeout(() => {
+        const q = encodeURIComponent(currentLandingQuery || '');
+        window.navigateToPage('home.html' + (q ? '?q=' + q : ''));
+      }, 700);
+    } catch (err) {
+      console.error('Google auth verify error:', err);
+      if (errEl) {
+        errEl.style.color = '';
+        errEl.style.borderColor = '';
+        errEl.style.background = '';
+        errEl.textContent = err.message || 'Google sign-in failed. Please try again.';
+        errEl.classList.add('show');
+      }
+      resetSocialButtons();
+    }
+  }
+
+  // ── REAL OAUTH POPUP FLOW (GITHUB & GOOGLE FALLBACK) ───────────────────
   let _oauthPopup = null;
   let _oauthTimer = null;
 
@@ -2696,23 +3121,22 @@
 
     // Set loading state on the button
     const btn = document.querySelector(`.social-btn[data-provider="${provider}"]`);
-    const originalHTML = btn ? btn.innerHTML : '';
     if (btn) { btn.innerHTML = `<span class="social-spinner"></span> Connecting…`; btn.disabled = true; }
 
     // Open real OAuth flow in a centered popup window
     const W = 520, H = 640;
     const left = Math.round(screen.width / 2 - W / 2);
     const top  = Math.round(screen.height / 2 - H / 2);
-    const host = API_HOST || (window.location.port === '3088' ? '' : 'http://127.0.0.1:3088');
-    const url  = `${host}/api/auth/${provider}`;
+    const base = getApiBaseUrl();
+    const url  = `${base}/api/auth/${provider}`;
     _oauthPopup = window.open(url, `cognisphere_${provider}_oauth`,
       `width=${W},height=${H},left=${left},top=${top},toolbar=no,menubar=no,scrollbars=yes,resizable=yes`);
 
     if (!_oauthPopup || _oauthPopup.closed) {
       // Popup was blocked — fallback to same-tab redirect
-      if (btn) { btn.innerHTML = originalHTML; btn.disabled = false; }
+      resetSocialButtons();
       if (errEl) { errEl.textContent = 'Popup blocked by browser. Redirecting in this tab…'; errEl.classList.add('show'); }
-      setTimeout(() => { window.location.href = url; }, 1500);
+      setTimeout(() => { window.location.href = url; }, 1200);
       return;
     }
 
@@ -2720,7 +3144,7 @@
     _oauthTimer = setInterval(() => {
       if (_oauthPopup && _oauthPopup.closed) {
         clearInterval(_oauthTimer);
-        if (btn) { btn.innerHTML = originalHTML; btn.disabled = false; }
+        resetSocialButtons();
       }
     }, 500);
   }
@@ -2746,22 +3170,17 @@
         errEl.textContent = `✅ Authenticated as ${user.name}! Entering workspace…`;
         errEl.classList.add('show');
       }
-      setTimeout(() => { window.navigateToPage('home.html'); }, 900);
+      setTimeout(() => { window.navigateToPage('home.html'); }, 800);
       return;
     }
 
     if (type === 'OAUTH_ERROR') {
       const msg = error || 'OAuth authentication failed. Please try again.';
       if (errEl) { errEl.style.color = ''; errEl.style.borderColor = ''; errEl.style.background = ''; errEl.textContent = msg; errEl.classList.add('show'); }
-      // Restore all social buttons
-      document.querySelectorAll('.social-btn').forEach(b => { b.disabled = false; });
-      // Reset button HTML — re-render buttons
-      const gBtn = document.querySelector('.social-btn[data-provider="google"]');
-      const ghBtn = document.querySelector('.social-btn[data-provider="github"]');
-      if (gBtn) gBtn.innerHTML = '<svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615z"/><path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 009 18z"/><path fill="#FBBC05" d="M3.964 10.71A5.41 5.41 0 013.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 000 9c0 1.452.348 2.827.957 4.042l3.007-2.332z"/><path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 00.957 4.958L3.964 6.29C4.672 4.163 6.656 3.58 9 3.58z"/></svg> Continue with Google';
-      if (ghBtn) ghBtn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0112 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/></svg> Continue with GitHub';
+      resetSocialButtons();
     }
   }, false);
+
 
   // ═══════════════════════════════════════════════════════════════════
   // ── DYNAMIC FRONTIER MODEL SELECTION & OMNIBAR BINDING ──
