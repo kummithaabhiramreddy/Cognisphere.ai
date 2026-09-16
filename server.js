@@ -1595,79 +1595,167 @@ function getText(url, headers = {}, timeout = 2500) {
   });
 }
 
-// Organic Multi-Engine Web Search (DuckDuckGo HTML Parser for verified, accurate URLs)
-async function searchDuckDuckGoOrganic(query) {
-  try {
-    const postData = 'q=' + encodeURIComponent(query);
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 4000);
-    const res = await fetch('https://html.duckduckgo.com/html/', {
-      method: 'POST',
-      signal: controller.signal,
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
-        'Content-Type': 'application/x-www-form-urlencoded',
-        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'
-      },
-      body: postData
+// Robust Multi-Engine Web & News Search (Google News RSS + DDG Lite/HTML + Wikipedia + HackerNews + OpenAlex)
+async function searchMultiEngineWeb(query) {
+  if (!query || !query.trim()) return [];
+  const cleanQ = query.trim();
+  const encoded = encodeURIComponent(cleanQ);
+  const results = [];
+  const seenUrls = new Set();
+
+  function addResult(title, snippet, url, source) {
+    if (!url || !url.startsWith('http')) return;
+    if (url.includes('duckduckgo.com/y.js') || url.includes('bing.com/aclick') || url.includes('google.com/aclk')) return;
+    if (seenUrls.has(url)) return;
+    seenUrls.add(url);
+
+    let host = source || '';
+    try {
+      if (!host) host = new URL(url).hostname.replace(/^www\./, '');
+    } catch (e) { }
+
+    results.push({
+      title: (title || host).replace(/&#x27;/g, "'").replace(/&#39;/g, "'").replace(/&quot;/g, '"').replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/<[^>]+>/g, '').trim(),
+      snippet: (snippet || '').replace(/&#x27;/g, "'").replace(/&#39;/g, "'").replace(/&quot;/g, '"').replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/<[^>]+>/g, '').slice(0, 180).trim(),
+      url,
+      source: host
     });
-    clearTimeout(timeout);
-    if (!res.ok) return [];
-    const data = await res.text();
-    const results = [];
-    const blocks = data.split(/class="result\s+results_links/);
-    blocks.slice(1).forEach(block => {
-      const titleMatch = block.match(/class="result__a"[^>]*href="([^"]+)"[^>]*>([\s\S]*?)<\/a>/);
-      const snippetMatch = block.match(/class="result__snippet"[^>]*>([\s\S]*?)<\/a>/);
-      if (titleMatch) {
-        let rawUrl = titleMatch[1];
-        let title = (titleMatch[2] || '')
-          .replace(/&#x27;/g, "'")
-          .replace(/&#39;/g, "'")
-          .replace(/&quot;/g, '"')
-          .replace(/&amp;/g, '&')
-          .replace(/&lt;/g, '<')
-          .replace(/&gt;/g, '>')
-          .replace(/&nbsp;/g, ' ')
-          .replace(/<[^>]+>/g, '')
-          .trim();
-        let snippet = (snippetMatch ? snippetMatch[1] : '')
-          .replace(/&#x27;/g, "'")
-          .replace(/&#39;/g, "'")
-          .replace(/&quot;/g, '"')
-          .replace(/&amp;/g, '&')
-          .replace(/&lt;/g, '<')
-          .replace(/&gt;/g, '>')
-          .replace(/&nbsp;/g, ' ')
-          .replace(/<[^>]+>/g, '')
-          .trim();
+  }
 
-        if (rawUrl.includes('uddg=')) {
-          try {
-            const u = new URL('https://duckduckgo.com' + rawUrl);
-            rawUrl = decodeURIComponent(u.searchParams.get('uddg'));
-          } catch (e) { }
-        }
-
-        // Strictly exclude Wikipedia, Wikimedia, trackers, and ad links
-        if (rawUrl.includes('wikipedia.org') || rawUrl.includes('wikimedia.org')) return;
-        if (rawUrl.startsWith('http') && !rawUrl.includes('duckduckgo.com/y.js') && !rawUrl.includes('bing.com/aclick')) {
-          try {
-            const host = new URL(rawUrl).hostname.replace(/^www\./, '');
-            results.push({
-              title,
-              snippet,
-              url: rawUrl,
-              source: host
-            });
-          } catch (e) { }
+  // 1. Google News RSS Search (Extremely fast, 100% reliable on Vercel/serverless environments)
+  const gNewsPromise = (async () => {
+    try {
+      const res = await fetch(`https://news.google.com/rss/search?q=${encoded}&hl=en-US&gl=US&ceid=US:en`, {
+        signal: AbortSignal.timeout(3500),
+        headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36' }
+      });
+      if (res.ok) {
+        const xml = await res.text();
+        const items = xml.match(/<item>[\s\S]*?<\/item>/g) || [];
+        for (const item of items.slice(0, 5)) {
+          const tMatch = item.match(/<title>([\s\S]*?)<\/title>/);
+          const lMatch = item.match(/<link>([\s\S]*?)<\/link>/);
+          const sMatch = item.match(/<source[^>]*>([\s\S]*?)<\/source>/);
+          if (tMatch && lMatch) {
+            let title = tMatch[1].replace(/<!\[CDATA\[(.*?)\]\]>/g, '$1');
+            let link = lMatch[1].trim();
+            let source = sMatch ? sMatch[1].replace(/<!\[CDATA\[(.*?)\]\]>/g, '$1') : '';
+            addResult(title, `Latest reporting and overview from ${source || 'verified news source'}`, link, source);
+          }
         }
       }
-    });
-    return results.slice(0, 5);
-  } catch (err) {
-    return [];
-  }
+    } catch (e) { }
+  })();
+
+  // 2. DuckDuckGo Lite & HTML Multi-fallback
+  const ddgLitePromise = (async () => {
+    try {
+      const postData = 'q=' + encoded;
+      const res = await fetch('https://lite.duckduckgo.com/lite/', {
+        method: 'POST',
+        signal: AbortSignal.timeout(3500),
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+          'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: postData
+      });
+      if (res.ok) {
+        const html = await res.text();
+        const rows = html.match(/<tr[\s\S]*?<\/tr>/g) || [];
+        let currLink = null;
+        let currTitle = null;
+        for (const row of rows) {
+          const linkMatch = row.match(/class=['"]result-link['"][^>]*href=['"]([^'"]+)['"][^>]*>([\s\S]*?)<\/a>/i) ||
+            row.match(/<a rel="nofollow" href="([^"]+)" class=['"]result-link['"]>([\s\S]*?)<\/a>/i);
+          if (linkMatch) {
+            let rawUrl = linkMatch[1];
+            if (rawUrl.includes('uddg=')) {
+              try {
+                const u = new URL('https://duckduckgo.com' + rawUrl);
+                rawUrl = decodeURIComponent(u.searchParams.get('uddg'));
+              } catch (e) { }
+            }
+            currLink = rawUrl;
+            currTitle = linkMatch[2];
+          }
+          const snipMatch = row.match(/class=['"]result-snippet['"][^>]*>([\s\S]*?)<\/td>/i);
+          if (snipMatch && currLink) {
+            addResult(currTitle, snipMatch[1], currLink);
+            currLink = null;
+            currTitle = null;
+          }
+        }
+      }
+    } catch (e) { }
+  })();
+
+  // 3. Wikipedia OpenSearch
+  const wikiPromise = (async () => {
+    try {
+      const res = await fetch(`https://en.wikipedia.org/w/api.php?action=opensearch&search=${encoded}&limit=4&namespace=0&format=json`, {
+        signal: AbortSignal.timeout(3000),
+        headers: { 'User-Agent': 'CognisphereAI/2.0 (web-assistant)' }
+      });
+      if (res.ok) {
+        const data = await res.json();
+        const titles = data[1] || [];
+        const snippets = data[2] || [];
+        const links = data[3] || [];
+        for (let i = 0; i < titles.length; i++) {
+          if (titles[i] && links[i]) {
+            addResult(titles[i], snippets[i] || `Encyclopedia reference for ${titles[i]}`, links[i], 'wikipedia.org');
+          }
+        }
+      }
+    } catch (e) { }
+  })();
+
+  // 4. HackerNews Algolia (tech & development queries)
+  const hnPromise = (async () => {
+    try {
+      const res = await fetch(`https://hn.algolia.com/api/v1/search?query=${encoded}&tags=story&hitsPerPage=4`, {
+        signal: AbortSignal.timeout(3000)
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (data && data.hits) {
+          for (const hit of data.hits) {
+            if (hit.title && hit.url) {
+              addResult(hit.title, `Community discussion & technical reference (${hit.points || 0} pts)`, hit.url);
+            }
+          }
+        }
+      }
+    } catch (e) { }
+  })();
+
+  // 5. OpenAlex (Scholarly & Academic Papers)
+  const oaPromise = (async () => {
+    try {
+      const res = await fetch(`https://api.openalex.org/works?search=${encoded}&per-page=3`, {
+        signal: AbortSignal.timeout(3000)
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (data && data.results) {
+          for (const work of data.results) {
+            if (work.title && (work.doi || work.id)) {
+              addResult(work.title, `Academic Paper (${work.publication_year || 'Research'}) — ${work.host_venue?.display_name || 'OpenAlex'}`, work.doi || work.id, 'openalex.org');
+            }
+          }
+        }
+      }
+    } catch (e) { }
+  })();
+
+  await Promise.allSettled([gNewsPromise, ddgLitePromise, wikiPromise, hnPromise, oaPromise]);
+  return results.slice(0, 10);
+}
+
+// Fallback searchDuckDuckGoOrganic wrapper for backwards compatibility
+async function searchDuckDuckGoOrganic(query) {
+  return searchMultiEngineWeb(query);
 }
 
 // Universal Web Page & Video Reader Engine
@@ -2015,10 +2103,10 @@ app.get('/api/live-search', async (req, res) => {
 
   const results = { summary: '', bullets: [], articles: [], images: [], videos: [] };
 
-  // Primary: Multi-Engine Organic Web Search (Real platforms, official sites, tech blogs, documentation)
+  // Primary: Multi-Engine Organic Web Search (Google News RSS, DDG Lite/HTML, Wikipedia, HackerNews, OpenAlex)
   const ddgOrganicPromise = (async () => {
     try {
-      const organicArticles = await searchDuckDuckGoOrganic(targetTerm);
+      const organicArticles = await searchMultiEngineWeb(targetTerm);
       if (organicArticles && organicArticles.length > 0) {
         results.articles.push(...organicArticles);
         if (!results.summary && organicArticles[0].snippet) {
@@ -2047,7 +2135,7 @@ app.get('/api/live-search', async (req, res) => {
       );
       if (ddg) {
         if (ddg.AbstractText && !results.summary) results.summary = ddg.AbstractText;
-        if (ddg.Image && ddg.Image.startsWith('http') && !ddg.Image.includes('wikipedia') && !ddg.Image.includes('wikimedia')) {
+        if (ddg.Image && ddg.Image.startsWith('http') && !ddg.Image.includes('wikimedia')) {
           results.images.push({ src: ddg.Image, alt: ddg.Heading || query, link: ddg.AbstractURL || `https://duckduckgo.com/?q=${encoded}` });
         }
       }
@@ -2193,11 +2281,10 @@ app.get('/api/live-search', async (req, res) => {
     }
   }
 
-  // Remove duplicate articles by URL and strictly purge all Wikipedia / Wikimedia domains
+  // Remove duplicate articles by URL
   const seenUrls = new Set();
   results.articles = results.articles.filter(a => {
     if (!a.url || seenUrls.has(a.url)) return false;
-    if (a.url.includes('wikipedia.org') || a.url.includes('wikimedia.org')) return false;
     seenUrls.add(a.url);
     return true;
   });
@@ -2205,21 +2292,19 @@ app.get('/api/live-search', async (req, res) => {
   if (results.images) {
     results.images = results.images.filter(img => {
       if (!img.src) return false;
-      if (img.src.includes('wikipedia.org') || img.src.includes('wikimedia.org')) return false;
-      if (img.link && (img.link.includes('wikipedia.org') || img.link.includes('wikimedia.org'))) return false;
       return true;
     });
   }
 
-  // Prioritize organic websites, documentation, and official domains at the top
+  // Prioritize organic websites, news, documentation, and official domains
   results.articles.sort((a, b) => {
     const aIsAcademic = a.url.includes('arxiv.org') || a.url.includes('ncbi.nlm.nih.gov') || a.url.includes('openalex.org') || a.url.includes('crossref.org');
     const bIsAcademic = b.url.includes('arxiv.org') || b.url.includes('ncbi.nlm.nih.gov') || b.url.includes('openalex.org') || b.url.includes('crossref.org');
     if (!aIsAcademic && bIsAcademic) return -1;
     if (aIsAcademic && !bIsAcademic) return 1;
 
-    const aIsCollege = /\.(ac\.in|edu\.in|\.edu)\b/i.test(a.url || '');
-    const bIsCollege = /\.(ac\.in|edu\.in|\.edu)\b/i.test(b.url || '');
+    const aIsCollege = /\.(ac\.in|edu\.in|\.edu|\.gov|\.gov\.in)\b/i.test(a.url || '');
+    const bIsCollege = /\.(ac\.in|edu\.in|\.edu|\.gov|\.gov\.in)\b/i.test(b.url || '');
     if (aIsCollege && !bIsCollege) return -1;
     if (!aIsCollege && bIsCollege) return 1;
 

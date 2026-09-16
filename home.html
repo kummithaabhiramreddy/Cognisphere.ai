@@ -14782,27 +14782,100 @@
       const encoded = encodeURIComponent(query);
       const encodedWiki = encodeURIComponent(wikiQuery);
 
-      // 1. Try backend proxy first (fast, reliable, CORS-free, view sorted)
+      let results = { summary: '', bullets: [], articles: [], images: [], videos: [] };
+
+      // Helper for fetching client-side articles (100% CORS-friendly)
+      const fetchClientArticles = async () => {
+        const clientArticles = [];
+        const seenUrls = new Set();
+        const addArt = (title, snippet, url, source) => {
+          if (!url || !url.startsWith('http') || seenUrls.has(url)) return;
+          seenUrls.add(url);
+          let host = source || '';
+          try { if (!host) host = new URL(url).hostname.replace(/^www\./, ''); } catch (e) { }
+          clientArticles.push({
+            title: (title || host).replace(/<[^>]+>/g, '').trim(),
+            snippet: (snippet || '').replace(/<[^>]+>/g, '').slice(0, 160).trim(),
+            url,
+            source: host
+          });
+        };
+
+        const wikiP = fetch(`https://en.wikipedia.org/w/api.php?action=opensearch&search=${encodedWiki}&limit=4&namespace=0&format=json&origin=*`, {
+          signal: safeTimeoutSignal(4000)
+        }).then(r => r.json()).then(data => {
+          const titles = data[1] || [];
+          const snippets = data[2] || [];
+          const links = data[3] || [];
+          for (let i = 0; i < titles.length; i++) {
+            if (titles[i] && links[i]) addArt(titles[i], snippets[i] || `Encyclopedia reference for ${titles[i]}`, links[i], 'wikipedia.org');
+          }
+        }).catch(() => { });
+
+        const hnP = fetch(`https://hn.algolia.com/api/v1/search?query=${encoded}&tags=story&hitsPerPage=4`, {
+          signal: safeTimeoutSignal(4000)
+        }).then(r => r.json()).then(data => {
+          if (data && data.hits) {
+            for (const hit of data.hits) {
+              if (hit.title && hit.url) addArt(hit.title, `Technical analysis & community discussion (${hit.points || 0} pts)`, hit.url);
+            }
+          }
+        }).catch(() => { });
+
+        const oaP = fetch(`https://api.openalex.org/works?search=${encoded}&per-page=3`, {
+          signal: safeTimeoutSignal(4000)
+        }).then(r => r.json()).then(data => {
+          if (data && data.results) {
+            for (const work of data.results) {
+              if (work.title && (work.doi || work.id)) {
+                addArt(work.title, `Academic Paper (${work.publication_year || 'Research'}) — ${work.host_venue?.display_name || 'OpenAlex'}`, work.doi || work.id, 'openalex.org');
+              }
+            }
+          }
+        }).catch(() => { });
+
+        await Promise.allSettled([wikiP, hnP, oaP]);
+        return clientArticles;
+      };
+
+      // 1. Try backend proxy first (fast, reliable, view sorted)
       try {
         const res = await fetch(`${API_BASE}/api/live-search?q=${encoded}&lang=${langCode}`, {
-          signal: safeTimeoutSignal(12000)
+          signal: safeTimeoutSignal(8000)
         });
         if (res.ok) {
           const data = await res.json();
-          if (data && (data.summary || data.articles?.length || data.videos?.length || data.images?.length)) {
-            return data;
+          if (data) {
+            results = data;
+            if (!results.articles) results.articles = [];
+            if (!results.videos) results.videos = [];
+            if (!results.images) results.images = [];
+
+            // If backend returned fewer than 2 articles, augment seamlessly with client-side fallback
+            if (results.articles.length < 2) {
+              const extraArts = await fetchClientArticles();
+              for (const a of extraArts) {
+                if (!results.articles.some(existing => existing.url === a.url)) {
+                  results.articles.push(a);
+                }
+              }
+            }
+            return results;
           }
         }
       } catch (err) {
         console.warn('Backend live search unavailable, falling back to client-side fetching:', err.message);
       }
 
-      const results = { summary: '', bullets: [], articles: [], images: [], videos: [] };
+      // 2. Client-side Fallbacks (Runs if backend fails or is unreachable)
+      const clientArts = await fetchClientArticles();
+      results.articles.push(...clientArts);
 
       // 3. Wikidata Fallback (CORS safe with origin=*)
       try {
         const wd = await fetch(
-          `https://www.wikidata.org/w/api.php?action=wbsearchentities&search=${encoded}&language=en&format=json&origin=*`
+          `https://www.wikidata.org/w/api.php?action=wbsearchentities&search=${encoded}&language=en&format=json&origin=*`,
+          { signal: safeTimeoutSignal(3500) }
         ).then(r => r.json());
         if (wd && wd.search && wd.search.length > 0) {
           for (const item of wd.search.slice(0, 3)) {
@@ -14835,12 +14908,13 @@
           }
         });
       } else if (!isExplicitImgQ) {
-        // Never dump unrelated images for non-image queries
         results.images = [];
       }
 
-      // 5. Invidious YouTube videos Fallback
-      results.videos = await fetchYouTubeVideos(query, langCode);
+      // 5. YouTube videos Fallback
+      if (!results.videos || results.videos.length === 0) {
+        results.videos = await fetchYouTubeVideos(query, langCode);
+      }
 
       return results;
     }
@@ -14848,40 +14922,11 @@
     // ====== CITATION PILL & HIGH-LEVEL LIVE BROWSER LAUNCHER ======
     function buildInlineCitationPill(articles) {
       if (!articles || !articles.length) return '';
-
-      // Filter valid articles and prioritize high-relevance official & educational sources
       const validArticles = articles.filter(a => a && a.url && a.url.startsWith('http'));
-      if (!validArticles.length) return '';
-
-      const scoredArticles = [...validArticles].sort((a, b) => {
-        const getScore = (item) => {
-          let score = 0;
-          try {
-            const host = new URL(item.url).hostname.toLowerCase();
-            const fullUrl = item.url.toLowerCase();
-            // Official institution, government, and educational domains
-            if (host.endsWith('.edu') || host.endsWith('.ac.in') || host.endsWith('.gov') || host.endsWith('.gov.in') || host.endsWith('.edu.in')) score += 50;
-            if (host.includes('wikipedia.org') || host.includes('britannica.com')) score += 40;
-            if (host.includes('developer.mozilla.org') || host.includes('w3schools.com') || host.includes('geeksforgeeks.org') || host.includes('github.com') || host.includes('python.org') || host.includes('nodejs.org')) score += 45;
-            if (host.includes('nature.com') || host.includes('sciencedirect.com') || host.includes('ieee.org')) score += 35;
-            // Penalize obscure or duplicate PMC IDs for general topics
-            if (fullUrl.includes('/pmc/articles/')) score -= 20;
-          } catch (e) { }
-          return score;
-        };
-        return getScore(b) - getScore(a);
-      });
-
-      const validScored = scoredArticles.filter(a => {
-        if (!a || !a.url) return false;
-        const u = a.url.toLowerCase();
-        return !u.includes('wikipedia.org') && !u.includes('wikimedia.org');
-      });
-      return validScored;
+      return validArticles;
     }
 
     // ── AUTHORITATIVE PLATFORM WHITELIST ──────────────────────────────────────
-    // Only main, trusted platforms are shown. Useless/low-quality domains are excluded.
     const TRUSTED_PLATFORMS = [
       'github.com','stackoverflow.com','developer.mozilla.org','mdn.web.docs',
       'docs.python.org','reactjs.org','nodejs.org','npmjs.com','pypi.org',
@@ -14897,7 +14942,7 @@
       'kubernetes.io','docker.com','linux.org','ubuntu.com',
       'vercel.com','netlify.com','heroku.com','supabase.com','firebase.google.com',
       'neetcode.io','leetcode.com','hackerrank.com','codeforces.com',
-      'britannica.com','nationalgeographic.com','bbc.com','reuters.com','apnews.com',
+      'britannica.com','wikipedia.org','nationalgeographic.com','bbc.com','reuters.com','apnews.com',
       'who.int','cdc.gov','nih.gov','nasa.gov','un.org','gov.in'
     ];
 
@@ -14907,12 +14952,9 @@
     function buildChatGptStyleSources(articles) {
       if (!articles || !articles.length) return '';
 
-      // Filter: exclude search engines, aggregators, low-quality domains
+      // Filter: exclude tracking or ad links
       const BLOCKLIST = [
-        'wikipedia.org','wikimedia.org','duckduckgo.com','bing.com',
-        'google.com','yahoo.com','ask.com','answers.com','quora.com',
-        'pinterest.com','reddit.com','twitter.com','x.com','facebook.com',
-        'instagram.com','tiktok.com','scribd.com','slideshare.net'
+        'duckduckgo.com/y.js','bing.com/aclick','google.com/aclk'
       ];
 
       const valid = articles.filter(a => {
@@ -14927,7 +14969,6 @@
       valid.forEach(art => {
         let domain = 'web';
         try { domain = new URL(art.url).hostname.replace(/^www\./, ''); } catch(e) {}
-        // Use registered domain (last 2 parts) as group key for sub-domains
         const parts = domain.split('.');
         const groupKey = parts.length >= 2 ? parts.slice(-2).join('.') : domain;
         if (!platformMap.has(groupKey)) platformMap.set(groupKey, { domain, articles: [] });
@@ -15001,7 +15042,6 @@
       const pop = document.getElementById('pop-' + pillId);
       if (!pill || !pop) return;
       const isOpen = pop.classList.contains('open');
-      // Close all other popovers
       document.querySelectorAll('.src-pill-popover.open').forEach(p => {
         p.classList.remove('open');
         const parentPill = p.closest('.src-platform-pill');
@@ -15020,10 +15060,6 @@
         if (parentPill) parentPill.setAttribute('aria-expanded', 'false');
       });
     });
-
-    function buildInlineCitationPill(articles) {
-      return '';
-    }
 
     function buildRelatedSourceLinks(articles) {
       if (!articles || !articles.length) return '';
@@ -16308,7 +16344,7 @@ Building interactive websites, HTML applications, and frontend UI dashboards is 
             const tempDiv = document.createElement('div');
             tempDiv.innerHTML = result.text;
             const sourceParts = [];
-            tempDiv.querySelectorAll('.chat-citation-pill, .web-result-card, .video-pill-wrap, .query-image-gallery-wrap, .image-gallery-container').forEach(el => {
+            tempDiv.querySelectorAll('.chat-sources-shelf, .src-platform-pill, .chat-citation-pill, .web-result-card, .video-pill-wrap, .query-image-gallery-wrap, .image-gallery-container, .ai-inline-image-grid').forEach(el => {
               sourceParts.push(el.outerHTML);
             });
             // Also check for web result sections at end that aren't in markdown
@@ -16330,7 +16366,7 @@ Building interactive websites, HTML applications, and frontend UI dashboards is 
             const tempDiv2 = document.createElement('div');
             tempDiv2.innerHTML = result.text;
             const sp2 = [];
-            tempDiv2.querySelectorAll('.chat-citation-pill, .web-result-card, .video-pill-wrap, .query-image-gallery-wrap, .image-gallery-container').forEach(el => {
+            tempDiv2.querySelectorAll('.chat-sources-shelf, .src-platform-pill, .chat-citation-pill, .web-result-card, .video-pill-wrap, .query-image-gallery-wrap, .image-gallery-container, .ai-inline-image-grid').forEach(el => {
               sp2.push(el.outerHTML);
             });
             if (sp2.length > 0) pendingMsg._webSourcesHtml = sp2.join('');
@@ -17868,6 +17904,8 @@ d----        13-09-2026     10:30                api
           (/^[\s\n]*<(?:div|table|ul|ol|p|section|article|pre|figure|header|main)\b/i.test(rawText.trim()) ||
             rawText.includes('class="code-card-wrap"') ||
             rawText.includes('class="web-result-card"') ||
+            rawText.includes('class="chat-sources-shelf"') ||
+            rawText.includes('class="src-platform-pill"') ||
             rawText.includes('class="chat-citation-pill"'))
         );
 
