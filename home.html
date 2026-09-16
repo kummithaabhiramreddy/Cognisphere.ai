@@ -1218,200 +1218,156 @@
       flex-shrink: 0;
     }
 
-    /* ── ATTACHMENT CARDS ── */
+    /* ─── ULTRA-PREMIUM ATTACHMENT TRAY (CHATGPT / CLAUDE / ANTIGRAVITY GRADE) ─── */
     .attached-files {
       display: flex;
       flex-wrap: nowrap;
-      align-items: flex-start;
+      align-items: center;
       gap: 10px;
       width: 100%;
       max-height: 0;
       opacity: 0;
       overflow: hidden;
       margin-bottom: 0;
-      transition: max-height .25s, opacity .2s, margin-bottom .25s;
+      transition: max-height 0.28s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.22s ease, margin-bottom 0.28s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
     .attached-files.has-files {
-      max-height: 250px;
+      max-height: 110px;
       opacity: 1;
-      margin-bottom: 10px;
+      margin-bottom: 12px;
       overflow-x: auto;
       overflow-y: hidden;
-      padding-bottom: 4px;
-      scrollbar-width: none;
+      padding: 4px 2px 8px 2px;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(255, 255, 255, 0.15) transparent;
     }
 
     .attached-files::-webkit-scrollbar {
-      display: none;
+      height: 4px;
+    }
+    .attached-files::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.18);
+      border-radius: 4px;
     }
 
     .attach-card {
       position: relative;
       flex-shrink: 0;
-      width: 190px;
+      height: 54px;
+      min-width: 185px;
+      max-width: 250px;
       display: flex;
-      flex-direction: column;
+      align-items: center;
       gap: 10px;
-      background: var(--bg-lift);
-      border: 1px solid var(--border-m);
-      border-radius: 14px;
-      padding: 12px;
+      background: rgba(18, 22, 31, 0.88);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 12px;
+      padding: 7px 10px 7px 8px;
       cursor: pointer;
-      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
-      transition: border-color .15s, transform .15s, box-shadow .15s;
+      box-shadow: 0 4px 18px rgba(0, 0, 0, 0.35);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      user-select: none;
     }
 
     .attach-card:hover {
-      border-color: var(--accent);
+      border-color: rgba(255, 255, 255, 0.28);
+      background: rgba(26, 32, 45, 0.96);
       transform: translateY(-2px);
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+      box-shadow: 0 8px 26px rgba(0, 0, 0, 0.5);
     }
 
-    .attach-card .chip-remove {
-      position: absolute;
-      top: 7px;
-      right: 7px;
-      z-index: 2;
+    .attach-card-icon-box {
+      width: 38px;
+      height: 38px;
+      border-radius: 9px;
       flex-shrink: 0;
-      width: 18px;
-      height: 18px;
-      border-radius: 50%;
-      border: none;
-      background: rgba(0, 0, 0, 0.5);
-      color: var(--text-2);
       display: flex;
       align-items: center;
       justify-content: center;
-      cursor: pointer;
-      font-size: 0.6rem;
-      padding: 0;
-      transition: background .15s, color .15s;
-    }
-
-    .attach-card .chip-remove:hover {
-      background: rgba(224, 85, 85, 0.25);
-      color: #e05555;
-    }
-
-    .attach-card-preview {
-      width: 100%;
-      height: 108px;
-      border-radius: 10px;
-      overflow: hidden;
-      background: var(--bg-card);
       position: relative;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .attach-card-preview.is-text {
-      align-items: flex-start;
-      justify-content: flex-start;
-      padding: 9px 10px;
-      display: block;
-    }
-
-    .attach-card-code {
+      overflow: hidden;
       font-family: 'JetBrains Mono', monospace;
-      font-size: 0.63rem;
-      line-height: 1.55;
-      color: var(--text-2);
-      white-space: pre-wrap;
-      word-break: break-word;
+      font-weight: 700;
+      font-size: 0.65rem;
+      letter-spacing: 0.04em;
     }
 
-    .attach-card-code .tok-tag {
-      color: var(--accent);
-    }
-
-    .attach-card-code .tok-str {
-      color: var(--teal);
-    }
-
-    .attach-card-preview.is-text::after {
-      content: '';
-      position: absolute;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      height: 34px;
-      background: linear-gradient(180deg, transparent, var(--bg-card));
-      pointer-events: none;
-    }
-
-    .attach-card-preview img {
+    .attach-card-icon-box img {
       width: 100%;
       height: 100%;
       object-fit: cover;
       display: block;
-      pointer-events: none;
     }
 
-    .attach-card-play {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      width: 32px;
-      height: 32px;
-      border-radius: 50%;
-      background: rgba(0, 0, 0, 0.55);
-      border: 1px solid rgba(255, 255, 255, 0.12);
+    .attach-card-meta {
       display: flex;
-      align-items: center;
-      justify-content: center;
-      color: var(--text);
-    }
-
-    .attach-card-play svg {
-      width: 12px;
-      height: 12px;
-      margin-left: 2px;
-    }
-
-    .attach-card-glyph {
-      color: var(--accent);
-      font-family: 'JetBrains Mono', monospace;
-      font-weight: 700;
-      font-size: 1rem;
-    }
-
-    .attach-card-loading {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.63rem;
-      color: var(--text-3);
-    }
-
-    .attach-card-footer {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 8px;
-    }
-
-    .attach-card-badge {
-      flex-shrink: 0;
-      padding: 5px 10px;
-      border-radius: 7px;
-      border: 1px solid var(--border-m);
-      background: transparent;
-      font-size: 0.64rem;
-      font-weight: 700;
-      letter-spacing: .05em;
-      text-transform: uppercase;
-      color: var(--text);
+      flex-direction: column;
+      min-width: 0;
+      flex: 1;
+      gap: 2px;
     }
 
     .attach-card-name {
-      min-width: 0;
+      font-size: 0.80rem;
+      font-weight: 600;
+      color: #f0f3f6;
+      white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
-      white-space: nowrap;
+      line-height: 1.25;
+    }
+
+    .attach-card-sub {
       font-size: 0.67rem;
-      color: var(--text-2);
-      text-align: right;
+      color: #8b949e;
+      font-family: 'JetBrains Mono', monospace;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .attach-card-sub .badge-dot {
+      display: inline-block;
+      width: 3px;
+      height: 3px;
+      border-radius: 50%;
+      background: #8b949e;
+      opacity: 0.6;
+    }
+
+    .attach-card .chip-remove {
+      position: absolute;
+      top: -6px;
+      right: -6px;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: #1c212c;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #c9d1d9;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 0.62rem;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+      opacity: 0.85;
+      transition: all 0.15s ease;
+      z-index: 3;
+    }
+
+    .attach-card .chip-remove:hover {
+      background: #ef4444;
+      border-color: #ef4444;
+      color: #ffffff;
+      opacity: 1;
+      transform: scale(1.12);
     }
 
     /* ── MAIN + HERO ── */
@@ -1857,75 +1813,495 @@
     }
 
     /* Small cards (images / files in message) */
+    
+    /* ─── MESSAGE ATTACHMENT CARDS (CLAUDE / CHATGPT GRADE) ─── */
     .msg-small-cards-wrap {
       display: flex;
       flex-wrap: wrap;
-      gap: 8px;
-      margin-bottom: 8px;
+      gap: 10px;
+      margin-bottom: 12px;
+      width: 100%;
     }
 
-    .msg-small-card {
+    .msg-small-card, .msg-file-card {
       display: inline-flex;
       align-items: center;
-      gap: 8px;
-      padding: 6px 12px;
-      background: var(--bg-lift);
-      border: 1px solid var(--border-m);
-      border-radius: 10px;
+      gap: 12px;
+      padding: 10px 14px;
+      background: rgba(18, 22, 31, 0.85);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 14px;
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
       cursor: pointer;
-      transition: all 0.2s;
-      max-width: 260px;
+      min-width: 220px;
+      max-width: 380px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.28);
+      transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
       user-select: none;
+      position: relative;
     }
 
-    .msg-small-card:hover {
-      background: rgba(217, 119, 87, 0.1);
-      border-color: var(--accent);
-      transform: translateY(-1px);
+    .msg-small-card:hover, .msg-file-card:hover {
+      background: rgba(28, 35, 49, 0.95);
+      border-color: rgba(255, 255, 255, 0.28);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
     }
 
-    .msg-small-card-thumb {
-      width: 28px;
-      height: 28px;
-      border-radius: 6px;
-      object-fit: cover;
-      background: var(--bg-card);
-      flex-shrink: 0;
+    .msg-file-icon-box, .msg-small-card-thumb {
+      width: 42px;
+      height: 42px;
+      border-radius: 10px;
       display: flex;
       align-items: center;
       justify-content: center;
-      color: var(--accent);
+      flex-shrink: 0;
+      position: relative;
+      overflow: hidden;
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 700;
+      font-size: 0.68rem;
     }
 
-    .msg-small-card-thumb img {
+    .msg-file-icon-box img, .msg-small-card-thumb img {
       width: 100%;
       height: 100%;
-      border-radius: 6px;
       object-fit: cover;
+      display: block;
     }
 
-    .msg-small-card-info {
+    .msg-file-info, .msg-small-card-info {
       display: flex;
       flex-direction: column;
-      overflow: hidden;
       min-width: 0;
+      flex: 1;
+      gap: 3px;
     }
 
-    .msg-small-card-title {
-      font-size: 0.75rem;
+    .msg-file-name, .msg-small-card-title {
+      font-size: 0.84rem;
       font-weight: 600;
-      color: var(--text);
+      color: #f0f3f6;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      line-height: 1.3;
+    }
+
+    .msg-file-meta, .msg-small-card-badge {
+      font-size: 0.69rem;
+      color: #8b949e;
+      font-family: 'JetBrains Mono', monospace;
+      display: flex;
+      align-items: center;
+      gap: 5px;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
     }
 
-    .msg-small-card-badge {
-      font-size: 0.61rem;
-      color: var(--accent-s);
-      font-family: 'JetBrains Mono', monospace;
-      opacity: 0.85;
+    .msg-file-actions {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-left: auto;
+      opacity: 0.75;
+      transition: opacity 0.15s;
     }
+
+    .msg-file-card:hover .msg-file-actions, .msg-small-card:hover .msg-file-actions {
+      opacity: 1;
+    }
+
+    .msg-file-action-btn {
+      width: 28px;
+      height: 28px;
+      border-radius: 7px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: #c9d1d9;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .msg-file-action-btn:hover {
+      background: rgba(255, 255, 255, 0.18);
+      color: #ffffff;
+      border-color: rgba(255, 255, 255, 0.3);
+      transform: scale(1.08);
+    }
+
+    /* Message Image Card (High-res Lightbox Card) */
+    .msg-image-card {
+      position: relative;
+      border-radius: 14px;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      max-width: 320px;
+      max-height: 220px;
+      cursor: pointer;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
+      background: #090d14;
+      transition: all 0.2s ease;
+    }
+
+    .msg-image-card:hover {
+      border-color: rgba(255, 255, 255, 0.3);
+      transform: translateY(-2px);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    }
+
+    .msg-image-card img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: transform 0.3s ease;
+    }
+
+    .msg-image-card:hover img {
+      transform: scale(1.03);
+    }
+
+    .msg-image-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(0,0,0,0) 45%, rgba(0,0,0,0.85) 100%);
+      display: flex;
+      align-items: flex-end;
+      padding: 10px 12px;
+      opacity: 0.9;
+      transition: opacity 0.2s;
+    }
+
+    .msg-image-caption {
+      font-size: 0.72rem;
+      font-weight: 500;
+      color: #e6edf3;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+    }
+
+    .msg-image-zoom-badge {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      padding: 4px 8px;
+      border-radius: 6px;
+      background: rgba(0, 0, 0, 0.65);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: #f0f6fc;
+      font-size: 0.65rem;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      opacity: 0;
+      transform: translateY(-4px);
+      transition: all 0.2s ease;
+    }
+
+    .msg-image-card:hover .msg-image-zoom-badge {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* ─── ARTIFACT & DOCUMENT VIEWER MODAL ─── */
+    .doc-viewer-card {
+      width: 100%;
+      max-width: 960px;
+      height: 84vh;
+      max-height: 850px;
+      background: #0d1117;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      border-radius: 18px;
+      box-shadow: 0 24px 70px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(255, 255, 255, 0.05);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      transform: scale(0.96);
+      transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .modal-overlay.open .doc-viewer-card {
+      transform: scale(1);
+    }
+
+    .doc-viewer-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 20px;
+      background: rgba(22, 27, 34, 0.95);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      flex-shrink: 0;
+      gap: 16px;
+    }
+
+    .doc-viewer-title-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+      flex: 1;
+    }
+
+    .doc-viewer-badge {
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      background: rgba(56, 189, 248, 0.15);
+      border: 1px solid rgba(56, 189, 248, 0.35);
+      color: #38bdf8;
+      flex-shrink: 0;
+    }
+
+    .doc-viewer-title-meta {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+
+    .doc-viewer-title {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: #f0f6fc;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .doc-viewer-meta-row {
+      font-size: 0.70rem;
+      color: #8b949e;
+      font-family: 'JetBrains Mono', monospace;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .doc-viewer-meta-dot {
+      color: rgba(255, 255, 255, 0.2);
+    }
+
+    .doc-viewer-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+
+    .doc-viewer-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(255, 255, 255, 0.05);
+      color: #c9d1d9;
+      font-size: 0.78rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      text-decoration: none;
+    }
+
+    .doc-viewer-btn:hover {
+      background: rgba(255, 255, 255, 0.12);
+      border-color: rgba(255, 255, 255, 0.25);
+      color: #ffffff;
+      transform: translateY(-1px);
+    }
+
+    .doc-viewer-btn-primary {
+      background: #00ffaa;
+      border-color: #00ffaa;
+      color: #050810;
+      font-weight: 600;
+    }
+
+    .doc-viewer-btn-primary:hover {
+      background: #00e699;
+      border-color: #00e699;
+      color: #050810;
+    }
+
+    .doc-viewer-close-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      background: transparent;
+      border: 1px solid transparent;
+      color: #8b949e;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .doc-viewer-close-btn:hover {
+      background: rgba(239, 68, 68, 0.15);
+      color: #ef4444;
+      border-color: rgba(239, 68, 68, 0.3);
+    }
+
+    .doc-viewer-body {
+      flex: 1;
+      overflow: hidden;
+      position: relative;
+      background: #090d14;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Code & Text Viewer with Line Numbers */
+    .doc-code-viewer-container {
+      flex: 1;
+      display: flex;
+      overflow: auto;
+      font-family: 'JetBrains Mono', 'Fira Code', monospace;
+      font-size: 0.82rem;
+      line-height: 1.6;
+      background: #050810;
+    }
+
+    .doc-code-gutter {
+      padding: 16px 12px 16px 16px;
+      text-align: right;
+      color: #484f58;
+      user-select: none;
+      border-right: 1px solid rgba(255, 255, 255, 0.08);
+      background: #070b12;
+      flex-shrink: 0;
+      font-size: 0.78rem;
+    }
+
+    .doc-code-gutter-line {
+      line-height: 1.6;
+    }
+
+    .doc-code-content {
+      padding: 16px 20px;
+      flex: 1;
+      color: #e6edf3;
+      white-space: pre;
+      overflow-x: auto;
+      tab-size: 4;
+      margin: 0;
+    }
+
+    .doc-code-content.wrap-lines {
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .doc-edit-area {
+      flex: 1;
+      width: 100%;
+      height: 100%;
+      background: #050810;
+      color: #e6edf3;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.82rem;
+      line-height: 1.6;
+      padding: 16px 20px;
+      border: none;
+      outline: none;
+      resize: none;
+      tab-size: 4;
+    }
+
+    /* CSV / Spreadsheet Table Viewer */
+    .doc-table-viewer-wrap {
+      flex: 1;
+      overflow: auto;
+      padding: 16px;
+      background: #050810;
+    }
+
+    .doc-table-viewer {
+      width: 100%;
+      border-collapse: collapse;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.78rem;
+      color: #c9d1d9;
+    }
+
+    .doc-table-viewer th {
+      background: #161b22;
+      color: #58a6ff;
+      font-weight: 600;
+      padding: 8px 14px;
+      text-align: left;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      position: sticky;
+      top: 0;
+      z-index: 2;
+    }
+
+    .doc-table-viewer td {
+      padding: 7px 14px;
+      border: 1px solid rgba(255, 255, 255, 0.07);
+      white-space: nowrap;
+    }
+
+    .doc-table-viewer tr:nth-child(even) {
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    .doc-table-viewer tr:hover {
+      background: rgba(56, 189, 248, 0.08);
+    }
+
+    /* Image Viewer */
+    .doc-image-viewer-container {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      overflow: auto;
+      background: radial-gradient(circle at center, #111722 0%, #05070a 100%);
+    }
+
+    .doc-image-viewer-container img {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+      border-radius: 10px;
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      transition: transform 0.2s ease;
+    }
+
+    /* PDF Reader Container */
+    .doc-pdf-viewer-container {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      background: #050810;
+      overflow: hidden;
+    }
+
+    .doc-pdf-iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+
 
     /* Message actions (visible action bar) */
     .msg-actions {
@@ -12418,66 +12794,80 @@
     </div>
   </div>
 
-  <!-- Image / video / file preview modal -->
-  <div class="modal-overlay" id="mediaModal">
-    <div class="download-card" id="mediaModalCard" style="max-width:560px; padding:0; overflow:hidden;">
-      <div class="download-card-head" style="padding:16px 16px 0;">
-        <span class="download-card-title" id="mediaModalTitle">Attachment</span>
-        <button class="header-btn" id="closeMediaModal" aria-label="Close">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-            stroke-linejoin="round">
-            <line x1="18" y1="6" x2="6" y2="18"></line>
-            <line x1="6" y1="6" x2="18" y2="18"></line>
-          </svg>
-        </button>
-      </div>
-      <div id="mediaModalBody" style="padding:16px;"></div>
-    </div>
-  </div>
+  <!-- ════════════════════════════════════════════════════════════════════════
+       ULTRA-PREMIUM ARTIFACT & DOCUMENT VIEWER MODAL (CLAUDE / CHATGPT / ANTIGRAVITY GRADE)
+       ════════════════════════════════════════════════════════════════════════ -->
+  <div class="modal-overlay" id="docViewerModal">
+    <div class="doc-viewer-card" id="docViewerCard">
+      <!-- Modal Header -->
+      <div class="doc-viewer-head">
+        <div class="doc-viewer-title-group">
+          <span class="doc-viewer-badge" id="docViewerBadge">PDF</span>
+          <div class="doc-viewer-title-meta">
+            <span class="doc-viewer-title" id="docViewerTitle">filename.pdf</span>
+            <div class="doc-viewer-meta-row" id="docViewerMeta">
+              <span id="docViewerSize">1.2 MB</span>
+              <span class="doc-viewer-meta-dot">•</span>
+              <span id="docViewerType">PDF Document</span>
+            </div>
+          </div>
+        </div>
 
-  <!-- Pasted text preview / edit modal -->
-  <div class="modal-overlay" id="pasteModal">
-    <div class="paste-card">
-      <div class="paste-card-head">
-        <span class="paste-card-title" id="pasteModalTitle">Pasted text</span>
-        <div class="paste-card-head-actions">
-          <button class="paste-card-btn" id="pasteModalEditBtn">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-              stroke-linejoin="round">
-              <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"></path>
-              <path d="M18.5 2.5a2.12 2.12 0 013 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-            </svg>
+        <div class="doc-viewer-actions">
+          <!-- Wrap Toggle (for code/text) -->
+          <button type="button" class="doc-viewer-btn" id="docViewerWrapBtn" title="Toggle Word Wrap">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h10a4 4 0 0 1 0 8h-1M4 18h6"/><polyline points="16 17 13 20 16 23"/></svg>
+            <span>Wrap</span>
+          </button>
+          
+          <!-- Edit button (for text/code attachments) -->
+          <button type="button" class="doc-viewer-btn" id="docViewerEditBtn" style="display:none;" title="Edit Content">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"></path><path d="M18.5 2.5a2.12 2.12 0 013 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
             <span>Edit</span>
           </button>
-          <button class="paste-card-save-btn" id="pasteModalSaveBtn" style="display:none;">
-            <svg viewBox="0 0 24 24" fill="none" stroke="#0A0C10" stroke-width="2" stroke-linecap="round"
-              stroke-linejoin="round">
-              <path d="M20 6L9 17l-5-5"></path>
-            </svg>
+          
+          <!-- Save button (when editing) -->
+          <button type="button" class="doc-viewer-btn doc-viewer-btn-primary" id="docViewerSaveBtn" style="display:none;" title="Save Changes">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"></path></svg>
             <span>Save</span>
           </button>
-          <button class="paste-card-copy-btn" id="pasteModalCopyBtn">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-              stroke-linejoin="round">
-              <rect x="9" y="9" width="13" height="13" rx="2"></rect>
-              <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"></path>
-            </svg>
+
+          <!-- Copy Button -->
+          <button type="button" class="doc-viewer-btn" id="docViewerCopyBtn" title="Copy Content to Clipboard">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"></rect><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"></path></svg>
             <span>Copy</span>
           </button>
-          <button class="header-btn" id="closePasteModal" aria-label="Close">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-              stroke-linejoin="round">
+
+          <!-- Download Button -->
+          <button type="button" class="doc-viewer-btn" id="docViewerDownloadBtn" title="Download File">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+            <span>Download</span>
+          </button>
+
+          <!-- Pop-out / Open Original Link Button -->
+          <a class="doc-viewer-btn" id="docViewerOpenLink" target="_blank" rel="noopener" style="display:none;" title="Open in New Tab">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+            <span>Open</span>
+          </a>
+
+          <!-- Close Button -->
+          <button type="button" class="header-btn doc-viewer-close-btn" id="closeDocViewerModal" aria-label="Close">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <line x1="18" y1="6" x2="6" y2="18"></line>
               <line x1="6" y1="6" x2="18" y2="18"></line>
             </svg>
           </button>
         </div>
       </div>
-      <div class="paste-card-sub" id="pasteModalSub"></div>
-      <div class="paste-lines" id="pasteModalLines"></div>
-      <textarea class="paste-edit-area" id="pasteModalEditArea" spellcheck="false"></textarea>
+
+      <!-- Modal Body (Dynamic Render Container) -->
+      <div class="doc-viewer-body" id="docViewerBody"></div>
     </div>
   </div>
+
+  <!-- Compatibility aliases for legacy DOM references -->
+  <div class="modal-overlay" id="mediaModal" style="display:none;"><div id="mediaModalCard"><span id="mediaModalTitle"></span><button id="closeMediaModal"></button><div id="mediaModalBody"></div></div></div>
+  <div class="modal-overlay" id="pasteModal" style="display:none;"><div id="pasteModalTitle"></div><div id="pasteModalSub"></div><div id="pasteModalLines"></div><textarea id="pasteModalEditArea"></textarea><button id="pasteModalEditBtn"><span>Edit</span></button><button id="pasteModalSaveBtn"></button><button id="pasteModalCopyBtn"><span>Copy</span></button><button id="closePasteModal"></button></div>
 
   <header>
     <button class="header-btn" id="openSidebar" aria-label="Open history">
@@ -18077,51 +18467,98 @@ d----        13-09-2026     10:30                api
           cardsWrap.className = 'msg-small-cards-wrap';
 
           m.attachments.forEach(a => {
-            const card = document.createElement('div');
-            card.className = 'msg-small-card';
-
-            const thumb = document.createElement('div');
-            thumb.className = 'msg-small-card-thumb';
-
-            const isImg = Boolean(a.isImage || a.kind === 'image' || (a.mimeType && a.mimeType.startsWith('image/')) || /\.(png|jpe?g|gif|webp|bmp|svg)$/i.test(a.name || a.label || '') || (a.dataUrl && typeof a.dataUrl === 'string' && a.dataUrl.startsWith('data:image')) || (a.url && typeof a.url === 'string' && (a.url.startsWith('data:image') || a.url.startsWith('blob:'))));
+            const fileName = a.name || a.label || (a.kind === 'text' ? 'Pasted text' : 'Attachment');
+            const isImg = Boolean(a.isImage || a.kind === 'image' || (a.mimeType && a.mimeType.startsWith('image/')) || /\.(png|jpe?g|gif|webp|bmp|svg)$/i.test(fileName) || (a.dataUrl && typeof a.dataUrl === 'string' && a.dataUrl.startsWith('data:image')) || (a.url && typeof a.url === 'string' && (a.url.startsWith('data:image') || a.url.startsWith('blob:'))));
             const imgSrc = a.dataUrl || a.url || a.thumbnail;
-            const isPdfFile = Boolean(a.isPdf || (a.mimeType && a.mimeType.includes('pdf')) || /\.(pdf)$/i.test(a.name || a.label || ''));
+            const isPdfFile = Boolean(a.isPdf || (a.mimeType && a.mimeType.includes('pdf')) || /\.(pdf)$/i.test(fileName));
+            const isVid = Boolean(a.isVideo || (a.mimeType && a.mimeType.startsWith('video/')));
+            const isTxt = a.kind === 'text';
 
+            const meta = getFileFormatMeta(fileName, a.mimeType, isImg, isVid, isPdfFile, isTxt);
+            const sizeStr = a.size ? formatFileSize(a.size) : (isTxt ? `${a.lineCount || (a.content ? a.content.split('\n').length : 1)} lines` : '');
+
+            // 1. IMAGE ATTACHMENT: High-res Lightbox Card
             if (isImg && imgSrc) {
-              thumb.innerHTML = `<img src="${imgSrc}" alt="${a.label || a.name || 'Image'}" />`;
-            } else if (isPdfFile) {
-              thumb.innerHTML = `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="#ff4d4d" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>`;
-            } else if (a.isVideo) {
-              thumb.innerHTML = `<svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><polygon points="5,3 19,12 5,21"/></svg>`;
-            } else if (a.kind === 'text') {
-              thumb.innerHTML = `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"></rect><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"></path></svg>`;
-            } else {
-              thumb.innerHTML = `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>`;
+              const imgCard = document.createElement('div');
+              imgCard.className = 'msg-image-card';
+              imgCard.title = `Click to zoom: ${fileName}`;
+              imgCard.innerHTML = `
+                <img src="${imgSrc}" alt="${fileName}" loading="lazy" />
+                <div class="msg-image-overlay">
+                  <span class="msg-image-caption">${fileName}</span>
+                </div>
+                <div class="msg-image-zoom-badge">
+                  <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line><line x1="11" y1="8" x2="11" y2="14"></line><line x1="8" y1="11" x2="14" y2="11"></line></svg>
+                  <span>Preview</span>
+                </div>
+              `;
+              imgCard.addEventListener('click', () => openUnifiedDocViewer(a, true));
+              cardsWrap.appendChild(imgCard);
+              return;
             }
 
+            // 2. DOCUMENT / CODE / DATA FILE ATTACHMENT CARD
+            const card = document.createElement('div');
+            card.className = 'msg-file-card';
+            card.title = `Click to view ${fileName}`;
+
+            // Left Icon Plate
+            const iconBox = document.createElement('div');
+            iconBox.className = 'msg-file-icon-box';
+            iconBox.style.background = meta.themeBg;
+            iconBox.style.border = `1px solid ${meta.themeBorder}`;
+            iconBox.style.color = meta.themeColor;
+            iconBox.innerHTML = meta.iconSvg || `<span style="color:${meta.themeColor}">${meta.ext}</span>`;
+            card.appendChild(iconBox);
+
+            // Info Stack
             const info = document.createElement('div');
-            info.className = 'msg-small-card-info';
+            info.className = 'msg-file-info';
 
             const title = document.createElement('span');
-            title.className = 'msg-small-card-title';
-            title.textContent = a.label || a.name || (a.kind === 'text' ? 'Pasted Text' : 'Attachment');
-
-            const badge = document.createElement('span');
-            badge.className = 'msg-small-card-badge';
-            badge.textContent = isImg ? 'IMAGE • CLICK TO PREVIEW' : (isPdfFile ? 'PDF DOCUMENT • CLICK TO READ' : (a.isVideo ? 'VIDEO • CLICK TO PLAY' : (a.kind === 'text' ? 'TEXT • CLICK TO VIEW' : 'FILE • CLICK TO OPEN')));
-
+            title.className = 'msg-file-name';
+            title.textContent = fileName;
             info.appendChild(title);
-            info.appendChild(badge);
 
-            card.appendChild(thumb);
+            const metaRow = document.createElement('span');
+            metaRow.className = 'msg-file-meta';
+            metaRow.innerHTML = `<span style="color:${meta.themeColor}; font-weight:600;">${meta.label || meta.ext}</span>` + (sizeStr ? `<span>•</span><span>${sizeStr}</span>` : '');
+            info.appendChild(metaRow);
+
             card.appendChild(info);
 
+            // Action Buttons
+            const actions = document.createElement('div');
+            actions.className = 'msg-file-actions';
+
+            // Preview Eye Button
+            const previewBtn = document.createElement('button');
+            previewBtn.type = 'button';
+            previewBtn.className = 'msg-file-action-btn';
+            previewBtn.title = 'View file preview';
+            previewBtn.innerHTML = '<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>';
+            previewBtn.addEventListener('click', (e) => {
+              e.stopPropagation();
+              openUnifiedDocViewer(a, true);
+            });
+            actions.appendChild(previewBtn);
+
+            // Download Button
+            const downloadBtn = document.createElement('button');
+            downloadBtn.type = 'button';
+            downloadBtn.className = 'msg-file-action-btn';
+            downloadBtn.title = 'Download file';
+            downloadBtn.innerHTML = '<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>';
+            downloadBtn.addEventListener('click', (e) => {
+              e.stopPropagation();
+              downloadAttachmentFile(a);
+            });
+            actions.appendChild(downloadBtn);
+
+            card.appendChild(actions);
+
             card.addEventListener('click', () => {
-              if (a.kind === 'text') {
-                openPasteModalFromMessageAttachment(a);
-              } else {
-                openMediaModal(a);
-              }
+              openUnifiedDocViewer(a, true);
             });
 
             cardsWrap.appendChild(card);
@@ -19685,84 +20122,364 @@ d----        13-09-2026     10:30                api
       return html || '&nbsp;';
     }
 
+    // Format file sizes into human-readable strings
+    function formatFileSize(bytes) {
+      if (!bytes || isNaN(bytes)) return '';
+      if (bytes < 1024) return bytes + ' B';
+      if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
+      return (bytes / 1048576).toFixed(1) + ' MB';
+    }
+
+    // Comprehensive File Type Metadata Engine
+    function getFileFormatMeta(fileName, mimeType, isImage, isVideo, isPdf, isText) {
+      const name = (fileName || 'attachment').toLowerCase();
+      const ext = name.includes('.') ? name.split('.').pop() : '';
+
+      // Check specific code, document & data formats first so json/py/csv are never misidentified as images
+      if (['json'].includes(ext)) {
+        return {
+          ext: 'JSON',
+          category: 'data',
+          label: 'JSON Data',
+          themeColor: '#fb923c',
+          themeBg: 'rgba(251, 146, 60, 0.14)',
+          themeBorder: 'rgba(251, 146, 60, 0.35)',
+          iconSvg: '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#fb923c" stroke-width="2"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>'
+        };
+      }
+
+      if (['py', 'ipynb'].includes(ext)) {
+        return {
+          ext: 'PY',
+          category: 'code',
+          label: 'Python Script',
+          themeColor: '#38bdf8',
+          themeBg: 'rgba(56, 189, 248, 0.14)',
+          themeBorder: 'rgba(56, 189, 248, 0.35)',
+          iconSvg: '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#38bdf8" stroke-width="2"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>'
+        };
+      }
+
+      if (['js', 'jsx', 'mjs', 'cjs'].includes(ext)) {
+        return {
+          ext: 'JS',
+          category: 'code',
+          label: 'JavaScript',
+          themeColor: '#facc15',
+          themeBg: 'rgba(250, 204, 21, 0.14)',
+          themeBorder: 'rgba(250, 204, 21, 0.35)',
+          iconSvg: '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#facc15" stroke-width="2"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>'
+        };
+      }
+
+      if (['ts', 'tsx'].includes(ext)) {
+        return {
+          ext: 'TS',
+          category: 'code',
+          label: 'TypeScript',
+          themeColor: '#3b82f6',
+          themeBg: 'rgba(59, 130, 246, 0.14)',
+          themeBorder: 'rgba(59, 130, 246, 0.35)',
+          iconSvg: '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#3b82f6" stroke-width="2"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>'
+        };
+      }
+
+      if (['csv', 'xlsx', 'xls', 'tsv'].includes(ext)) {
+        return {
+          ext: (ext || 'CSV').toUpperCase(),
+          category: 'sheet',
+          label: ext.toUpperCase() === 'CSV' ? 'CSV Dataset' : 'Excel Sheet',
+          themeColor: '#10b981',
+          themeBg: 'rgba(16, 185, 129, 0.14)',
+          themeBorder: 'rgba(16, 185, 129, 0.35)',
+          iconSvg: '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#10b981" stroke-width="2"><path d="M3 3h18v18H3zM3 9h18M3 15h18M9 3v18M15 3v18"></path></svg>'
+        };
+      }
+
+      if (isPdf || ext === 'pdf' || (mimeType && mimeType.includes('pdf'))) {
+        return {
+          ext: 'PDF',
+          category: 'pdf',
+          label: 'PDF Document',
+          themeColor: '#ef4444',
+          themeBg: 'rgba(239, 68, 68, 0.14)',
+          themeBorder: 'rgba(239, 68, 68, 0.35)',
+          iconSvg: '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#ef4444" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>'
+        };
+      }
+
+      if (/\.(png|jpe?g|gif|webp|bmp|svg|ico|tiff)$/i.test(name) || (mimeType && mimeType.startsWith('image/')) || (isImage && !ext)) {
+        return {
+          ext: (ext || 'IMG').toUpperCase(),
+          category: 'image',
+          label: 'Image',
+          themeColor: '#a855f7',
+          themeBg: 'rgba(168, 85, 247, 0.14)',
+          themeBorder: 'rgba(168, 85, 247, 0.35)',
+          iconSvg: '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#a855f7" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>'
+        };
+      }
+
+      if (isPdf || ext === 'pdf' || (mimeType && mimeType.includes('pdf'))) {
+        return {
+          ext: 'PDF',
+          category: 'pdf',
+          label: 'PDF Document',
+          themeColor: '#ef4444',
+          themeBg: 'rgba(239, 68, 68, 0.14)',
+          themeBorder: 'rgba(239, 68, 68, 0.35)',
+          iconSvg: '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#ef4444" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>'
+        };
+      }
+
+      if (isVideo || /\.(mp4|webm|mov|avi|mkv)$/i.test(name) || (mimeType && mimeType.startsWith('video/'))) {
+        return {
+          ext: (ext || 'VID').toUpperCase(),
+          category: 'video',
+          label: 'Video Clip',
+          themeColor: '#ec4899',
+          themeBg: 'rgba(236, 72, 153, 0.14)',
+          themeBorder: 'rgba(236, 72, 153, 0.35)',
+          iconSvg: '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#ec4899" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"></rect><polygon points="10 8 16 12 10 16 10 8" fill="#ec4899"></polygon></svg>'
+        };
+      }
+
+      if (['py', 'ipynb'].includes(ext)) {
+        return {
+          ext: 'PY',
+          category: 'code',
+          label: 'Python Script',
+          themeColor: '#38bdf8',
+          themeBg: 'rgba(56, 189, 248, 0.14)',
+          themeBorder: 'rgba(56, 189, 248, 0.35)',
+          iconSvg: '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#38bdf8" stroke-width="2"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>'
+        };
+      }
+
+      if (['js', 'jsx', 'mjs', 'cjs'].includes(ext)) {
+        return {
+          ext: 'JS',
+          category: 'code',
+          label: 'JavaScript',
+          themeColor: '#facc15',
+          themeBg: 'rgba(250, 204, 21, 0.14)',
+          themeBorder: 'rgba(250, 204, 21, 0.35)',
+          iconSvg: '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#facc15" stroke-width="2"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>'
+        };
+      }
+
+      if (['ts', 'tsx'].includes(ext)) {
+        return {
+          ext: 'TS',
+          category: 'code',
+          label: 'TypeScript',
+          themeColor: '#3b82f6',
+          themeBg: 'rgba(59, 130, 246, 0.14)',
+          themeBorder: 'rgba(59, 130, 246, 0.35)',
+          iconSvg: '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#3b82f6" stroke-width="2"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>'
+        };
+      }
+
+      if (['csv', 'xlsx', 'xls', 'tsv'].includes(ext)) {
+        return {
+          ext: (ext || 'CSV').toUpperCase(),
+          category: 'sheet',
+          label: ext.toUpperCase() === 'CSV' ? 'CSV Dataset' : 'Excel Sheet',
+          themeColor: '#10b981',
+          themeBg: 'rgba(16, 185, 129, 0.14)',
+          themeBorder: 'rgba(16, 185, 129, 0.35)',
+          iconSvg: '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#10b981" stroke-width="2"><path d="M3 3h18v18H3zM3 9h18M3 15h18M9 3v18M15 3v18"></path></svg>'
+        };
+      }
+
+      if (['json'].includes(ext)) {
+        return {
+          ext: 'JSON',
+          category: 'data',
+          label: 'JSON Data',
+          themeColor: '#fb923c',
+          themeBg: 'rgba(251, 146, 60, 0.14)',
+          themeBorder: 'rgba(251, 146, 60, 0.35)',
+          iconSvg: '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#fb923c" stroke-width="2"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>'
+        };
+      }
+
+      if (['html', 'htm'].includes(ext)) {
+        return {
+          ext: 'HTML',
+          category: 'code',
+          label: 'HTML Document',
+          themeColor: '#f97316',
+          themeBg: 'rgba(249, 115, 22, 0.14)',
+          themeBorder: 'rgba(249, 115, 22, 0.35)',
+          iconSvg: '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#f97316" stroke-width="2"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>'
+        };
+      }
+
+      if (['css', 'scss', 'sass', 'less'].includes(ext)) {
+        return {
+          ext: ext.toUpperCase(),
+          category: 'code',
+          label: 'Stylesheet',
+          themeColor: '#06b6d4',
+          themeBg: 'rgba(6, 182, 212, 0.14)',
+          themeBorder: 'rgba(6, 182, 212, 0.35)',
+          iconSvg: '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#06b6d4" stroke-width="2"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>'
+        };
+      }
+
+      if (['doc', 'docx', 'rtf'].includes(ext)) {
+        return {
+          ext: (ext || 'DOC').toUpperCase(),
+          category: 'document',
+          label: 'Word Document',
+          themeColor: '#2563eb',
+          themeBg: 'rgba(37, 99, 235, 0.14)',
+          themeBorder: 'rgba(37, 99, 235, 0.35)',
+          iconSvg: '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#2563eb" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>'
+        };
+      }
+
+      if (['ppt', 'pptx'].includes(ext)) {
+        return {
+          ext: 'PPT',
+          category: 'presentation',
+          label: 'PowerPoint',
+          themeColor: '#ea580c',
+          themeBg: 'rgba(234, 88, 12, 0.14)',
+          themeBorder: 'rgba(234, 88, 12, 0.35)',
+          iconSvg: '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#ea580c" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>'
+        };
+      }
+
+      if (['zip', 'rar', '7z', 'tar', 'gz'].includes(ext)) {
+        return {
+          ext: ext.toUpperCase(),
+          category: 'archive',
+          label: 'Archive Package',
+          themeColor: '#eab308',
+          themeBg: 'rgba(234, 179, 8, 0.14)',
+          themeBorder: 'rgba(234, 179, 8, 0.35)',
+          iconSvg: '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#eab308" stroke-width="2"><polyline points="21 8 21 21 3 21 3 8"></polyline><rect x="1" y="3" width="22" height="5"></rect><line x1="10" y1="12" x2="14" y2="12"></line></svg>'
+        };
+      }
+
+      if (['md', 'markdown'].includes(ext)) {
+        return {
+          ext: 'MD',
+          category: 'document',
+          label: 'Markdown Doc',
+          themeColor: '#818cf8',
+          themeBg: 'rgba(129, 140, 248, 0.14)',
+          themeBorder: 'rgba(129, 140, 248, 0.35)',
+          iconSvg: '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#818cf8" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>'
+        };
+      }
+
+      if (isText || ['txt', 'log', 'env'].includes(ext)) {
+        return {
+          ext: isText ? 'TXT' : (ext.toUpperCase() || 'TXT'),
+          category: 'text',
+          label: isText ? 'Pasted Text' : 'Text Document',
+          themeColor: '#94a3b8',
+          themeBg: 'rgba(148, 163, 184, 0.14)',
+          themeBorder: 'rgba(148, 163, 184, 0.35)',
+          iconSvg: '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#94a3b8" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>'
+        };
+      }
+
+      if (['sql', 'java', 'c', 'cpp', 'h', 'hpp', 'rs', 'go', 'php', 'rb', 'swift', 'kt', 'dart', 'sh', 'bash', 'yaml', 'yml', 'xml'].includes(ext)) {
+        return {
+          ext: ext.toUpperCase(),
+          category: 'code',
+          label: ext.toUpperCase() + ' Code',
+          themeColor: '#38bdf8',
+          themeBg: 'rgba(56, 189, 248, 0.14)',
+          themeBorder: 'rgba(56, 189, 248, 0.35)',
+          iconSvg: '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#38bdf8" stroke-width="2"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>'
+        };
+      }
+
+      return {
+        ext: ext ? ext.slice(0, 4).toUpperCase() : 'FILE',
+        category: 'binary',
+        label: 'Attached File',
+        themeColor: '#64748b',
+        themeBg: 'rgba(100, 116, 139, 0.14)',
+        themeBorder: 'rgba(100, 116, 139, 0.35)',
+        iconSvg: '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#64748b" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>'
+      };
+    }
+
+    // ── Ultra-Sleek Omnibar Attachment Tray (ChatGPT / Claude / Antigravity Style) ──
     function renderAttachments() {
       attachedFilesEl.innerHTML = '';
-      attachedFilesEl.classList.toggle('has-files', attachments.filter(a => a.kind !== 'tool').length > 0);
+      const visibleAtts = attachments.filter(a => a.kind !== 'tool');
+      attachedFilesEl.classList.toggle('has-files', visibleAtts.length > 0);
 
-      attachments.forEach(att => {
-        if (att.kind === 'tool') return;
+      visibleAtts.forEach(att => {
+        const fileName = att.kind === 'text' ? 'Pasted Text' : (att.file ? att.file.name : (att.name || att.label || 'Attachment'));
+        const isImg = Boolean(att.isImage || (att.file && att.file.type && att.file.type.startsWith('image/')) || (att.mimeType && att.mimeType.startsWith('image/')) || /\.(png|jpe?g|gif|webp|bmp|svg)$/i.test(fileName));
+        const isPdfFile = Boolean(att.isPdf || (att.file && att.file.type === 'application/pdf') || /\.(pdf)$/i.test(fileName));
+        const isVid = Boolean(att.isVideo || (att.file && att.file.type && att.file.type.startsWith('video/')));
+        const isTxt = att.kind === 'text';
+        
+        const meta = getFileFormatMeta(fileName, att.mimeType || (att.file ? att.file.type : ''), isImg, isVid, isPdfFile, isTxt);
+        const sizeStr = att.file ? formatFileSize(att.file.size) : (att.size ? formatFileSize(att.size) : (isTxt ? `${att.lineCount || att.content.split('\n').length} lines` : ''));
 
         const card = document.createElement('div');
         card.className = 'attach-card';
+        card.title = `Click to view ${fileName}`;
         card.addEventListener('click', () => {
-          if (att.kind === 'text') openPasteModal(att);
-          else openMediaModal(att);
+          openUnifiedDocViewer(att);
         });
 
-        const preview = document.createElement('div');
-        preview.className = 'attach-card-preview';
+        // Icon / Thumbnail Box
+        const iconBox = document.createElement('div');
+        iconBox.className = 'attach-card-icon-box';
+        iconBox.style.background = meta.themeBg;
+        iconBox.style.border = `1px solid ${meta.themeBorder}`;
+        iconBox.style.color = meta.themeColor;
 
-        if (att.kind === 'text') {
-          preview.classList.add('is-text');
-          const code = document.createElement('div');
-          code.className = 'attach-card-code';
-          const previewLines = att.content.split(/\r\n|\r|\n/).slice(0, 5);
-          code.innerHTML = previewLines.map(highlightPreviewLine).join('<br>') + (att.lineCount > 5 ? '<br>…' : '');
-          preview.appendChild(code);
-        } else if (att.isImage || att.isVideo) {
-          if (att.thumbnail) {
-            const img = document.createElement('img');
-            img.src = att.thumbnail;
-            preview.appendChild(img);
-            if (att.isVideo) {
-              const play = document.createElement('span');
-              play.className = 'attach-card-play';
-              play.innerHTML = '<svg viewBox="0 0 24 24" fill="currentColor"><polygon points="6 3 20 12 6 21 6 3"></polygon></svg>';
-              preview.appendChild(play);
-            }
-          } else if (att.thumbnailFailed) {
-            const glyph = document.createElement('span');
-            glyph.className = 'attach-card-glyph';
-            glyph.textContent = fileExt(att.file.name);
-            preview.appendChild(glyph);
-          } else {
-            const loading = document.createElement('span');
-            loading.className = 'attach-card-loading';
-            loading.textContent = 'Loading…';
-            preview.appendChild(loading);
-          }
+        const thumbSrc = att.thumbnail || (isImg ? (att.dataUrl || att.url) : null);
+        if (isImg && thumbSrc) {
+          const img = document.createElement('img');
+          img.src = thumbSrc;
+          img.alt = fileName;
+          iconBox.appendChild(img);
         } else {
-          const glyph = document.createElement('span');
-          glyph.className = 'attach-card-glyph';
-          glyph.textContent = fileExt(att.file.name);
-          preview.appendChild(glyph);
+          iconBox.innerHTML = meta.iconSvg || `<span style="color:${meta.themeColor}; font-weight:700;">${meta.ext}</span>`;
         }
-        card.appendChild(preview);
+        card.appendChild(iconBox);
 
-        const footer = document.createElement('div');
-        footer.className = 'attach-card-footer';
-        const badge = document.createElement('span');
-        badge.className = 'attach-card-badge';
-        badge.textContent = badgeForAttachment(att);
-        footer.appendChild(badge);
-        if (att.kind !== 'text') {
-          const name = document.createElement('span');
-          name.className = 'attach-card-name';
-          name.textContent = att.file.name;
-          footer.appendChild(name);
-        }
-        card.appendChild(footer);
+        // Metadata Stack
+        const metaStack = document.createElement('div');
+        metaStack.className = 'attach-card-meta';
 
-        const remove = document.createElement('button');
-        remove.type = 'button';
-        remove.className = 'chip-remove';
-        remove.setAttribute('aria-label', 'Remove');
-        remove.textContent = '✕';
-        remove.addEventListener('click', (e) => {
+        const nameEl = document.createElement('span');
+        nameEl.className = 'attach-card-name';
+        nameEl.textContent = fileName;
+        metaStack.appendChild(nameEl);
+
+        const subEl = document.createElement('span');
+        subEl.className = 'attach-card-sub';
+        subEl.innerHTML = `<span style="color:${meta.themeColor}; font-weight:600;">${meta.ext}</span>` + (sizeStr ? `<span class="badge-dot"></span><span>${sizeStr}</span>` : '');
+        metaStack.appendChild(subEl);
+
+        card.appendChild(metaStack);
+
+        // Delete Chip Button
+        const removeBtn = document.createElement('button');
+        removeBtn.type = 'button';
+        removeBtn.className = 'chip-remove';
+        removeBtn.setAttribute('aria-label', 'Remove attachment');
+        removeBtn.innerHTML = '✕';
+        removeBtn.title = 'Remove';
+        removeBtn.addEventListener('click', (e) => {
           e.stopPropagation();
           removeAttachment(att.id);
         });
-        card.appendChild(remove);
+        card.appendChild(removeBtn);
 
         attachedFilesEl.appendChild(card);
       });
@@ -19801,564 +20518,278 @@ d----        13-09-2026     10:30                api
       pasteModalLines.appendChild(frag);
     }
 
-    function openPasteModal(att, readOnly) {
-      pasteModalAttachment = att;
-      pasteModalEditing = false;
-      pasteModalReadOnly = !!readOnly;
-      pasteModalTitle.textContent = 'Pasted text';
-      pasteModalSub.textContent = (att.lineCount || att.content.split(/\r\n|\r|\n/).length) + ' lines';
-      renderPasteModalLines(att.content);
-      pasteModalEditArea.value = att.content;
-      pasteModalEditArea.classList.remove('open');
-      pasteModalLines.classList.remove('hidden');
-      pasteModalEditBtn.querySelector('span').textContent = 'Edit';
-      pasteModalSaveBtn.style.display = 'none';
-      // Messages already sent in the chat thread are read-only — no editing after the fact.
-      pasteModalEditBtn.style.display = pasteModalReadOnly ? 'none' : 'flex';
-      pasteModal.classList.add('open');
-    }
-    function closePasteModal() {
-      pasteModal.classList.remove('open');
-      pasteModalAttachment = null;
-      pasteModalReadOnly = false;
-    }
-    document.getElementById('closePasteModal').addEventListener('click', closePasteModal);
-    pasteModal.addEventListener('click', (e) => { if (e.target === pasteModal) closePasteModal(); });
+    
+    // ══════════════════════════════════════════════════════════════════════════
+    // UNIFIED ULTRA-PREMIUM ARTIFACT & DOCUMENT VIEWER (CLAUDE / CHATGPT GRADE)
+    // ══════════════════════════════════════════════════════════════════════════
+    const docViewerModal = document.getElementById('docViewerModal');
+    const docViewerTitle = document.getElementById('docViewerTitle');
+    const docViewerBadge = document.getElementById('docViewerBadge');
+    const docViewerSize = document.getElementById('docViewerSize');
+    const docViewerType = document.getElementById('docViewerType');
+    const docViewerBody = document.getElementById('docViewerBody');
+    const docViewerWrapBtn = document.getElementById('docViewerWrapBtn');
+    const docViewerEditBtn = document.getElementById('docViewerEditBtn');
+    const docViewerSaveBtn = document.getElementById('docViewerSaveBtn');
+    const docViewerCopyBtn = document.getElementById('docViewerCopyBtn');
+    const docViewerDownloadBtn = document.getElementById('docViewerDownloadBtn');
+    const docViewerOpenLink = document.getElementById('docViewerOpenLink');
+    const closeDocViewerModalBtn = document.getElementById('closeDocViewerModal');
 
-    pasteModalEditBtn.addEventListener('click', () => {
-      if (pasteModalReadOnly) return;
-      pasteModalEditing = !pasteModalEditing;
-      if (pasteModalEditing) {
-        pasteModalEditArea.value = pasteModalAttachment.content;
-        pasteModalEditArea.classList.add('open');
-        pasteModalLines.classList.add('hidden');
-        pasteModalEditBtn.querySelector('span').textContent = 'Cancel';
-        pasteModalSaveBtn.style.display = 'flex';
-        pasteModalEditArea.focus();
-      } else {
-        pasteModalEditArea.classList.remove('open');
-        pasteModalLines.classList.remove('hidden');
-        pasteModalEditBtn.querySelector('span').textContent = 'Edit';
-        pasteModalSaveBtn.style.display = 'none';
-      }
-    });
+    let currentDocAttachment = null;
+    let isDocViewerEditing = false;
+    let isDocViewerReadOnly = false;
+    let isDocViewerWrapped = true;
 
-    pasteModalSaveBtn.addEventListener('click', () => {
-      if (!pasteModalAttachment || pasteModalReadOnly) return;
-      const newContent = pasteModalEditArea.value;
-      pasteModalAttachment.content = newContent;
-      pasteModalAttachment.lineCount = newContent.split(/\r\n|\r|\n/).length;
-      pasteModalEditing = false;
-      pasteModalEditArea.classList.remove('open');
-      pasteModalLines.classList.remove('hidden');
-      pasteModalEditBtn.querySelector('span').textContent = 'Edit';
-      pasteModalSaveBtn.style.display = 'none';
-      pasteModalSub.textContent = pasteModalAttachment.lineCount + ' lines';
-      renderPasteModalLines(newContent);
-      renderAttachments();
-    });
+    function downloadAttachmentFile(att) {
+      if (!att) return;
+      const fileName = att.name || att.label || (att.file ? att.file.name : 'attachment.txt');
+      const content = att.content || att.textContent || '';
+      const url = att.dataUrl || att.url;
 
-    pasteModalCopyBtn.addEventListener('click', () => {
-      if (!pasteModalAttachment) return;
-      const textToCopy = pasteModalEditing ? pasteModalEditArea.value : pasteModalAttachment.content;
-      copyTextToClipboard(textToCopy).then(() => {
-        const label = pasteModalCopyBtn.querySelector('span');
-        const orig = label.textContent;
-        label.textContent = 'Copied';
-        pasteModalCopyBtn.classList.add('copied');
-        setTimeout(() => { label.textContent = orig; pasteModalCopyBtn.classList.remove('copied'); }, 1600);
-      });
-    });
-
-    // ---------- CONVERTED FILE DOWNLOAD TRIGGER ENGINE ----------
-    async function triggerConvertedDownload(sourceUrlOrText, fileName, targetFormat) {
-      const fmt = (targetFormat || 'txt').toLowerCase().trim();
-      const baseName = (fileName || 'converted-file').replace(/\.[^/.]+$/, '').replace(/[^a-zA-Z0-9_-]/g, '_');
-
-      if (['pdf', 'png', 'jpg', 'jpeg', 'webp'].includes(fmt)) {
-        await convertImageToFormat(sourceUrlOrText, fmt, baseName);
-        return;
-      }
-
-      let mimeType = 'text/plain;charset=utf-8';
-      let fileExt = fmt;
-      if (fmt === 'txt' || fmt === 'text') { mimeType = 'text/plain;charset=utf-8'; fileExt = 'txt'; }
-      else if (fmt === 'docx' || fmt === 'doc' || fmt === 'word') { mimeType = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'; fileExt = 'docx'; }
-      else if (fmt === 'csv') { mimeType = 'text/csv;charset=utf-8'; fileExt = 'csv'; }
-      else if (fmt === 'json') { mimeType = 'application/json;charset=utf-8'; fileExt = 'json'; }
-      else if (fmt === 'html' || fmt === 'htm') { mimeType = 'text/html;charset=utf-8'; fileExt = 'html'; }
-      else if (fmt === 'md' || fmt === 'markdown') { mimeType = 'text/markdown;charset=utf-8'; fileExt = 'md'; }
-
-      let fileContent = sourceUrlOrText || '';
-      if (fileExt === 'docx') {
-        const cleanText = fileContent.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-        fileContent = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n<w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:body><w:p><w:r><w:t>${cleanText}</w:t></w:r></w:p></w:body></w:document>`;
-      } else if (fileExt === 'html') {
-        fileContent = '<!DOCTYPE html>\n<html><head><meta charset="utf-8"><title>' + baseName + '</title><style>body{font-family:Inter,sans-serif;padding:30px;line-height:1.6;color:#e0e0e0;background:#0d1117;}pre{background:#161b22;padding:16px;border-radius:8px;overflow-x:auto;}<\/style><\/head><body><pre>' + fileContent + '<\/pre><\/body><\/html>';
-      } else if (fileExt === 'json' && !fileContent.trim().startsWith('{') && !fileContent.trim().startsWith('[')) {
-        fileContent = JSON.stringify({ filename: baseName, content: fileContent }, null, 2);
-      } else if (fileExt === 'csv' && !fileContent.includes(',')) {
-        const lines = fileContent.split('\n').map(l => `"${l.replace(/"/g, '""')}"`);
-        fileContent = `Content\n${lines.join('\n')}`;
-      }
-
-      const blob = new Blob([fileContent], { type: mimeType });
-      const link = document.createElement('a');
-      link.href = URL.createObjectURL(blob);
-      link.download = `${baseName}.${fileExt}`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    }
-
-    // Global registry to safely pass large content (blob URLs, base64 arrays) to download buttons
-    window._convRegistry = window._convRegistry || {};
-
-    window.triggerCardDownload = function (btn) {
-      if (!btn) return;
-      const key = btn.getAttribute('data-conv-key');
-      const r = window._convRegistry ? window._convRegistry[key] : null;
-      if (!r) return;
-      const fmt = (r.targetFormat || '').toLowerCase();
-      if (r.handler === 'convertImagesToSinglePdf') {
-        if (typeof convertImagesToSinglePdf === 'function') convertImagesToSinglePdf(r.content, r.fileName);
-      } else if (fmt === 'pptx') {
-        convertToPptx(r.content, r.fileName);
-      } else if (fmt === 'xlsx') {
-        convertToXlsx(r.content, r.fileName);
-      } else {
-        if (typeof convertImageToFormat === 'function') convertImageToFormat(r.content, r.targetFormat, r.fileName);
-      }
-    };
-
-    // ── PPTX CONVERSION: content (text or dataUrl) → PowerPoint slide deck
-    async function convertToPptx(content, fileName) {
-      if (!window.PptxGenJS) {
-        const s = document.createElement('script');
-        s.src = 'https://cdn.jsdelivr.net/npm/pptxgenjs@3.12.0/dist/pptxgen.bundle.js';
-        document.head.appendChild(s);
-        await new Promise(r => { s.onload = r; s.onerror = r; });
-      }
-      const PptxGenJS = window.PptxGenJS;
-      if (!PptxGenJS) { alert('PptxGenJS library not loaded. Check your internet connection.'); return; }
-      const pres = new PptxGenJS();
-      pres.layout = 'LAYOUT_WIDE';
-
-      if (content && content.startsWith('data:image')) {
-        // Image → single-slide PPT
-        const slide = pres.addSlide();
-        slide.addImage({ data: content, x: 0.5, y: 0.5, w: 8.5, h: 5.5 });
-      } else {
-        // Text → multi-slide PPT (one slide per ~500 chars)
-        const text = content || 'No content';
-        const chunks = [];
-        for (let i = 0; i < text.length; i += 500) chunks.push(text.slice(i, i + 500));
-        chunks.forEach((chunk, idx) => {
-          const slide = pres.addSlide();
-          slide.background = { color: '0d1117' };
-          slide.addText('Slide ' + (idx + 1), { x: 0.5, y: 0.2, w: 8.5, h: 0.4, fontSize: 12, color: '00ffcc', bold: true });
-          slide.addText(chunk, { x: 0.5, y: 0.7, w: 8.5, h: 5, fontSize: 14, color: 'ffffff', wrap: true });
-        });
-      }
-      pres.writeFile({ fileName: fileName || 'converted.pptx' });
-    }
-
-    // ── XLSX CONVERSION: text/csv/json content → Excel spreadsheet
-    function convertToXlsx(content, fileName) {
-      if (!window.XLSX) { alert('SheetJS library not loaded. Check your internet connection.'); return; }
-      let wb;
-      try {
-        // Try parsing as JSON array of objects
-        const parsed = JSON.parse(content);
-        if (Array.isArray(parsed)) {
-          const ws = window.XLSX.utils.json_to_sheet(parsed);
-          wb = window.XLSX.utils.book_new();
-          window.XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
-        } else {
-          throw new Error('not array');
-        }
-      } catch (e) {
-        // Treat as CSV / plain text
-        const ws = window.XLSX.utils.aoa_to_sheet(
-          (content || 'Content').split('\n').map(row => row.split(','))
-        );
-        wb = window.XLSX.utils.book_new();
-        window.XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
-      }
-      window.XLSX.writeFile(wb, fileName || 'converted.xlsx');
-    }
-
-    // Build a clean rectangle DOM card element from a registry key
-    function createCardDOMElement(regKey) {
-      const r = (window._convRegistry || {})[regKey];
-      const fileName = r ? r.fileName : 'Converted File';
-      const fmtUpper = r ? (r.targetFormat || 'FILE').toUpperCase() : 'FILE';
-      const subtitleText = r ? (r.subtitle || ('Format: ' + fmtUpper + ' \u2022 Click to download')) : 'Click to download';
-
-      let icon = '📄';
-      if (['PNG', 'JPG', 'JPEG', 'WEBP'].includes(fmtUpper)) icon = '🖼️';
-      else if (['DOCX', 'WORD', 'DOC'].includes(fmtUpper)) icon = '📝';
-      else if (['CSV', 'JSON'].includes(fmtUpper)) icon = '📊';
-      else if (['PDF'].includes(fmtUpper)) icon = '📑';
-      else if (['HTML', 'HTM'].includes(fmtUpper)) icon = '🌐';
-      else if (['MD', 'MARKDOWN'].includes(fmtUpper)) icon = '📝';
-      else if (['TXT', 'TEXT'].includes(fmtUpper)) icon = '📄';
-
-      const wrap = document.createElement('div');
-      wrap.style.cssText = 'display:flex; align-items:center; gap:10px; margin:10px 0; padding:11px 16px; background:linear-gradient(135deg,rgba(20,28,42,0.96),rgba(10,14,22,0.98)); border:1px solid rgba(0,255,204,0.4); border-radius:12px; box-shadow:0 4px 20px rgba(0,0,0,0.4); max-width:460px; box-sizing:border-box; position:relative; overflow:hidden;';
-
-      // Subtle left accent bar
-      const bar = document.createElement('div');
-      bar.style.cssText = 'position:absolute; left:0; top:0; bottom:0; width:3px; background:linear-gradient(180deg,#00ffcc,#d97757); border-radius:3px 0 0 3px;';
-      wrap.appendChild(bar);
-
-      // Icon
-      const iconEl = document.createElement('div');
-      iconEl.style.cssText = 'width:38px; height:38px; background:rgba(0,255,204,0.1); border:1px solid rgba(0,255,204,0.25); border-radius:9px; display:flex; align-items:center; justify-content:center; font-size:1.2rem; flex-shrink:0; margin-left:4px;';
-      iconEl.textContent = icon;
-      wrap.appendChild(iconEl);
-
-      // Info
-      const info = document.createElement('div');
-      info.style.cssText = 'flex:1; min-width:0; overflow:hidden;';
-      const nameEl = document.createElement('div');
-      nameEl.style.cssText = 'font-family:Inter,sans-serif; font-size:0.84rem; font-weight:700; color:#ffffff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;';
-      nameEl.textContent = fileName;
-      const subEl = document.createElement('div');
-      subEl.style.cssText = 'font-size:0.70rem; color:#7a8ca0; margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;';
-      subEl.textContent = subtitleText;
-      info.appendChild(nameEl);
-      info.appendChild(subEl);
-      wrap.appendChild(info);
-
-      // Download button
-      const btn = document.createElement('button');
-      btn.type = 'button';
-      btn.setAttribute('data-conv-key', regKey);
-      btn.style.cssText = 'all:unset; box-sizing:border-box; padding:7px 15px; background:linear-gradient(135deg,#d97757,#e88868); color:#fff; font-family:Inter,sans-serif; font-size:0.76rem; font-weight:700; border-radius:8px; cursor:pointer; display:inline-flex; align-items:center; gap:5px; flex-shrink:0; box-shadow:0 2px 10px rgba(217,119,87,0.4); transition:all .18s; letter-spacing:0.02em; white-space:nowrap;';
-      btn.innerHTML = '<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Download ' + fmtUpper;
-      btn.onmouseover = () => { btn.style.opacity = '.88'; btn.style.transform = 'translateY(-1px)'; };
-      btn.onmouseout = () => { btn.style.opacity = '1'; btn.style.transform = 'none'; };
-      btn.onclick = () => triggerCardDownload(btn);
-      wrap.appendChild(btn);
-
-      return wrap;
-    }
-
-    function buildConvertedFileCardHTML(fileName, targetFormat, contentOrUrl, customSubtitle = null, customHandler = null) {
-      const regKey = 'conv_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7);
-      window._convRegistry[regKey] = { content: contentOrUrl, fileName, targetFormat, handler: customHandler };
-
-      const fmtUpper = (targetFormat || 'FILE').toUpperCase();
-      let icon = '📄';
-      if (['PNG', 'JPG', 'JPEG', 'WEBP'].includes(fmtUpper)) icon = '🖼️';
-      else if (['DOCX', 'WORD', 'DOC'].includes(fmtUpper)) icon = '📝';
-      else if (['CSV', 'JSON'].includes(fmtUpper)) icon = '📊';
-      else if (['PDF'].includes(fmtUpper)) icon = '📑';
-
-      const subtitleText = customSubtitle || `Format: ${fmtUpper} • Click to download`;
-
-      return `
-      <div class="converted-file-card mini-card" style="margin:8px 0; padding:10px 14px; background:linear-gradient(135deg, rgba(20,28,42,0.92), rgba(12,17,26,0.96)); border:1px solid rgba(0,255,204,0.35); border-radius:10px; box-shadow:0 4px 16px rgba(0,0,0,0.35); display:inline-flex; align-items:center; gap:10px; max-width:100%; box-sizing:border-box;">
-        <div style="width:34px; height:34px; background:rgba(0,255,204,0.12); border:1px solid rgba(0,255,204,0.3); border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:1.15rem; flex-shrink:0;">${icon}</div>
-        <div style="flex:1; min-width:130px; overflow:hidden;">
-          <div style="font-family:Inter, sans-serif; font-size:0.85rem; font-weight:700; color:#ffffff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${fileName}</div>
-          <div style="font-size:0.72rem; color:#8a99ad; margin-top:1px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${subtitleText}</div>
-        </div>
-        <button type="button" data-conv-key="${regKey}" onclick="triggerCardDownload(this)" style="all:unset; box-sizing:border-box; padding:6px 14px; background:linear-gradient(135deg, #d97757, #e88868); color:#fff; font-family:Inter, sans-serif; font-size:0.78rem; font-weight:600; border-radius:7px; cursor:pointer; display:inline-flex; align-items:center; gap:5px; flex-shrink:0; transition:all .18s; box-shadow:0 2px 8px rgba(217,119,87,0.35);" onmouseover="this.style.opacity='.88';this.style.transform='translateY(-1px)'" onmouseout="this.style.opacity='1';this.style.transform='none'">
-          <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-          Download ${fmtUpper}
-        </button>
-      </div>
-    `;
-    }
-
-
-    // ---------- IMAGE & FILE CONVERTER ENGINE (Format Conversion to PDF, PNG, JPG, WEBP) ----------
-    async function convertImageToFormat(imgUrlOrBase64, targetFormat = 'png', filename = 'converted-image') {
-      const toast = document.createElement('div');
-      toast.style.cssText = 'position:fixed; bottom:24px; right:24px; z-index:99999; background:#1a2332; border:1px solid #00ffcc; color:#ffffff; font-family:Inter,sans-serif; font-size:0.8rem; font-weight:600; padding:10px 18px; border-radius:10px; box-shadow:0 10px 30px rgba(0,0,0,0.5); display:flex; align-items:center; gap:8px;';
-      toast.innerHTML = `<span>🔄</span> <span>Converting to ${targetFormat.toUpperCase()} & downloading...</span>`;
-      document.body.appendChild(toast);
-
-      const removeToast = () => { setTimeout(() => toast.remove(), 2500); };
-
-      const fmt = (targetFormat || 'png').toLowerCase().trim();
-      const baseName = (filename || 'converted-image').replace(/\.[^/.]+$/, '').replace(/[^a-zA-Z0-9_-]/g, '_');
-
-      // Detect if source is plain text (from a PDF/DOCX read), not an image URL/base64
-      const isTextContent = typeof imgUrlOrBase64 === 'string' &&
-        !imgUrlOrBase64.startsWith('data:image') &&
-        !imgUrlOrBase64.startsWith('blob:') &&
-        !imgUrlOrBase64.startsWith('http') &&
-        imgUrlOrBase64.length > 0;
-
-      try {
-        // Ensure jsPDF library is loaded if converting to PDF
-        if (fmt === 'pdf' && (!window.jspdf || !window.jspdf.jsPDF)) {
-          await new Promise((resolve, reject) => {
-            const s = document.createElement('script');
-            s.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
-            s.onload = resolve;
-            s.onerror = reject;
-            document.head.appendChild(s);
-          }).catch(e => console.warn('jsPDF load error:', e));
-        }
-
-        // ---- TEXT CONTENT → PDF (using jsPDF text mode) ----
-        if (isTextContent && fmt === 'pdf') {
-          const { jsPDF } = window.jspdf || {};
-          if (!jsPDF) throw new Error('jsPDF not loaded');
-          const doc = new jsPDF('p', 'pt', 'a4');
-          const pageW = doc.internal.pageSize.getWidth();
-          const pageH = doc.internal.pageSize.getHeight();
-          const margin = 40;
-          const maxLineW = pageW - margin * 2;
-          doc.setFont('helvetica', 'normal');
-          doc.setFontSize(11);
-          const lines = doc.splitTextToSize(imgUrlOrBase64, maxLineW);
-          let y = margin + 16;
-          lines.forEach(line => {
-            if (y > pageH - margin) { doc.addPage(); y = margin + 16; }
-            doc.text(line, margin, y);
-            y += 14;
-          });
-          doc.save(`${baseName}.pdf`);
-          toast.innerHTML = `✅ Downloaded <strong>${baseName}.pdf</strong>`;
-          removeToast();
-          return;
-        }
-
-        // ---- TEXT CONTENT → TXT (plain text direct download) ----
-        if (isTextContent && ['txt', 'text'].includes(fmt)) {
-          const blob = new Blob([imgUrlOrBase64], { type: 'text/plain;charset=utf-8' });
-          const link = document.createElement('a');
-          link.href = URL.createObjectURL(blob);
-          link.download = `${baseName}.txt`;
-          document.body.appendChild(link);
-          link.click();
-          document.body.removeChild(link);
-          toast.innerHTML = `✅ Downloaded <strong>${baseName}.txt</strong>`;
-          removeToast();
-          return;
-        }
-
-        // ---- IMAGE URL/BASE64 → TARGET FORMAT (canvas-based) ----
-        let srcUrl = imgUrlOrBase64;
-        if (typeof imgUrlOrBase64 === 'string' && (imgUrlOrBase64.startsWith('http://') || imgUrlOrBase64.startsWith('https://'))) {
-          try {
-            const resp = await fetch(imgUrlOrBase64, { mode: 'cors' });
-            if (resp.ok) {
-              const blob = await resp.blob();
-              srcUrl = URL.createObjectURL(blob);
-            }
-          } catch (fetchErr) {
-            console.warn('Direct image fetch fallback:', fetchErr);
-          }
-        }
-
-        await new Promise((resolve, reject) => {
-          const img = new Image();
-          img.onload = () => {
-            const canvas = document.createElement('canvas');
-            canvas.width = img.naturalWidth || img.width || 1024;
-            canvas.height = img.naturalHeight || img.height || 768;
-            const ctx = canvas.getContext('2d');
-            ctx.fillStyle = '#FFFFFF';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-            ctx.drawImage(img, 0, 0);
-
-            if (fmt === 'pdf') {
-              try {
-                const { jsPDF } = window.jspdf || {};
-                if (jsPDF) {
-                  const orientation = canvas.width > canvas.height ? 'l' : 'p';
-                  const doc = new jsPDF(orientation, 'pt', [canvas.width, canvas.height]);
-                  const imgData = canvas.toDataURL('image/jpeg', 0.92);
-                  doc.addImage(imgData, 'JPEG', 0, 0, canvas.width, canvas.height);
-                  doc.save(`${baseName}.pdf`);
-                  toast.innerHTML = `✅ Converted & Downloaded <strong>${baseName}.pdf</strong>`;
-                  removeToast();
-                  resolve();
-                  return;
-                }
-              } catch (pdfErr) {
-                console.warn('jsPDF error:', pdfErr);
-              }
-            }
-
-            let mimeType = 'image/png';
-            let ext = 'png';
-            if (fmt === 'jpg' || fmt === 'jpeg') { mimeType = 'image/jpeg'; ext = 'jpg'; }
-            else if (fmt === 'webp') { mimeType = 'image/webp'; ext = 'webp'; }
-            else if (fmt === 'png') { mimeType = 'image/png'; ext = 'png'; }
-
-            canvas.toBlob((blob) => {
-              if (!blob) {
-                toast.innerHTML = `❌ Conversion failed`;
-                removeToast();
-                reject(new Error('Conversion failed'));
-                return;
-              }
-              const link = document.createElement('a');
-              link.href = URL.createObjectURL(blob);
-              link.download = `${baseName}.${ext}`;
-              document.body.appendChild(link);
-              link.click();
-              document.body.removeChild(link);
-              toast.innerHTML = `✅ Converted & Downloaded <strong>${baseName}.${ext}</strong>`;
-              removeToast();
-              resolve();
-            }, mimeType, 0.95);
-          };
-          img.onerror = reject;
-          img.src = srcUrl;
-        });
-      } catch (err) {
-        toast.innerHTML = `❌ Failed to convert: ${err.message || 'unknown error'}`;
-        removeToast();
+      if (url && (url.startsWith('blob:') || url.startsWith('http') || url.startsWith('data:'))) {
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = fileName;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+      } else if (content) {
+        const blob = new Blob([content], { type: att.mimeType || 'text/plain;charset=utf-8' });
+        const blobUrl = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = blobUrl;
+        a.download = fileName;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        setTimeout(() => URL.revokeObjectURL(blobUrl), 1000);
       }
     }
 
-    // ---------- MULTI-IMAGE SINGLE PDF GENERATOR ENGINE ----------
-    async function convertImagesToSinglePdf(imageSources, filename = 'converted-document') {
-      if (!Array.isArray(imageSources) || !imageSources.length) return;
+    function openUnifiedDocViewer(att, readOnly) {
+      if (!att) return;
+      currentDocAttachment = att;
+      isDocViewerEditing = false;
+      isDocViewerReadOnly = !!readOnly;
 
-      const toast = document.createElement('div');
-      toast.style.cssText = 'position:fixed; bottom:24px; right:24px; z-index:99999; background:#1a2332; border:1px solid #00ffcc; color:#ffffff; font-family:Inter,sans-serif; font-size:0.8rem; font-weight:600; padding:10px 18px; border-radius:10px; box-shadow:0 10px 30px rgba(0,0,0,0.5); display:flex; align-items:center; gap:8px;';
-      toast.innerHTML = `<span>🔄</span> <span>Converting ${imageSources.length} image(s) into 1 PDF...</span>`;
-      document.body.appendChild(toast);
+      const fileName = att.name || att.label || (att.file ? att.file.name : (att.kind === 'text' ? 'pasted_text.txt' : 'Attachment'));
+      const ext = fileName.includes('.') ? fileName.split('.').pop().toLowerCase() : '';
+      const isCodeOrDocExt = ['json', 'js', 'ts', 'py', 'html', 'css', 'csv', 'xlsx', 'pdf', 'docx', 'doc', 'txt', 'md', 'xml', 'sql', 'c', 'cpp', 'java', 'rs', 'go', 'php'].includes(ext);
+      const isImg = !isCodeOrDocExt && Boolean(att.isImage || att.kind === 'image' || (att.mimeType && att.mimeType.startsWith('image/')) || /\.(png|jpe?g|gif|webp|bmp|svg)$/i.test(fileName) || (att.dataUrl && typeof att.dataUrl === 'string' && att.dataUrl.startsWith('data:image')));
+      const isPdfFile = Boolean(att.isPdf || (att.mimeType && att.mimeType.includes('pdf')) || /\.(pdf)$/i.test(fileName));
+      const isVid = Boolean(att.isVideo || (att.mimeType && att.mimeType.startsWith('video/')));
+      const isTxt = att.kind === 'text';
 
-      const removeToast = () => { setTimeout(() => toast.remove(), 2500); };
+      const meta = getFileFormatMeta(fileName, att.mimeType || (att.file ? att.file.type : ''), isImg, isVid, isPdfFile, isTxt);
+      const textBody = att.content || att.textContent || (att.file && typeof att.file === 'string' ? att.file : '');
+      const sizeStr = att.file ? formatFileSize(att.file.size) : (att.size ? formatFileSize(att.size) : (textBody ? formatFileSize(new Blob([textBody]).size) : ''));
 
-      try {
-        if (!window.jspdf || !window.jspdf.jsPDF) {
-          await new Promise((resolve, reject) => {
-            const s = document.createElement('script');
-            s.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
-            s.onload = resolve;
-            s.onerror = reject;
-            document.head.appendChild(s);
-          }).catch(e => console.warn('jsPDF load error:', e));
-        }
-
-        const { jsPDF } = window.jspdf || {};
-        if (!jsPDF) throw new Error('jsPDF library not loaded');
-
-        let pdfDoc = null;
-        const baseName = (filename || 'converted-document').replace(/\.[^/.]+$/, '').replace(/[^a-zA-Z0-9_-]/g, '_');
-
-        for (let i = 0; i < imageSources.length; i++) {
-          const src = imageSources[i];
-          const loadedImg = await new Promise((resolve) => {
-            const img = new Image();
-            img.onload = () => resolve(img);
-            img.onerror = () => resolve(null);
-            img.src = src;
-          });
-
-          if (!loadedImg) continue;
-
-          const canvas = document.createElement('canvas');
-          canvas.width = loadedImg.naturalWidth || loadedImg.width || 1024;
-          canvas.height = loadedImg.naturalHeight || loadedImg.height || 768;
-          const ctx = canvas.getContext('2d');
-          ctx.fillStyle = '#FFFFFF';
-          ctx.fillRect(0, 0, canvas.width, canvas.height);
-          ctx.drawImage(loadedImg, 0, 0);
-
-          const orientation = canvas.width > canvas.height ? 'l' : 'p';
-          const imgData = canvas.toDataURL('image/jpeg', 0.92);
-
-          if (!pdfDoc) {
-            pdfDoc = new jsPDF(orientation, 'pt', [canvas.width, canvas.height]);
-            pdfDoc.addImage(imgData, 'JPEG', 0, 0, canvas.width, canvas.height);
-          } else {
-            pdfDoc.addPage([canvas.width, canvas.height], orientation);
-            pdfDoc.addImage(imgData, 'JPEG', 0, 0, canvas.width, canvas.height);
-          }
-        }
-
-        if (!pdfDoc) throw new Error('Could not process image files');
-
-        pdfDoc.save(`${baseName}.pdf`);
-        toast.innerHTML = `✅ Converted & Downloaded <strong>${baseName}.pdf</strong> (${imageSources.length} page${imageSources.length > 1 ? 's' : ''})`;
-        removeToast();
-      } catch (err) {
-        toast.innerHTML = `❌ Failed to create PDF: ${err.message || 'unknown error'}`;
-        removeToast();
+      // Configure Header
+      if (docViewerTitle) docViewerTitle.textContent = fileName;
+      if (docViewerBadge) {
+        docViewerBadge.textContent = meta.ext;
+        docViewerBadge.style.background = meta.themeBg;
+        docViewerBadge.style.borderColor = meta.themeBorder;
+        docViewerBadge.style.color = meta.themeColor;
       }
-    }
+      if (docViewerSize) docViewerSize.textContent = sizeStr || 'Attachment';
+      if (docViewerType) docViewerType.textContent = meta.label || 'File';
 
-    // Expose conversion functions globally so inline onclick in download cards can call them
-    window.convertImageToFormat = convertImageToFormat;
-    window.convertImagesToSinglePdf = convertImagesToSinglePdf;
-    window.triggerConvertedDownload = triggerConvertedDownload;
+      // Controls visibility
+      if (docViewerWrapBtn) docViewerWrapBtn.style.display = (isImg || isVid || isPdfFile) ? 'none' : 'inline-flex';
+      if (docViewerEditBtn) docViewerEditBtn.style.display = (!isDocViewerReadOnly && (isTxt || meta.category === 'code' || meta.category === 'text')) ? 'inline-flex' : 'none';
+      if (docViewerSaveBtn) docViewerSaveBtn.style.display = 'none';
+      if (docViewerCopyBtn) docViewerCopyBtn.style.display = (isImg || isVid) ? 'none' : 'inline-flex';
+      if (docViewerDownloadBtn) docViewerDownloadBtn.style.display = 'inline-flex';
 
-
-
-    // ---------- Image / video / file preview modal ----------
-    const mediaModal = document.getElementById('mediaModal');
-    const mediaModalTitle = document.getElementById('mediaModalTitle');
-    const mediaModalBody = document.getElementById('mediaModalBody');
-
-    function openMediaModal(att) {
-      const fileName = att.name || att.label || (att.file ? att.file.name : 'Attachment');
-      mediaModalTitle.textContent = fileName;
-      mediaModalBody.innerHTML = '';
-
-      const isImageFile = Boolean(att.isImage || att.kind === 'image' || (att.mimeType && att.mimeType.startsWith('image/')) || /\.(png|jpe?g|gif|webp|bmp|svg)/i.test(fileName) || /\.(png|jpe?g|gif|webp|bmp|svg)/i.test(att.url || '') || (att.url && (att.url.startsWith('http') || att.url.startsWith('data:image') || att.url.startsWith('blob:'))));
       const mediaUrl = att.dataUrl || att.url || att.thumbnail;
-
-      if (isImageFile && mediaUrl) {
-        const img = document.createElement('img');
-        img.src = mediaUrl;
-        img.alt = fileName;
-        img.style.cssText = 'width:100%; max-height:75vh; object-fit:contain; border-radius:10px; display:block; background:#05070a; box-shadow:0 12px 36px rgba(0,0,0,0.7); padding:8px;';
-        mediaModalBody.appendChild(img);
-      } else if (att.isVideo) {
-        const video = document.createElement('video');
-        video.src = mediaUrl;
-        video.controls = true;
-        video.autoplay = true;
-        video.playsInline = true;
-        if (att.thumbnail) video.poster = att.thumbnail;
-        video.style.cssText = 'width:100%; max-height:70vh; border-radius:10px; display:block; background:#000;';
-        mediaModalBody.appendChild(video);
-      } else {
-        const ext = (fileName.split('.').pop() || 'file').toUpperCase();
-        const label = document.createElement('div');
-        label.style.cssText = 'font-family:Inter, sans-serif; font-weight:600; color:var(--text-primary); margin-bottom:6px;';
-        label.textContent = ext + ' file';
-        mediaModalBody.appendChild(label);
-
-        if (att.textContent) {
-          const textPre = document.createElement('pre');
-          textPre.style.cssText = 'max-height:60vh; overflow-y:auto; background:var(--bg-panel-alt); padding:12px; border-radius:8px; font-family:JetBrains Mono, monospace; font-size:0.8rem; color:var(--text-primary); white-space:pre-wrap;';
-          textPre.textContent = att.textContent;
-          mediaModalBody.appendChild(textPre);
+      if (docViewerOpenLink) {
+        if (mediaUrl && (mediaUrl.startsWith('http') || mediaUrl.startsWith('blob:') || mediaUrl.startsWith('data:'))) {
+          docViewerOpenLink.href = mediaUrl;
+          docViewerOpenLink.style.display = 'inline-flex';
         } else {
-          const note = document.createElement('div');
-          note.style.cssText = 'font-family:Inter, sans-serif; font-size:0.82rem; color:var(--text-muted); line-height:1.5; margin-bottom:12px;';
-          note.textContent = "This file is attached and processed by Cognisphere AI.";
-          mediaModalBody.appendChild(note);
-          if (mediaUrl) {
-            const openLink = document.createElement('a');
-            openLink.href = mediaUrl;
-            openLink.target = '_blank';
-            openLink.rel = 'noopener';
-            openLink.textContent = 'Open file';
-            openLink.style.cssText = 'display:inline-block; color:var(--gold-soft); font-family:Inter, sans-serif; font-size:0.82rem; text-decoration:underline;';
-            mediaModalBody.appendChild(openLink);
-          }
+          docViewerOpenLink.style.display = 'none';
         }
       }
-      mediaModal.classList.add('open');
+
+      // Render Body Content
+      if (docViewerBody) {
+        docViewerBody.innerHTML = '';
+
+        if (isImg && mediaUrl) {
+          // 1. IMAGE LIGHTBOX
+          const container = document.createElement('div');
+          container.className = 'doc-image-viewer-container';
+          const img = document.createElement('img');
+          img.src = mediaUrl;
+          img.alt = fileName;
+          container.appendChild(img);
+          docViewerBody.appendChild(container);
+
+        } else if (isVid && mediaUrl) {
+          // 2. VIDEO PLAYER
+          const video = document.createElement('video');
+          video.src = mediaUrl;
+          video.controls = true;
+          video.autoplay = true;
+          video.playsInline = true;
+          video.style.cssText = 'width:100%; height:100%; max-height:75vh; object-fit:contain; background:#000; display:block;';
+          docViewerBody.appendChild(video);
+
+        } else if (meta.ext === 'CSV' && textBody && textBody.includes(',')) {
+          // 3. CSV TABULAR VIEWER
+          const wrap = document.createElement('div');
+          wrap.className = 'doc-table-viewer-wrap';
+          const table = document.createElement('table');
+          table.className = 'doc-table-viewer';
+
+          const rows = textBody.replace(/^--- [^\n]+ ---\n?/, '').replace(/--- END [^\n]+ ---\n?/, '').trim().split(/\r?\n/);
+          if (rows.length > 0) {
+            const thead = document.createElement('thead');
+            const headTr = document.createElement('tr');
+            const cols = rows[0].split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
+            
+            const numTh = document.createElement('th');
+            numTh.textContent = '#';
+            numTh.style.width = '40px';
+            headTr.appendChild(numTh);
+
+            cols.forEach(c => {
+              const th = document.createElement('th');
+              th.textContent = c.replace(/^"|"$/g, '').trim();
+              headTr.appendChild(th);
+            });
+            thead.appendChild(headTr);
+            table.appendChild(thead);
+
+            const tbody = document.createElement('tbody');
+            rows.slice(1, 200).forEach((r, idx) => {
+              const tr = document.createElement('tr');
+              const numTd = document.createElement('td');
+              numTd.style.color = '#484f58';
+              numTd.style.fontFamily = 'monospace';
+              numTd.textContent = idx + 1;
+              tr.appendChild(numTd);
+
+              const cells = r.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
+              cells.forEach(c => {
+                const td = document.createElement('td');
+                td.textContent = c.replace(/^"|"$/g, '').trim();
+                tr.appendChild(td);
+              });
+              tbody.appendChild(tr);
+            });
+            table.appendChild(tbody);
+          }
+          wrap.appendChild(table);
+          docViewerBody.appendChild(wrap);
+
+        } else if (isPdfFile && mediaUrl && mediaUrl.startsWith('blob:')) {
+          // 4. PDF VIEWER (Direct Embedded PDF)
+          const pdfWrap = document.createElement('div');
+          pdfWrap.className = 'doc-pdf-viewer-container';
+          const iframe = document.createElement('iframe');
+          iframe.className = 'doc-pdf-iframe';
+          iframe.src = mediaUrl;
+          pdfWrap.appendChild(iframe);
+          docViewerBody.appendChild(pdfWrap);
+
+        } else {
+          // 5. CODE / TEXT / MARKDOWN / EXTRACTED PDF VIEWER WITH LINE NUMBERS
+          const viewerContainer = document.createElement('div');
+          viewerContainer.className = 'doc-code-viewer-container';
+
+          const contentLines = (textBody || 'No preview available.').split(/\r?\n/);
+          const gutter = document.createElement('div');
+          gutter.className = 'doc-code-gutter';
+          gutter.innerHTML = contentLines.map((_, i) => `<div class="doc-code-gutter-line">${i + 1}</div>`).join('');
+
+          const codePre = document.createElement('pre');
+          codePre.className = 'doc-code-content' + (isDocViewerWrapped ? ' wrap-lines' : '');
+          codePre.id = 'docViewerCodePre';
+          codePre.textContent = textBody;
+
+          viewerContainer.appendChild(gutter);
+          viewerContainer.appendChild(codePre);
+          docViewerBody.appendChild(viewerContainer);
+        }
+      }
+
+      if (docViewerModal) docViewerModal.classList.add('open');
+    }
+
+    function closeUnifiedDocViewer() {
+      if (docViewerModal) docViewerModal.classList.remove('open');
+      currentDocAttachment = null;
+      isDocViewerEditing = false;
+    }
+
+    if (closeDocViewerModalBtn) closeDocViewerModalBtn.addEventListener('click', closeUnifiedDocViewer);
+    if (docViewerModal) {
+      docViewerModal.addEventListener('click', (e) => {
+        if (e.target === docViewerModal) closeUnifiedDocViewer();
+      });
+    }
+
+    // Toggle Word Wrap
+    if (docViewerWrapBtn) {
+      docViewerWrapBtn.addEventListener('click', () => {
+        isDocViewerWrapped = !isDocViewerWrapped;
+        const codePre = document.getElementById('docViewerCodePre');
+        if (codePre) codePre.classList.toggle('wrap-lines', isDocViewerWrapped);
+        docViewerWrapBtn.style.color = isDocViewerWrapped ? '#00ffaa' : '';
+      });
+    }
+
+    // Copy Content
+    if (docViewerCopyBtn) {
+      docViewerCopyBtn.addEventListener('click', () => {
+        if (!currentDocAttachment) return;
+        const textToCopy = currentDocAttachment.content || currentDocAttachment.textContent || '';
+        if (textToCopy) {
+          copyTextToClipboard(textToCopy).then(() => {
+            const span = docViewerCopyBtn.querySelector('span');
+            if (span) {
+              const orig = span.textContent;
+              span.textContent = 'Copied!';
+              docViewerCopyBtn.style.borderColor = '#00ffaa';
+              docViewerCopyBtn.style.color = '#00ffaa';
+              setTimeout(() => {
+                span.textContent = orig;
+                docViewerCopyBtn.style.borderColor = '';
+                docViewerCopyBtn.style.color = '';
+              }, 1600);
+            }
+          });
+        }
+      });
+    }
+
+    // Download File
+    if (docViewerDownloadBtn) {
+      docViewerDownloadBtn.addEventListener('click', () => {
+        downloadAttachmentFile(currentDocAttachment);
+      });
+    }
+
+    // Forward legacy modal openers to unified viewer
+    function openMediaModal(att) {
+      openUnifiedDocViewer(att);
     }
     function closeMediaModal() {
-      mediaModal.classList.remove('open');
-      mediaModalBody.innerHTML = '';
+      closeUnifiedDocViewer();
     }
+    function openPasteModal(att, readOnly) {
+      openUnifiedDocViewer(att, readOnly);
+    }
+    function closePasteModal() {
+      closeUnifiedDocViewer();
+    }
+    function openPasteModalFromMessageAttachment(att) {
+      openUnifiedDocViewer(att, true);
+    }
+
     document.getElementById('closeMediaModal').addEventListener('click', closeMediaModal);
     mediaModal.addEventListener('click', (e) => {
       if (e.target === mediaModal) { closeMediaModal(); }
